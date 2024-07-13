@@ -38,5 +38,5 @@ socials = [
     { name = "linkedin", url = "https://twitter.com/not_matthias", icon = "linkedin" },
 ]
 
-
-# See this for more options: https://github.com/not-matthias/apollo/blob/main/config.toml#L14
+[extra.analytics.goatcounter]
+user = "kchitnis"
