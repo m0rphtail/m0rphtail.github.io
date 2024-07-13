@@ -32,12 +32,14 @@ mathjax_dollar_inline_enable = true
 
 menu = [
     { name = "/blogs", url = "/posts", weight = 1 },
+    { name = "/about", url = "about", weight = 2},
 ]
 
 socials = [
     { name = "twitter", url = "https://twitter.com/morphtail", icon = "twitter" },
     { name = "github", url = "https://github.com/m0rphtail/", icon = "github" },
     { name = "linkedin", url = "https://linkedin.com/in/kshitijchitnis", icon = "linkedin" },
+    { name = "email", url = "mailto:chitniskshitij@gmail.com", icon = "email" },
 ]
 
 [extra.analytics]
