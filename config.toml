@@ -4,9 +4,10 @@ title = "kchitnis"
 description = "Kshitij Chitnis's blog website"
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
+minify_html = true
 
 # Whether to build a search index to be used later on by a JavaScript library
-build_search_index = true
+build_search_index = false
 
 theme = "apollo"
 taxonomies = [{ name = "tags" }]
@@ -20,19 +21,19 @@ highlight_theme = "ayu-light"
 [extra]
 # Put all your custom variables here
 
-#toc =true
-use_cdn = false
+toc = false
+use_cdn = true
 theme = "auto"
 favicon = "favicon.ico"
 comment = false
-fancy_code = true
-dynamic_note = true           # a note that can be toggled
+fancy_code = false
+dynamic_note = false           # a note that can be toggled
 mathjax = true
 mathjax_dollar_inline_enable = true
 
 menu = [
     { name = "/blogs", url = "/blogs", weight = 1 },
-    { name = "/about", url = "about", weight = 2},
+    { name = "/about", url = "/about", weight = 2},
 ]
 
 socials = [
