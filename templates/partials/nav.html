@@ -4,7 +4,7 @@
 
         <div class="socials">
             {% for social in config.extra.socials | default(value=[]) %}
-            <a rel="me" href="{{ social.url }}" class="social">
+            <a rel="me" href="{{ social.url }}" target="_blank" class="social">
                 <img alt={{ social.name }} src={{ get_url(path="social_icons/" ~ social.icon ~ ".svg") }}>
             </a>
             {% endfor %}
