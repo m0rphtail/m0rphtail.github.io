@@ -1,5 +1,5 @@
 +++
-paginate_by = 7
+paginate_by = 9
 title = "blogs"
 sort_by = "date"
 

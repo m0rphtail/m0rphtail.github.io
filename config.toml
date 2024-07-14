@@ -31,7 +31,7 @@ mathjax = true
 mathjax_dollar_inline_enable = true
 
 menu = [
-    { name = "/blogs", url = "/posts", weight = 1 },
+    { name = "/blogs", url = "/blogs", weight = 1 },
     { name = "/about", url = "about", weight = 2},
 ]
 
