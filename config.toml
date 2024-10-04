@@ -33,7 +33,8 @@ mathjax_dollar_inline_enable = true
 
 menu = [
     { name = "/blogs", url = "/blogs", weight = 1 },
-    { name = "/about", url = "/about", weight = 2},
+    { name = "/resume", url = "/resume", weight = 2},
+    { name = "/art", url = "/art", weight = 3},
 ]
 
 socials = [

@@ -3,29 +3,10 @@ title= "Kshitij Chitnis"
 template = "homepage.html"
 +++
 
-<!-- New York | +1 (551) 344-6216 | chitniskshitij@gmail.com -->
+`About Me:`
 
-> A developer, hacker, CTF player and learner, with a masters in Cybersecurity and experience as a CyberSecurity Analyst and Penetration Tester. Also a huge GNU/linux fanatic and FOSS evangelist.
+My journey into cybersecurity began with childhood curiosity - a desire to understand how things work. From dismantling toys to exploring websites, my interests naturally evolved into coding and ethical hacking. This passion led me through a Bachelor's in Information Technology and a Master's in Cybersecurity from Stevens Institute of Technology. 
 
-# Skills
-- **Programming Languages:** Assembly, Bash, C, C++, Go, Java, Javascript, Perl, Python, Ruby, Rust, SQL.
-- **Platforms:** Linux, Windows, MacOS, AWS, GCP, Azure, Active Directory, FortiGate, Docker.
-- **Tools:** Git, Ghidra, GDB, IDA, BurpSuite, Metasploit, Wireshark, IBM Qradar, Splunk, Shodan, NetCat, Nessus, Nikto, Hydra, Yara.
-- **Frameworks:** NIST Cybersecurity Framework (CSF), OWASP Top 10, MITRE ATT&CK, ISO 27001, SANS, Cyber Kill Chain.
-- **Others:** IR, SOC, EDR, SIEM, Github, GitLab, IAM, SOAR, Automation, Log Analysis.
+Each step has been a humble learning experience, reminding me of the vast knowledge still to be discovered in this field. Even now, I'm constantly learning, eager to explore new technologies and methodologies. 
 
-# Certifications
-- CompTIA Security+
-- Fortinet Certified Associate in Cybersecurity
-- Google Cybersecurity
-- IBM Cybersecurity Analyst
-
-<!-- # Education
-
-- Stevens Institute of Technology, Hoboken, NJ
-    Masters of Science, Cybersecurity
-
-- Pune University, Pune, India
-    Bachelors of Engineering, Information Technology
-
-# Work Experience -->
+As I continue to navigate the intricate landscape of cybersecurity, I'm driven by the thrill of the unknown and the pursuit of innovative solutions to the world's most pressing security challenges.
