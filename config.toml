@@ -35,6 +35,7 @@ menu = [
     { name = "/blogs", url = "/blogs", weight = 1 },
     { name = "/resume", url = "/resume", weight = 2},
     { name = "/art", url = "/art", weight = 3},
+    { name = "/music", url = "/music", weight =4}
 ]
 
 socials = [

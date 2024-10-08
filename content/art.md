@@ -2,8 +2,6 @@
 title = "art"
 +++
 
-Some of my digital and 3D art.
-
 ![alt text](/images/man.webp)
 
 ![alt text](/images/desert1.webp)
