@@ -27,7 +27,7 @@ Pune University, Pune, India
 ---
 ## Work Experience
 
-# Threat Detection Enginee @ FileHive.io 
+# Threat Detection Analyst @ FileHive.io 
 - Created custom detections using threat feed sources, managed version lifecycles in a GitHub repository, and leveraged Git and GitHub Actions.
 - Used honeypots (T-Pot and RDP) to collect basic threat telemetry and leveraged Red Canary's Atomic Red Team for pre-deployed, mapped tests.
 - Utilized Terraform for infrastructure provisioning and Ansible for configuring the ELK stack, ensuring a minimal reproducible detections environment.

@@ -8,7 +8,7 @@ zola serve
 Deploy:
 ```
 zola build
-git -a .
+git add .
 git commit -m "build"
 git push
 ```
