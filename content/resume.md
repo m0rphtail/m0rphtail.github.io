@@ -6,8 +6,8 @@ title = "Kshitij Chitnis"
 ---
 ## Skills
 - **Programming Languages:** Assembly, Bash, C, C++, Go, Java, Javascript, Perl, Python, Ruby, Rust, SQL.
-- **Platforms:** Linux, Windows, MacOS, AWS, GCP, Azure, Active Directory, FortiGate, Docker.
-- **Tools:** Git, Ghidra, GDB, IDA, BurpSuite, Metasploit, Wireshark, IBM Qradar, Splunk, Shodan, NetCat, Nessus, Nikto, Hydra, Yara.
+- **Platforms:** Linux, Windows, MacOS, AWS, GCP, Azure Sentinel, Active Directory, FortiGate, Docker, Palo Alto Firewall, Akamai, Theia.
+- **Tools:** Git, Ghidra, GDB, IDA, BurpSuite, Metasploit, Wireshark, IBM Qradar, Splunk, Shodan, NetCat, Nessus, Nikto, Hydra, Yara, Symantec, Crowdstrike, XSOAR.
 - **Frameworks:** NIST Cybersecurity Framework (CSF), OWASP Top 10, MITRE ATT&CK, ISO 27001, SANS, Cyber Kill Chain.
 - **Others:** IR, SOC, EDR, SIEM, Github, GitLab, IAM, SOAR, Automation, Log Analysis.
 ---
@@ -20,12 +20,23 @@ title = "Kshitij Chitnis"
 ## Education
 
 - **Masters of Science, Cybersecurity** \
-Stevens Institute of Technology, Hoboken, NJ 
+Stevens Institute of Technology, Hoboken, NJ, USA 
 
 - **Bachelors of Engineering, Information Technology** \
 Pune University, Pune, India
 ---
 ## Work Experience
+
+# Information Security Analyst I @ TD Bank
+- Investigate Cybersecurity Incidents and Cybersecurity Events and preform root cause analysis.
+- Collect indicators and escalate finding for containment and recovery
+- Contribute to the definition, development, and oversight of a global security management strategy and frameworks.
+- Ensure technology, processes, and governance are in place to monitor, detect, prevent, and react to both current and emerging technology and security threats against the business.
+- Contribute to development of on-going operational enhancements for Cybersecurity including alerting, monitoring, and detection across multiple security domains.
+- Adhere to internal policies and procedures, technology control standards, and applicable regulatory guidelines.
+- Contribute to the review of internal processes and activities and assist in identifying potential opportunities for improvement.
+- Adhere to, advise, oversee, monitor and enforce enterprise frameworks and methodologies that relate to technology controls / information security activities.
+- Reduce risk and foster a strong technology risk management culture throughout the enterprise.
 
 # Threat Detection Analyst @ FileHive.io 
 - Created custom detections using threat feed sources, managed version lifecycles in a GitHub repository, and leveraged Git and GitHub Actions.
@@ -67,5 +78,5 @@ subdomains.
 ---
 ## Awards
 - Awarded a prize in the highly competitive Cytaka New York Capture The Flag (CTF) cybersecurity challenge.
-- As part of an elite CTF team, secured the top global ranking on CTFTime.
+- As part of an elite CTF team, secured the top global ranking on CTF-Time.
 - Achieved a solo rank in the top 14.8% at the DownUnderCTF and ranked within the top 11.6% at the H@ctivityCon CTF.
