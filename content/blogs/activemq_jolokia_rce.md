@@ -1,5 +1,5 @@
 +++
-title = "The ActiveMQ Bug That Hid in Plain Sight for 13 Years — Until an LLM Read the Config"
+title = "The ActiveMQ Bug That Hid in Plain Sight for 13 Years — Until Claude Read the Config"
 date = "2026-04-07"
 +++
 
