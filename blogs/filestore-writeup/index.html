@@ -1,0 +1,67 @@
+<!doctype html><html class="dark light" lang=en><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="width=device-width,initial-scale=1.0" name=viewport><meta content=https://kchitnis.com name=base><title>
+            
+                Filestore Writeup (Google CTF 2021)
+            
+        </title><meta content="Filestore Writeup (Google CTF 2021)" property=og:title><meta content="Kshitij Chitnis's blog website" property=og:description><meta content="Kshitij Chitnis's blog website" name=description><link href=https://kchitnis.com/favicon.ico rel=icon type=image/png><link crossorigin href=https://cdn.jsdelivr.net rel=preconnect><link href=https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono.min.css rel=stylesheet><link href=https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@4.5.8/index.min.css rel=stylesheet><script async data-goatcounter=https://kchitnis.goatcounter.com/count src=https://kchitnis.com/js/count.js></script><noscript><img src="https://kchitnis.goatcounter.com//count?p=/blogs/filestore-writeup/&t=Filestore Writeup (Google CTF 2021)"></noscript><script>MathJax = {
+                tex: {
+                    inlineMath: [
+                        ['$', '$'],
+                        ['\\(', '\\)']
+                    ]
+                }
+            };</script><script async id=MathJax-script src=https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js></script><link media="(prefers-color-scheme: dark)" href=https://kchitnis.com/giallo-dark.css rel=stylesheet><link media="(prefers-color-scheme: light)" href=https://kchitnis.com/giallo-light.css rel=stylesheet><link href=https://kchitnis.com/theme/light.css rel=stylesheet><link media="(prefers-color-scheme: dark)" href=https://kchitnis.com/theme/dark.css rel=stylesheet><script src=https://kchitnis.com/js/themetoggle.js></script><script>if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    setTheme("dark");
+                } else {
+                    setTheme("light");
+                }</script><link href=https://kchitnis.com/main.css media=screen rel=stylesheet><link href=https://kchitnis.com/custom.css rel=stylesheet><body><div class=left-content></div><div class=content><nav><div class=left-nav><a href=https://kchitnis.com>kchitnis</a><div class=socials><a rel="me noopener" class=social href=https://github.com/m0rphtail/ target=_blank> <img alt=github src=https://kchitnis.com/icons/social/github.svg> </a><a rel="me noopener" class=social href=https://x.com/MorphTail target=_blank> <img alt=twitter src=https://kchitnis.com/icons/social/twitter.svg> </a><a rel="me noopener" class=social href=https://linkedin.com/in/kshitijchitnis target=_blank> <img alt=linkedin src=https://kchitnis.com/icons/social/linkedin.svg> </a><a rel="me noopener" class=social href=mailto:chitniskshitij@gmail.com target=_blank> <img alt=email src=https://kchitnis.com/icons/social/email.svg> </a></div></div><div class=right-nav><a href=https://kchitnis.com/blogs style=margin-right:.5em>/blogs</a><a href=https://kchitnis.com/resume style=margin-right:.5em>/resume</a><a href=https://kchitnis.com/art style=margin-right:.5em>/art</a><a href=https://kchitnis.com/music style=margin-right:.5em>/music</a></div></nav><div data-selector="main article p" class=visible-element-observer-root><main><article><div class=title><div class=page-header>Filestore Writeup (Google CTF 2021)</div><div class=meta>Posted on <time>2021-07-19</time> :: Updated on <time>2024-07-12</time></div></div><section class=body><h2 id=description><a aria-label="Anchor link for: description" class=zola-anchor href=#description>Description</a></h2><p>We stored our flag on this platform, but forgot to save the id. Can you help us restore it?<p><code>filestore.2021.ctfcompetition.com 1337</code><h2 id=solution><a aria-label="Anchor link for: solution" class=zola-anchor href=#solution>Solution</a></h2><p>Let's analyze the challenge<pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>$ nc filestore.2021.ctfcompetition.com 1337</span></span>
+<span class=giallo-l><span>== proof-of-work: disabled ==</span></span>
+<span class=giallo-l><span>Welcome to our file storage solution.</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>Menu:</span></span>
+<span class=giallo-l><span>- load</span></span>
+<span class=giallo-l><span>- store</span></span>
+<span class=giallo-l><span>- status</span></span>
+<span class=giallo-l><span>- exit</span></span></code></pre><p>So we can<ul><li><code>load</code> -> retrieve the stored text using the id</ul><pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>Send me the file id...</span></span>
+<span class=giallo-l><span>QpNmkzQzzHy4SV8i</span></span>
+<span class=giallo-l><span>123</span></span></code></pre><ul><li><code>store</code> -> store some text</ul><pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>Send me a line of data...</span></span>
+<span class=giallo-l><span>123</span></span>
+<span class=giallo-l><span>Stored! Here's your file id:</span></span>
+<span class=giallo-l><span>QpNmkzQzzHy4SV8i</span></span></code></pre><ul><li><code>status</code> -> view the memory status</ul><pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>User: ctfplayer</span></span>
+<span class=giallo-l><span>Time: Sun Jul 18 20:11:24 2021</span></span>
+<span class=giallo-l><span>Quota: 0.026kB/64.000kB</span></span>
+<span class=giallo-l><span>Files: 1</span></span></code></pre><ul><li><code>exit</code> -> close the connection</ul><p>Before analyzing the given file we started to make some test and found that if we enter <code>CTF{</code> the <code>Quota</code> value didn't change<pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>$ nc filestore.2021.ctfcompetition.com 1337</span></span>
+<span class=giallo-l><span>== proof-of-work: disabled ==</span></span>
+<span class=giallo-l><span>Welcome to our file storage solution.</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>Menu:</span></span>
+<span class=giallo-l><span>- load</span></span>
+<span class=giallo-l><span>- store</span></span>
+<span class=giallo-l><span>- status</span></span>
+<span class=giallo-l><span>- exit</span></span>
+<span class=giallo-l><span>status</span></span>
+<span class=giallo-l><span>User: ctfplayer</span></span>
+<span class=giallo-l><span>Time: Sun Jul 18 20:16:51 2021</span></span>
+<span class=giallo-l><span>Quota: 0.026kB/64.000kB</span></span>
+<span class=giallo-l><span>Files: 1</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>Menu:</span></span>
+<span class=giallo-l><span>- load</span></span>
+<span class=giallo-l><span>- store</span></span>
+<span class=giallo-l><span>- status</span></span>
+<span class=giallo-l><span>- exit</span></span>
+<span class=giallo-l><span>store</span></span>
+<span class=giallo-l><span>Send me a line of data...</span></span>
+<span class=giallo-l><span>CTF{</span></span>
+<span class=giallo-l><span>Stored! Here's your file id:</span></span>
+<span class=giallo-l><span>kVLwEEpyVwpqwoI4</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>Menu:</span></span>
+<span class=giallo-l><span>- load</span></span>
+<span class=giallo-l><span>- store</span></span>
+<span class=giallo-l><span>- status</span></span>
+<span class=giallo-l><span>- exit</span></span>
+<span class=giallo-l><span>status</span></span>
+<span class=giallo-l><span>User: ctfplayer</span></span>
+<span class=giallo-l><span>Time: Sun Jul 18 20:16:59 2021</span></span>
+<span class=giallo-l><span>Quota: 0.026kB/64.000kB</span></span>
+<span class=giallo-l><span>Files: 2</span></span></code></pre><p>So maybe we can bruteforce one character of the flag per time I use this bash command and find each character in the flag. x_x<pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>$ echo "store\nCTF{\nstatus\nexit" | nc filestore.2021.ctfcompetition.com 1337 | grep Quota</span></span></code></pre><h4 id=flag-ctf-cr1m3-0f-d3dup1ic4ti0n><a aria-label="Anchor link for: flag-ctf-cr1m3-0f-d3dup1ic4ti0n" class=zola-anchor href=#flag-ctf-cr1m3-0f-d3dup1ic4ti0n><strong>FLAG >></strong> <code>CTF{CR1M3_0f_d3dup1ic4ti0n}</code></a></h4></section></article></main></div></div><div class=right-content></div>

@@ -1,0 +1,122 @@
+/* kchitnis.com theme override — restore the pre-upgrade look on top of the updated apollo theme */
+
+/* Blue primary (was #ef5350 in upstream) — use :root.light/:root.dark to match
+   the theme's own specificity (html.light loses to :root.light) */
+:root.light, :root.dark, :root {
+  --primary-color: #0096c7;
+}
+
+/* Fonts: back to Jetbrains Mono body + Space Grotesk headers (upstream switched to Zed) */
+:root, html.light, html.dark {
+  --text-font: 'Jetbrains Mono';
+  --header-font: 'Space Grotesk', 'Helvetica', sans-serif;
+  --code-font: 'Jetbrains Mono';
+  --mono-text-font: 'Jetbrains Mono';
+}
+
+/* Old line-height and page width */
+html {
+  line-height: 1.6em;
+}
+:root {
+  --line-height: 1.6;
+  --page-width: 1000px;
+}
+
+/* Old font-size scaling (16.5px @640, 17px @720, 18px @960) */
+@media all and (min-width: 640px) {
+  html { font-size: 16.5px; }
+}
+@media all and (min-width: 720px) {
+  html { font-size: 17px; }
+}
+@media all and (min-width: 960px) {
+  html { font-size: 18px; }
+}
+
+/* Old link underline */
+a {
+  border-bottom: 3px solid var(--primary-color);
+  position: relative;
+  z-index: 1;
+}
+a.zola-anchor {
+  border-bottom: none;
+}
+
+/* No underline on social icon links (as in the old theme) */
+.social {
+  border-bottom: unset;
+  background-image: unset;
+  padding: 2px;
+}
+
+/* Kill the theme's global img border-radius on social icons —
+   at 16px it rounds the square LinkedIn/email glyphs into circles */
+.social img {
+  border-radius: 0;
+}
+
+/* Old hr */
+hr {
+  border: 0;
+  border-top: 3px solid var(--border-color);
+  margin: 1em 0;
+}
+
+/* Old time color */
+time {
+  color: grey;
+}
+
+/* Old post list spacing and title size */
+.post-list .list-item, .tag-list .list-item {
+  margin-bottom: 45px;
+}
+.post-header h1 {
+  margin: 0;
+  font-size: 130%;
+  font-weight: bold;
+}
+.post-header h1 a {
+  border-bottom: none;
+}
+
+/* Old content padding */
+.content {
+  padding: 0 24px;
+}
+
+/* Inline code: light pastel blue (accent #0096c7, lightened) */
+:not(pre) > code {
+  color: #00b4d8;
+}
+
+/* ── Responsive fixes ─────────────────────────────────────────────
+   The new theme uses content-box sizing; with width:100% + padding
+   the .content box overflowed the viewport (718px + 48px padding =
+   766px in a 749px body) and text bled off-screen. Restore the old
+   theme's border-box model and let the flex children shrink. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: clip;
+}
+
+.content {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* Stack the layout on narrow screens: hide the empty side columns
+   and let the content take the full width */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+  }
+  .left-content, .right-content {
+    display: none;
+  }
+}
