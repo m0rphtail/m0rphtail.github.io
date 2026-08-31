@@ -1,5 +1,5 @@
 +++
-title = "eBPF Rootkits Don't Fool the Kernel — They Fool the Tools You Trust to Read It"
+title = "eBPF Rootkits Don't Fool the Kernel, They Fool the Tools You Trust to Read It"
 date = "2026-07-27"
 +++
 
