@@ -51,6 +51,12 @@ a.zola-anchor {
   padding: 2px;
 }
 
+/* Kill the theme's global img border-radius on social icons —
+   at 16px it rounds the square LinkedIn/email glyphs into circles */
+.social img {
+  border-radius: 0;
+}
+
 /* Old hr */
 hr {
   border: 0;
