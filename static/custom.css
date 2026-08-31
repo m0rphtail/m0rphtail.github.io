@@ -86,3 +86,32 @@ time {
 .content {
   padding: 0 24px;
 }
+
+/* ── Responsive fixes ─────────────────────────────────────────────
+   The new theme uses content-box sizing; with width:100% + padding
+   the .content box overflowed the viewport (718px + 48px padding =
+   766px in a 749px body) and text bled off-screen. Restore the old
+   theme's border-box model and let the flex children shrink. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: clip;
+}
+
+.content {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+/* Stack the layout on narrow screens: hide the empty side columns
+   and let the content take the full width */
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+  }
+  .left-content, .right-content {
+    display: none;
+  }
+}
