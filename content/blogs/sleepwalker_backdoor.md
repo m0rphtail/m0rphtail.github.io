@@ -13,7 +13,7 @@ I read it twice. The second read was slower.
 
 The DLL exports the same seven data protection functions as the real `dpapi.dll` and carries a version resource copied from ESET Management Agent. Side-loading into `ERAAgent.exe` relies on Windows DLL search order, not a flaw in ESET's product. Writing the file into the application directory requires local admin an operator already holds. As Reichel notes, there's nothing to patch here. The response to a confirmed match is incident response and a rebuild.
 
-ESET isn't new territory for this. Kaspersky caught ToddyCat abusing a search-order flaw in ESET's command-line scanner to load a malicious DLL. Side-loading the vendor's own agent is a different, and in some ways worse, trick: The host process is signed, trusted, present on every protected endpoint, and it auto-starts. The malware couldn't ask for a better home.
+ESET isn't new territory for this. Kaspersky caught ToddyCat abusing a search-order flaw in ESET's command-line scanner to load a malicious DLL. Side-loading the vendor's own agent is a different, and in some ways worse, trick: the host process is signed, trusted, present on every protected endpoint, and it auto-starts. The malware couldn't ask for a better home.
 
 ## The trigger
 

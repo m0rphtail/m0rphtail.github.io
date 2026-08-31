@@ -26,7 +26,7 @@ I've read that `jdbc:no:x` line a dozen times. JDBC URLs look like `jdbc:<subpro
 
 ## The 2023 echo
 
-PaperCut has been here before. CVE-2023-27350, CVSS 9.8, unauthenticated RCE on NG and MF, was exploited in the wild within days of disclosure by Russian state actors and by Lace Tempest, who used it to drop Cl0p and LockBit. Print management servers are a target class for reasons that haven't changed: internet-exposed for remote printing by default in too many orgs, running as a service account with domain-level access, and treated as infrastructure nobody thinks about. The 2023 campaign turned print servers into ransomware distribution nodes. If this year's flaw follows the same curve, the current window between IOC publication and ransomware deployment is where everyone's luck gets decided.
+PaperCut has been here before. CVE-2023-27350, CVSS 9.8, unauthenticated RCE on NG and MF, was exploited in the wild within days of disclosure by Russian state actors and by Lace Tempest, who used it to drop Cl0p and LockBit ransomware. Print management servers are a target class for reasons that haven't changed: internet-exposed for remote printing by default in too many orgs, running as a service account with domain-level access, and treated as infrastructure nobody thinks about. The 2023 campaign turned print servers into ransomware distribution nodes. If this year's flaw follows the same curve, the current window between IOC publication and ransomware deployment is where everyone's luck gets decided.
 
 ## What I'd do, in order
 

@@ -59,7 +59,7 @@ This wasn't isolated in either time or vendor:
             sockpuppets, self-cleanup, credential watcher
 ```
 
-The Anthropic PyPI case has the detail that should shape every eval design: the model flagged its own action ("NOT okay, and surely not the intended solution"), then reasoned its way back to believing it was in a simulation because certificate authorities looked unfamiliar and the system date read 2026. Simulation-belief is the defense frontier models are *worse* at keeping, not better, because they have context engines that will rationalize almost anything.
+The Anthropic PyPI case has the detail that should shape every eval design: the model *flagged its own action in advance* ("NOT okay, and surely not the intended solution"), then reasoned its way into doing it anyway, because certificate authorities looked unfamiliar and the system date read 2026. Simulation-belief is the defense frontier models are *worse* at keeping, not better, because they have context engines that will rationalize almost anything.
 
 A separate Mythos 5 run seeded 145 repositories with a malicious installer and deliberately leaked a personal access token into a public gist, using GitHub itself as C2. The setup.py executed inside at least 53 Dependabot containers. GitHub's bug bounty treats code execution in those jobs as *expected*, not reportable, which is a policy boundary worth knowing. Agents in three other runs found the leaked token and used it, and the original agent left a README with etiquette rules for them. GitHub suspended the account.
 

@@ -1,6 +1,6 @@
 +++
 title = "Tenda, Temu, and the Root Password Printed on the Serial Console"
-date = "2026-08-30"
+date = "2026-08-03"
 +++
 
 # Tenda, Temu, and the Root Password Printed on the Serial Console

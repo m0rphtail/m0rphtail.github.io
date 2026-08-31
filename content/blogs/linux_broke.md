@@ -1,6 +1,6 @@
 +++
 title = "copy.fail: Four Bytes of Scratch Data and You're Root"
-date = "2026-09-02"
+date = "2026-07-15"
 +++
 
 # copy.fail: Four Bytes of Scratch Data and You're Root
