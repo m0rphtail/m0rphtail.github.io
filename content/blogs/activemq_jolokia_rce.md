@@ -3,8 +3,6 @@ title = "The ActiveMQ Bug That Hid in Plain Sight for 13 Years — Until an LLM 
 date = "2026-04-07"
 +++
 
-# The ActiveMQ Bug That Hid in Plain Sight for 13 Years — Until an LLM Read the Config
-
 CVE-2026-34197 dropped in April, and its nickname says most of what you need to know: "10 Minutes with Claude." It's a 13-year-old remote code execution bug in Apache ActiveMQ Classic, and the person who found it didn't find it in the traditional sense — an LLM did, on a first pass through the source. The human's job was validating the finding, chaining it into a working exploit, and writing it up. By most estimates, the discovery itself was 80% Claude.
 
 ## A patch that left the door unlocked
