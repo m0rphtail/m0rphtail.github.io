@@ -23,7 +23,7 @@ streak-metricsazb@1.0.0             streak-kit-map@1.0.0
 
 The delivery mechanic is the sharpest part. The entry file `dist/index.mjs` re-exports the real date helpers and launches the bundled implant the moment the module loads. No install hook, no exported function to call, no postinstall script for the registry to flag. From Trend's report: "a single import anywhere in the dependency graph, even a transitive one, is enough to execute the payload."
 
-Read that again with your dependency tree in mind. Not *your* import. Anyone's.
+Keep your dependency tree in mind here. Not *your* import. Anyone's.
 
 ## The payload
 

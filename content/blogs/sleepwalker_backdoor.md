@@ -49,7 +49,7 @@ The host indicators, verbatim:
 
 The writeup ships a YARA rule and a read-only PowerShell scanner that checks all of it. That's the right way to publish.
 
-## My read
+## Conclusion
 
 No infrastructure to sinkhole, no beacon to detect, no handshake to fingerprint. It just listens, on interfaces you already trust, inside a process your EDR almost certainly whitelists, and does nothing until its operator decides otherwise.
 

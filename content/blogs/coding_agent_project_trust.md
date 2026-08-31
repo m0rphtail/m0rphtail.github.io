@@ -71,6 +71,6 @@ So the rule changes from "review the repo" to "treat project trust like running 
 
 For the Contagious Interview pattern specifically: a take-home that requires cloning a repo and trusting it in an agent is a red flag on its own. Legitimate interviews do not need your agent to run untrusted code.
 
-## My read
+## Conclusion
 
 The interesting part is how the defense evolved. Codex put hooks behind a review gate, and the research moved sideways to MCP. That is the pattern of this whole space: every control creates a new hiding place, and the hiding places are all "features" that assign executable meaning to project content. The only durable defense is isolation, not inspection. Treat the repo as hostile until proven otherwise, because the agent's trust prompt is not a security boundary, it is a UX feature.

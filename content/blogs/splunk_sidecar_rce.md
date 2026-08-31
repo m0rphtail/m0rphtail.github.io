@@ -73,7 +73,7 @@ import os; os.system("id > /opt/splunk/share/splunk/search_mrsparkle/exposed/wat
 
 And `watchTowr.txt` appeared in the webroot. Pre-auth RCE on the default AWS deployment of the most common SIEM on the planet.
 
-## What I took from it
+## Conclusion
 
 Three things, in the order they hit me.
 

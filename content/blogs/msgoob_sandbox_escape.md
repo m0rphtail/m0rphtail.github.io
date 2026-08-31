@@ -34,7 +34,7 @@ The mechanics: an OOB message sits in the receive queue as a normal SKB, with th
 
 The fix was only backported to 6.9.8, so older LTS branches were safe from the buggy fix. That's a detail worth remembering: the bug was introduced by a fix, and the fix's backport discipline accidentally protected most users.
 
-## The exploit journey
+## The exploit path
 
 The writeup's real value is the middle: what it takes to turn that UAF into kernel code execution from inside a renderer sandbox. The exploit needed heap grooming to reallocate the freed SKB, delay injection to win races, and a second memory corruption bug found by code review, all chained through 8 syscalls. The second bug needed exactly the right sequence, which is why fuzzing missed it: the chance of a fuzzer chaining the right syscalls in the right order drops exponentially with each additional syscall.
 
@@ -44,7 +44,7 @@ Two takeaways from the exploit work stuck with me:
 
 **Usercopy hardening is a speed bump, not a wall.** The checks on `copy_to_user()` from arbitrary kernel addresses were annoying but workable, since access to almost anything except type-specific SLUB pages is allowed.
 
-## What I take from it
+## Conclusion
 
 The conclusion Jann draws is the one I'd underline: Chrome's Linux renderer sandbox exposes kernel attack surface that is never legitimately used in the sandbox. `MSG_OOB` isn't used by Chrome, isn't used by almost anyone, and was still reachable from inside the sandbox because the sandbox filters syscalls, not flags. The kernel contributes by exposing esoteric features through the same syscalls as core functionality.
 

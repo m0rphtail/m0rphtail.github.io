@@ -35,7 +35,7 @@ NullReceiver buys stealth by shrinking capacity. EtherHiding smuggles a full URL
 
 The attribution chain is the usual one: Guardio Labs documented EtherHiding in October 2023; GTIG tied its use by DPRK groups to Contagious Interview, the campaign that approaches security and crypto people on LinkedIn with job offers and "assessment" coding tasks that deploy malware. The victims of this delivery mechanism are exactly the people reading this blog post, which is why I bother writing it.
 
-## What I take from it
+## Conclusion
 
 Blockchain-backed C2 removes "seize the server" from the playbook permanently. What's left is at the endpoint: why is a UI package resolving ENS or hitting Ethereum RPC? That's a behavior question, and it's answerable with dependency review and egress monitoring rather than indicators, because the infrastructure is infinite and fresh.
 

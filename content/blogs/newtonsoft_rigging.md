@@ -23,7 +23,7 @@ var settings = new JsonSerializerSettings();
 JsonConvert.DefaultSettings = () => settings;   // ← backdoor arms HERE
 ```
 
-The malicious behavior begins only after the host initializes `JsonConvert.DefaultSettings`, can only succeed on systems exposing the target's specific game backend method, and only fires after a randomized delay. The analysis put it plainly: non-targeted consumers see a working JSON library and no rigging behavior, which is exactly what makes the typosquat so effective.
+The malicious behavior begins only after the host initializes `JsonConvert.DefaultSettings`, can only succeed on systems exposing the target's specific game backend method, and only fires after a randomized delay. Non-targeted consumers see a working JSON library and no rigging behavior, which is exactly what makes the typosquat so effective.
 
 Run it in a sandbox: functional date math, no network, no obvious ugliness. Static analysis: it's a real fork of a real library with real commits. Reputation checks: 1,200 downloads, plausible version numbers. Nothing fires because nothing is wrong, unless you're Digitain.
 
@@ -37,7 +37,7 @@ The version history is the author iterating under real conditions:
 
 The rigged results went to `185.126.237.64:5341`, wearing the header `X-Seq-ApiKey: theper...25`, dressed as telemetry. Digitain says it knew and has taken steps, with the full extent of exposure unknown.
 
-## My read
+## Conclusion
 
 Two things stick with me.
 

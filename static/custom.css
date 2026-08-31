@@ -87,6 +87,11 @@ time {
   padding: 0 24px;
 }
 
+/* Inline code: light pastel orange */
+:not(pre) > code {
+  color: #ffb26b;
+}
+
 /* ── Responsive fixes ─────────────────────────────────────────────
    The new theme uses content-box sizing; with width:100% + padding
    the .content box overflowed the viewport (718px + 48px padding =

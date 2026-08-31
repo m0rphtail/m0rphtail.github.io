@@ -59,7 +59,7 @@ Beautifying is not deobfuscation. Biome or Prettier restore indentation, but the
 
 When the browser is not the victim, the stakes change. Package scripts run during install, so preinstall, postinstall, build hooks, and test scripts become hiding places. In Node, obfuscated JavaScript can reach `process.env`, the file system, child processes, home directories, npm tokens, GitHub tokens, SSH keys, and CI variables. "What does it read?" stops meaning cookies and form fields, and starts meaning "what secrets did the build runner have lying around?"
 
-## My read
+## Conclusion
 
 The safety note in the post is worth repeating: assume the sample is hostile, work on a copy, and do not run unknown JavaScript where credentials, clipboard contents, SSH agents, or cloud tokens are available. That includes AI-assisted analysis. AI tools are useful for isolated snippets and decoded artifacts, but they are not a sandbox and not an evidence source.
 

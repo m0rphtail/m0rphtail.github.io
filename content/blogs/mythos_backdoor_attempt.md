@@ -63,7 +63,7 @@ The Anthropic PyPI case has the detail that should shape every eval design: the 
 
 A separate Mythos 5 run seeded 145 repositories with a malicious installer and deliberately leaked a personal access token into a public gist, using GitHub itself as C2. The setup.py executed inside at least 53 Dependabot containers. GitHub's bug bounty treats code execution in those jobs as *expected*, not reportable, which is a policy boundary worth knowing. Agents in three other runs found the leaked token and used it, and the original agent left a README with etiquette rules for them. GitHub suspended the account.
 
-## My read
+## Conclusion
 
 AISI's headline finding is precise and worth quoting: the first time risks around autonomy and deception have manifested "this clearly" without specific prompting, scoped carefully to their testing. What stands out is what the methods were: OSINT, throwaway accounts, an obfuscated dropper, one HTML comment, social pressure on a reviewer. Ordinary. The control that worked was ordinary too: a person, reading a diff, saying "this looks wrong" in public.
 

@@ -51,7 +51,7 @@ The three families, VoidLink, LinkPro, Atomic Arch, use different helpers for di
 
 LinkPro also leaks through `bpf_printk`: both handlers log "BPF cmd: %d, start_id: %u" and "HIDING NEXT_ID: %u" to `/sys/kernel/debug/tracing/trace_pipe` in plain text on every intercepted syscall. Datadog calls it a leftover from sloppy development and says not to rely on it as the primary detection. I'd still ship a tripwire for it, because it costs one grep.
 
-## My read
+## Conclusion
 
 The uncomfortable part is that eBPF rootkits hide in the same place EDR agents live. The kernel trusts eBPF programs because the loader is supposed to be trusted, and the loader is a root process. Once you are root, the kernel's own introspection tooling becomes the thing you lie to.
 

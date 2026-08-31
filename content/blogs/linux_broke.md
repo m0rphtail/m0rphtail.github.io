@@ -55,6 +55,6 @@ The published PoC ships the shellcode gzipped, which is a size convenience for t
 
 The mainline commit (A664B in the revert chain) removes the 2017 in-place optimization that let input and output scatterlists alias. Defensively, if AEAD is a loadable module on your distro, you can blacklist and block autoload, which is the option that works this month. If it's compiled in, you're waiting for the kernel that ships the revert.
 
-## My read
+## Conclusion
 
 Every universal LPE is a story about a contract that holds everywhere except where it matters. The AEAD contract says input pages are read-only. A 2017 optimization broke it in one narrow case (scratch writes past the tag), and everyone's threat model for that case was "it's our own crypto state, who cares." The answer turned out to be "page cache, so everyone." The phrase "one of the most beautiful exploits I've seen in a while" stuck with me. I get it. The primitive is four bytes. The architecture that makes four bytes fatal is a decade old, shipped in every distro, and reads like an engineering joke: the write the kernel never meant to be a write, pointed at the file the kernel never checks because it's cache, not memory. There's a whole genre now, copy.fail, Dirty Pipe, Dirty Cow, of "write four bytes into where the kernel keeps its copy of the truth." Detecting the exploit isn't the game. Patching cadence is, and this one had a decade of runway before anyone looked.

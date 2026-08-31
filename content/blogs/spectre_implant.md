@@ -31,7 +31,7 @@ UAT-10147 targets internet-facing IIS and Linux servers, and the monetization is
 
 The tooling spread is the story: custom SPECTRE, the Specter rootkit, BadIIS, QuasarRAT with a campaign ID containing a derogatory string about Vietnamese elderly, Gh0stCringe embedded as shellcode in a custom Go loader, plus open-source LPE tools like GodPotato and juicypotato. A full ecosystem, some custom, some borrowed, all orchestrated.
 
-## What I take from it
+## Conclusion
 
 The BYOVD pattern is the part I'd flag for anyone running Windows servers. RTCore64 and DBUtil have been signed, abused, revoked, and abused again for years, and they're still the go-to for killing EDR. If your EDR doesn't monitor driver loads, it can be turned off by a driver that Microsoft already knows about. The detection is driver-load telemetry, not malware signatures.
 

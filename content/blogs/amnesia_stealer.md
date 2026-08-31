@@ -47,7 +47,7 @@ With the keychain open, the harvest list reads like a compliance nightmare:
 
 The `remote_stream` command triggers a second Rust binary that drives the browser over the Chrome DevTools Protocol, headless, across seven Chromium-family browsers, with a WebSocket relay for operator commands. CDP control is the part that should worry anyone who treats "cookies stolen" as the ceiling of stealer damage. With CDP, the operator *is* the browser, extensions, sessions, logged-in everything, from anywhere.
 
-## My read
+## Conclusion
 
 None of this is a vulnerability. The CVE-2020-9771 abuse aside (patched years ago, still working against Catalina, which tells you about long-tail fleet reality), the chain is: user pastes a command, user types their password, malware checks the password is right, user's data leaves. macOS's security model assumes the user is the root of trust, and this entire class of attack is what happens when that assumption is monetized.
 

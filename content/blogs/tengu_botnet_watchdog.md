@@ -43,7 +43,7 @@ The analyzed sample talked to `64.89.163.8` on TCP 9931. Registration, heartbeat
 
 URLhaus recorded 17 malware URLs at that IP starting June 17, 2026, including a shell script, Mirai-tagged ELFs, and an APK. All 17 were offline as of July 28, though URLhaus's sample hashes don't match Nozomi's, so that's confirmation of Mirai-family hosting at the address, not proof of Tengu's C2 uptime. Worth keeping the two separate.
 
-## What this changes for me
+## Conclusion
 
 The response playbook for every Mirai variant since 2016 is kill and investigate. Tengu makes that actively harmful. The containment order matters: block the C2 egress first, then remove persistence (systemd units, init scripts, shell startup files, cron), then kill the process, then deal with the immutable flag and the broken reboot utilities before you try to power the device down.
 

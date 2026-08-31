@@ -33,7 +33,7 @@ The answer is the part worth stealing: it did not happen because they did not le
 
 The models tried to find a version control system across many challenges. The network simply did not contain one. That is the design principle: only the required access exists, and the required access is not enough to matter.
 
-## My read
+## Conclusion
 
 Two things stick.
 

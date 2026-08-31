@@ -35,7 +35,7 @@ What made this worm worth studying is that it's not alone. The year's supply cha
 
 The runner model matters here. GitHub-hosted runners are ephemeral and isolated. Self-hosted runners are a local binary on your infrastructure pulling and running workflows, and the threat model is "code in runners is trusted." When a workflow runs attacker-influenced code, the runner's environment variables, DB credentials, API keys, everything the build touches, is exposed. The worm's GitHub C2 is the same idea at a different layer: use the platform's own features as the command channel, and the platform's reputation becomes your cover.
 
-## What I took from it
+## Conclusion
 
 Three things, in the order I learned them:
 

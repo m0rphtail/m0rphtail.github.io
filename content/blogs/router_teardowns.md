@@ -70,6 +70,6 @@ The `date %s` handler takes a URL parameter, `sprintf`s it into a buffer, and `s
 
 The disclosure ending is the part that should bother regulators more than it does: he couldn't identify a vendor to tell. No company, no PSIRT, nothing. A vulnerability with no owner gets published, correctly. The supply chain produced the bug and then dissolved when it came time to fix it.
 
-## What I take from it
+## Conclusion
 
 Firmware encryption on a router isn't security, it's an admission. You encrypt when you have something to hide, occasionally a legitimate IP concern, usually backdoor passwords. The Tenda pattern is a decade long and counting, and every break follows the same shape: not a clever memory-corruption, but a design so bad the firmware tells you the answer on a console tap. The practical defense hasn't changed since the first backdoor story: if you ship consumer networking gear with any credential material derived from secrets *stored on the same device as the credential*, you've built a self-defeating scheme, and someone with a $10 UART adapter and a free afternoon will prove it.
