@@ -1,6 +1,74 @@
-/* kchitnis.com theme override — blue primary (was #ef5350) */
-:root,
-html.light,
-html.dark {
+/* kchitnis.com theme override — restore the pre-upgrade look on top of the updated apollo theme */
+
+/* Blue primary (was #ef5350 in upstream) */
+:root, html.light, html.dark {
   --primary-color: #1E91D6;
+}
+
+/* Fonts: back to Jetbrains Mono body + Space Grotesk headers (upstream switched to Zed) */
+:root, html.light, html.dark {
+  --text-font: 'Jetbrains Mono';
+  --header-font: 'Space Grotesk', 'Helvetica', sans-serif;
+  --code-font: 'Jetbrains Mono';
+  --mono-text-font: 'Jetbrains Mono';
+}
+
+/* Old line-height and page width */
+html {
+  line-height: 1.6em;
+}
+:root {
+  --line-height: 1.6;
+  --page-width: 1000px;
+}
+
+/* Old font-size scaling (16.5px @640, 17px @720, 18px @960) */
+@media all and (min-width: 640px) {
+  html { font-size: 16.5px; }
+}
+@media all and (min-width: 720px) {
+  html { font-size: 17px; }
+}
+@media all and (min-width: 960px) {
+  html { font-size: 18px; }
+}
+
+/* Old link underline */
+a {
+  border-bottom: 3px solid var(--primary-color);
+  position: relative;
+  z-index: 1;
+}
+a.zola-anchor {
+  border-bottom: none;
+}
+
+/* Old hr */
+hr {
+  border: 0;
+  border-top: 3px solid var(--border-color);
+  margin: 1em 0;
+}
+
+/* Old time color */
+time {
+  color: grey;
+}
+
+/* Old post list spacing and title size */
+.list-item {
+  margin-bottom: 30px;
+}
+.post-header h1 {
+  margin: 0;
+  font-size: 130%;
+  font-weight: bold;
+}
+.post-header h1 a {
+  border-bottom: none;
+}
+
+/* Old content padding */
+.content {
+  padding: 0 24px;
 }

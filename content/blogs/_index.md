@@ -1,5 +1,4 @@
 +++
-paginate_by = 9
 title = "blogs"
 sort_by = "date"
 
