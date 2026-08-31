@@ -1,48 +1,55 @@
 +++
-title = "VEIL#DROP: Malware That Builds a New URL for Every Victim"
-date = "2026-09-27"
+title = "VEIL#DROP: The Malware That Builds a New URL for Every Victim"
+date = "2026-07-01"
 +++
 
-# VEIL#DROP: Malware That Builds a New URL for Every Victim
+# VEIL#DROP: The Malware That Builds a New URL for Every Victim
 
-Securonix documented a multi-stage malware chain in July 2026 that uses Blogger pages to deliver the PureLogs stealer. The chain is called VEIL#DROP, and the part worth studying is the dynamic stage generation: the malware constructs a unique blogspot URL for every execution by inserting a random number of forward slashes into the URL string, defeating static URL signatures, indicator-based blocking, and URL filtering.
+Securonix published their VEIL#DROP analysis in July, an infection chain ending in the PureLogs stealer, and the component that earns the study is the loader's URL construction: it builds the next-stage blogspot URL *at runtime*, inserting a random number of forward slashes into the path so that every single victim fetches a syntactically unique URL pointing at the same resource. A URL filter with exact-match signatures just died of old age.
 
-## The Chain
+## The chain
 
-The initial payloads are distributed via spear-phishing or drive-by compromise. The infection chain begins with a deceptively named JavaScript file masquerading as a document, like `transcript.pdf.js`, which executes through Windows Script Host and launches PowerShell with execution policy bypasses enabled.
+It starts with a fake document. `transcript.pdf.js`, a JavaScript file wearing a PDF's clothes, executed by Windows Script Host. WSH hands off to PowerShell with execution policy bypasses, and the PowerShell does housekeeping before anything interesting happens: terminates `wscript.exe` to cut the forensic thread, deletes `transcript.pdf.js` to erase the entry point, then loads the real payload.
 
-The PowerShell script retrieves a next-stage payload hosted on Blogger, `htlwub00klocate.blogspot[.]com`. Using Google's trusted infrastructure as a stager lets the attackers bypass reputation-based defenses and blend in with legitimate web activity. The downloaded payload loads a benign web page like Google, creating the impression that a PDF document is opened, while the infection proceeds silently in the background.
+The stager lives on Blogger, `htlwub00klocate.blogspot[.]com`, which is the first of several moves that make this chain feel like it was designed by someone who has sat in a SOC. Google's infrastructure passes reputation filtering by definition. The loaded page shows the victim a benign document, Google's homepage or similar, so the human sees "PDF opened" while the machine sees a payload fetch. The victim's own perception is part of the evasion.
 
-The loader also terminates processes like `wscript.exe` to minimize the forensic trail, deletes `transcript.pdf.js` to eliminate evidence of execution, and decrypts an embedded payload.
+```text
+transcript.pdf.js ──WSH──► PowerShell (bypass flags)
+    │ kills wscript.exe, deletes itself
+    ▼
+Blogger stager (trusted domain, reputation-filter pass)
+    ▼
+XOR-decrypted loader ──in-memory──► .NET assembly (reflective load)
+    ▼
+PureLogs stealer (MaaS, author "PureCoder"/"PureLog")
+```
 
-## The Evasion Core
+## The dynamic URL trick
 
-Following XOR decryption, the loader transitions into the most evasive component of the framework: dynamic stage generation combined with runtime mutation.
+After XOR decryption, the loader enters the part Securonix singles out. Instead of a hardcoded URL, the script builds the fetch target like this:
 
-Instead of static indicators like hardcoded URLs or predictable execution patterns, the malware constructs the next-stage payload location dynamically during execution. It builds a unique blogspot URL for each execution by inserting a random number of forward slashes into the URL string. A URL like `blogspot.com/evil` becomes `blogspot.com/////evil` with a random number of slashes, which breaks the exact-match signatures most URL filters use.
+```powershell
+# conceptual: N is random per execution
+$slashes = "/" * (Get-Random -Minimum 2 -Maximum 12)
+$url = "https://htlwub00klocate.blogspot.com$slashes/payload.html"
+# https://htlwub00klocate.blogspot.com/payload.html
+# https://htlwub00klocate.blogspot.com///payload.html
+# https://htlwub00klocate.blogspot.com///////payload.html
+#             ... all resolve to the same post
+```
 
-The decoded script also introduces runtime mutation and polymorphism, replacing placeholder values within the script with randomly generated strings and values during execution. This variability defeats script signatures and file hashes.
+Blogger, like most web stacks, normalizes redundant slashes, so every variant returns the same content. The malware gets a fresh URL string per victim for free. Static URL signatures, indicator blocks, and path-based URL filtering all depend on the URL being the same string twice. It never is.
 
-## The Payload
+On top of that, the decoded script does runtime mutation: placeholder values replaced with random strings at execution, so hash-based detections and script signatures get one shot at exactly one victim's build. The reconstructed script executes entirely in memory, and the .NET assembly comes in via reflective loading, no disk artifact.
 
-The chain ultimately deploys PureLogs Stealer, a .NET-based infostealer known for harvesting a wide range of sensitive data. PureLogs is offered under a malware-as-a-service model by a threat actor known as PureCoder, also called PureLog.
+If reflective loading is blocked by environment controls, the loader falls back to a cascading LOLBin chain, `regsvcs.exe`, `installutil.exe`, `msbuild.exe`, `aspnet_compiler.exe`, trying each until one works. Securonix notes it "does not depend on any single LOLBin." That fallback list is basically a survey of which Microsoft-signed binaries developers have requested get blocked in hardened environments. The loader ships the answer to every hardening config, not just one.
 
-## Why This Matters
+## My read
 
-The dynamic URL generation is the detail that should change how detection teams think about URL-based blocking. Most URL filtering works on exact or prefix matches. The random-slash insertion defeats both, because the URL is different for every victim. The same technique works against hash-based detection, because the script mutates at runtime.
+Two things make this worth the study time.
 
-The Blogger abuse is the other half of the story. Google's infrastructure is trusted, which means reputation-based defenses pass it. The attackers are not fighting the blocklist, they are hiding inside the allowlist.
+First, the URL trick is a transferable idea, and transferable ideas are the ones that matter. The specific implementation (Blogger, slashes) will be burned within weeks of the writeup; the underlying move, "the indicator space is larger than the detection space, so enumerate the indicator and you lose," is the whole modern offense in one line. Every URL-filtering vendor has to answer "what do you match on when the URL is never the same twice" now, because this trick will show up in next month's campaign wearing a different domain.
 
-## The Blue Team Read
+Second, the defensive anchor that survives all of it is process ancestry and in-memory execution artifacts. The chain can mutate URLs, hashes, and scripts all it wants; it cannot easily change `wscript.exe → powershell.exe -bypass → in-memory .NET` without giving up the delivery. That's where the YARA-in-memory scanning and AMSI coverage belong, and it's why AMSI tampering keeps being the escalation of choice for these families. The battle isn't over the payload, it's over whether the loader can run unsigned code in a script host at all. Everything after that step is negotiable; nothing before it is.
 
-For defenders, the signals are:
-
-- JavaScript files masquerading as documents, like `transcript.pdf.js`
-- PowerShell execution with bypass flags from script hosts
-- Blogger URLs with unusual slash patterns in the path
-- `wscript.exe` termination from unexpected processes
-- XOR-decrypted payloads with runtime string mutation
-
-The deeper lesson is about the arms race in URL-based detection. Static indicators are dying. The malware that matters now generates its infrastructure dynamically, mutates its payloads at runtime, and hides inside trusted platforms. The detection that survives is behavioral: what is the script doing, not what URL is it using.
-
-For anyone running a SOC, the VEIL#DROP pattern is worth adding to the playbook. The next variant will not use Blogger, and it will not use PureLogs, but it will still build a new URL for every victim, because that technique works.
+For PureLogs, the MaaS angle stays the economic story: a subscription stealer with support, delivered through a chain whose loader engineering is better than most APT tooling. Commodity is a spectrum, and at the top end, the only difference from targeted ops is the victim selection algorithm.

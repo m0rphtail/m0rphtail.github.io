@@ -1,36 +1,40 @@
 +++
-title = "Windows Hello for Business as an Attacker Tool: The PRT Problem"
-date = "2026-09-18"
+title = "Windows Hello Without the PIN: Abusing the Session You're Already In"
+date = "2026-08-07"
 +++
 
-# Windows Hello for Business as an Attacker Tool: The PRT Problem
+# Windows Hello Without the PIN: Abusing the Session You're Already In
 
-Entra ID researcher Dirk-jan Mollema demonstrated something that should make every identity team uncomfortable: malware already running in a signed-in Windows session can silently use the victim's Windows Hello for Business key to authenticate to Microsoft Entra ID. No PIN extraction, no biometric prompt, no private key theft. The attacker gets a Primary Refresh Token, registers a device it controls, and can add further authentication methods where tenant policies allow.
+Dirk-jan Mollema published new Entra ID research in August that changes where I'd draw the line on endpoint compromise. Malware inside a signed-in session can make the victim's Windows Hello for Business key sign authentication data and walk away with a Primary Refresh Token. No key extraction, no PIN capture, no biometric prompt. The private key never leaves the TPM, exactly as the marketing says, and the attacker authenticates as the user anyway.
 
-## How It Works
+## The mechanics
 
-The key insight is how Windows Hello for Business actually operates. On TPM-backed systems, the private key never leaves the TPM. But Windows ticketing keeps private-key operations available while the user is interactively signed in. Code running as the user can ask Windows to sign authentication data. That is by design, and it is the whole problem.
+Windows Hello keeps private-key operations available while the user is interactively signed in. That's how the feature works: the PIN and biometrics gate the user, but after sign-in, code running as the user can ask Windows to perform the signing. Mollema's DEF CON 32 work in 2024 could already produce a signed PRT assertion, but it needed access to an Entra-registered device.
 
-Mollema's earlier work, presented at DEF CON 32 in 2024, could produce a signed assertion for a PRT but required access to an Entra-registered or joined device. The new work removes that requirement by treating the Windows Hello for Business key as a FIDO2 passkey through WebAuthn.
+The new technique removes that by treating the WHfB key as a FIDO2 passkey through WebAuthn. The load-bearing discovery: the five-minute Entra ID challenge isn't bound to a session, user, or tenant. So the flow becomes:
 
-The critical finding: the five-minute Entra ID challenge is not bound to a session, user, or tenant. An attacker can request the challenge on another host and have the compromised endpoint produce the signed assertion. ROADtools, the open-source framework Mollema maintains, can use the assertion to request tokens or open a browser session as the victim.
+```text
+1. obtain code execution in victim's signed-in session (no admin needed)
+2. attacker host: request a WebAuthn challenge from Entra ID (any tenant)
+3. compromised endpoint: WHfB key signs the challenge as if the user logged in
+4. exchange the signed assertion for tokens / browser session via ROADtools
+5. the token carries NO device ID claim →
+6. register a NEW device → request a PRT for it → 90 days, auto-renewed
+7. where policy allows: add new passkeys/WHfB keys to the attacker's device
+```
 
-The token carries no device ID claim. Without device binding, the attacker can register a new device, request a PRT for it, and reach Microsoft cloud services. A PRT remains valid for 90 days and is continuously renewed while the device is actively used.
+Step 5 is the whole ballgame. No device binding means the assertion from a machine the tenant never saw is accepted as genuine. The WebAuthn sign-in also satisfies Conditional Access policies requiring phishing-resistant authentication strength, and counts as fresh MFA, which unlocks adding further credentials on the attacker's registered device.
 
-## Why This Breaks the Phishing-Resistant Promise
+The caveats are real, and Mollema states them: it needs user-session code execution, separate device-state or compliance policies can break the persistence chain, no in-the-wild exploitation is reported, and Microsoft has issued no CVE or advisory. This is documented behavior, left as-is.
 
-The finding exposes a limit of phishing-resistant authentication. The credential can remain hardware-bound and unexported, exactly what the marketing promises, while malware inside the signed-in endpoint session invokes it for the attacker. The hardware does not help when the attacker is already running as the user.
+## The artifacts
 
-The WebAuthn sign-in can satisfy Conditional Access policies requiring Microsoft's phishing-resistant authentication strength. It also counts as fresh multi-factor authentication, which means the attacker can add passkeys or Windows Hello for Business keys on the new device where policies allow.
+He shipped PowerShell PoCs in the ROADtools repo (`fido_assertion.ps1`, `hellopoc.ps1`) and gave the detection guidance you'd expect: hunt for Windows Hello for Business sign-ins with an empty device ID. He's honest about the false-positive rate too; legitimate incognito or non-SSO browser sessions produce the same pattern. That makes it a hunt, not a rule, and it belongs in your identity team's quarterly queries, not your alert pipeline.
 
-The caveats matter. Administrator privileges are not required, but the technique does require code execution in the victim's signed-in session. Separate device-state or compliance policies can interrupt the chain, so the complete persistence route will not work in every deployment. The disclosure does not report active exploitation or victims, and Microsoft has not issued a CVE or advisory for the behavior.
+## Why this lands hard for me
 
-## The Blue Team Read
+I've spent years treating "phishing-resistant" as the top of the auth pyramid. This research redraws the boundary, and the redraw is simple: phishing-resistant authentication protects the login prompt. It does nothing about a session that's already open. Once attacker code runs as the user, the honest model is that the attacker *has* the user's authentication capabilities, hardware-bound or not. The TPM stops copying, not invocation.
 
-Mollema describes the behavior as a consequence of how Windows Hello for Business works, left as-is. That means the fix is not a patch, it is monitoring and policy.
+That's not a reason to abandon WHfB. It's still the right default over passwords and OTP. But the identity teams who treat "we enabled passkeys" as the end of the auth roadmap are missing the second half: monitor what those credentials *do*. Unexpected device registrations in Entra audit logs are the tell here, and they're cheap to watch. Registrations from new geos, odd hours, or accounts that never register devices.
 
-The primary detection signal is unexpected device registrations. An attacker who registers a new device and requests a PRT leaves an Entra ID audit trail. Device registration events from accounts that do not normally register devices, or registrations that appear outside normal business hours, are the hunt.
-
-The deeper lesson is about what phishing-resistant authentication actually protects. It stops credential theft at the login prompt. It does not stop a compromised session from using the credentials that are already there. The distinction between "the attacker cannot steal the key" and "the attacker cannot use the key" is the entire gap this technique exploits.
-
-For identity teams, the practical response is to treat Windows Hello for Business as a powerful session credential, not a silver bullet. Monitor device registrations, enforce device compliance policies that can interrupt the chain, and assume that code execution in a signed-in session is equivalent to holding the user's authentication capabilities, because it is.
+The most disquieting part is how mundane the root cause is. Entra's own docs describe the ticketing behavior. Nothing was bypassed. The challenge simply doesn't bind to anything, which presumably made implementation easier at some point in 2019. Mollema describes it as "left as-is." The gap between "Microsoft documents this" and "your SOC watches for it" is where this technique lives.

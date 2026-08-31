@@ -1,42 +1,58 @@
 +++
-title = "SLEEPWALKER: A Backdoor That Does Nothing Until a Magic Packet Arrives"
-date = "2026-09-15"
+title = "SLEEPWALKER: The Backdoor That Does Nothing Until a Packet Says Otherwise"
+date = "2026-08-26"
 +++
 
-# SLEEPWALKER: A Backdoor That Does Nothing Until a Magic Packet Arrives
+# SLEEPWALKER: The Backdoor That Does Nothing Until a Packet Says Otherwise
 
-A 59,904-byte unsigned DLL, side-loaded into ESET Management Agent, impersonating Microsoft's `dpapi.dll`, with no domains, no IPs, no URLs, and no outbound connections of its own. It sits inert in memory until a specifically crafted network packet reaches the machine. Then it runs commands written in a 23-instruction language that exists nowhere else.
+Dominik Reichel, formerly of Palo Alto's Unit 42, published analysis of a Windows backdoor that inverts everything detection is built around. SLEEPWALKER is a 59,904-byte DLL side-loaded into ESET's own management agent, impersonating Microsoft's `dpapi.dll`, with no domains, no IPs, no URLs, and no outbound traffic of its own. It sits inert until a specific network packet crosses an interface it watches. Then a 23-instruction bytecode language nobody has ever seen anywhere else takes over.
 
-That is SLEEPWALKER, documented by independent malware researcher Dominik Reichel, and it is the most targeted-looking Windows backdoor I have read about this year.
+I read it twice. The second read was slower.
 
-## The Design
+## The load path
 
-The sample exports the same seven data protection functions as the real `dpapi.dll` and carries a version resource copied from ESET Management Agent. It is built to be side-loaded into `ERAAgent.exe`, the ESET Management Agent executable, relying on Windows DLL search order rather than any flaw in ESET's software. There is nothing to patch, which is the point. The response to a confirmed match is incident response and a rebuild.
+The DLL exports the same seven data protection functions as the real `dpapi.dll` and carries a version resource copied from ESET Management Agent. Side-loading into `ERAAgent.exe` relies on Windows DLL search order, not a flaw in ESET's product. Writing the file into the application directory requires local admin an operator already holds. As Reichel notes, there's nothing to patch here. The response to a confirmed match is incident response and a rebuild.
 
-Its embedded configuration decrypts with AES-256-CCM into a single instruction: monitor every network interface indefinitely, waiting for the trigger packet. The listener captures everything crossing each watched interface, including traffic addressed to other machines. A gateway, VPN server, or host bridging two network segments could see a trigger meant for a different machine entirely.
+ESET isn't new territory for this. Kaspersky caught ToddyCat abusing a search-order flaw in ESET's command-line scanner to load a malicious DLL. Side-loading the vendor's own agent is a different, and in some ways worse, trick: The host process is signed, trusted, present on every protected endpoint, and it auto-starts. The malware couldn't ask for a better home.
 
-Commands arrive as bytecode, not readable text. Recovering the encryption key yields opcodes in a format that exists nowhere but inside this one file. There is no known-bad infrastructure to watch for, because the backdoor never reaches out. It only listens.
+## The trigger
 
-## What Makes It Interesting
+The embedded config decrypts with AES-256-CCM into a single instruction: watch every network interface, indefinitely, for a magic packet. The listener captures everything crossing each watched interface, including traffic addressed to other machines, so a host that bridges two segments, a gateway, a VPN box, can catch a trigger meant for a different machine entirely.
 
-The operational security here is a level above what you normally see in commodity malware:
+Commands don't arrive as strings. They're bytecode in a format that exists only inside this file. Recovering the encryption key gets you opcodes, not text. The 23 instructions cover scheduling, data movement, staged file delivery verified against a SHA-256 before execution, and direct in-memory code execution. Not one of them writes to disk.
 
-- No network egress means no beacon to detect. Hosts look clean to tooling that watches for connections to known-bad infrastructure.
-- No hardcoded infrastructure means no domain sinkhole or IP blocklist helps.
-- The trigger packet is the only activation signal, and it can be delivered by any host on the watched segment.
-- The 23-instruction command language is bespoke, so signature-based detection has nothing to match.
+The transports are where it gets interesting: TCP, UDP, ICMP, SMB named pipes with credentialed lateral movement, raw promiscuous capture, and VMware's VMCI. VMCI rides through the hypervisor's virtual machine communication interface rather than a network adapter, so a packet capture taken between two machines misses it. Mandiant documented UNC3886 using VMCI sockets for persistence between compromised ESXi hosts and their guests. Same technique, new tenant.
 
-Reichel's assessment is that this is consistent with a targeted, well-resourced operation rather than an opportunistic one. The caveat is honest: the assessment rests on a single binary with no collection context. No attribution, no victim, no industry, no country, and no confirmation the sample was ever deployed.
+The analyzed sample's opcode enables only the raw-packet listener, but a second opcode enables a DNS-based trigger that exists in the binary but wasn't active in this build. There's dormant capability baked in and switched off, which tells you something about the development discipline behind it.
 
-## The Blue Team Read
+## The tradecraft details that separate signal from noise
 
-SLEEPWALKER is a post-compromise implant, not an entry point. Writing the DLL into the ESET directory requires local administrator rights an operator must already hold, and the backdoor relies on the security context of its host process rather than obtaining rights itself. How the operator first reached the machine is unknown.
+Two registry changes make the SMB named-pipe channel reachable by unauthenticated callers:
 
-That framing matters for detection. You are not going to catch this with a network rule. The huntable signals are:
+```text
+HKLM\SYSTEM\CurrentControlSet\Control\Lsa\EveryoneIncludesAnonymous = 1
+HKLM\SYSTEM\CurrentControlSet\Control\Lsa\NullSessionPipes += <pipe name>
+```
 
-- DLL side-loading into `ERAAgent.exe` from a non-standard path, or a `dpapi.dll` in the application directory that is not the system one
-- A 59,904-byte unsigned DLL with ESET's version resource but no signature
-- The ESET Management Agent service loading a library it should not be loading
-- Any process capturing traffic on all interfaces, which is abnormal for an endpoint agent
+And the cleanup is subtly malicious: the routine records whether its own write to `NullSessionPipes` succeeded, not whether the entry already existed. A removal script that naively reverses changes will delete a legitimate pre-infection entry. I've cleaned up enough Windows boxes to know that's the kind of detail that turns an IR engagement into a week.
 
-The deeper lesson is about persistence philosophy. Most malware wants to be found running. SLEEPWALKER wants to be found installed and then forgotten. The most dangerous implants are the ones that do nothing until their operator decides otherwise, because nothing is exactly what your EDR is trained to ignore.
+Reichel's host indicators, verbatim:
+
+```text
+- unexpected dpapi.dll beside ERAgent.exe
+- unexpected dpapisvc.dll in the same directory
+- SHA-256: d347170752a28e2b8c4b8b9f3cab2e3a6541ba11682c94498d26eb9002779d60
+- MD5:    2318327b29bb1c0e2d2b5f0211fc7fac
+- EveryoneIncludesAnonymous = 1
+- unexpected entry in NullSessionPipes
+```
+
+The writeup ships a YARA rule and a read-only PowerShell scanner that checks all of it. That's the right way to publish.
+
+## My read
+
+No infrastructure to sinkhole, no beacon to detect, no handshake to fingerprint. It just listens, on interfaces you already trust, inside a process your EDR almost certainly whitelists, and does nothing until its operator decides otherwise.
+
+The honest caveat, which Reichel states himself: the assessment rests on a single binary with no collection context. No attribution, no victim, no proof it was ever deployed. It might be a research exercise that leaked. But built-to-be-side-loaded into a security vendor's agent, with a bespoke bytecode VM whose only job is to be invisible, doesn't read like ambition to me. It reads like someone who studied how responders work and built the thing they'd least like.
+
+If you run ESET on Windows and you've never diffed what's sitting next to `ERAAgent.exe`, do it this week. It's a five-minute check, and the alternative is that someone else does it for you.

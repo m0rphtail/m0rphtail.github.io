@@ -1,49 +1,47 @@
 +++
-title = "The Unisoc VoLTE Exploit Chain: From a Video Call to Kernel Memory"
-date = "2026-09-17"
+title = "The Unisoc VoLTE Chain: A Video Call That Ends in Kernel Memory"
+date = "2026-08-17"
 +++
 
-# The Unisoc VoLTE Exploit Chain: From a Video Call to Kernel Memory
+# The Unisoc VoLTE Chain: A Video Call That Ends in Kernel Memory
 
-SSD Secure Disclosure published a two-stage exploit chain in August 2026 that achieves full Android kernel access on devices running Unisoc modem firmware. The entry point is a VoLTE video call. The chipset maker has not responded to disclosure attempts, and no fix exists.
+SSD Secure Disclosure published the second half of a two-stage attack on Unisoc phones in August, and the punchline is that the vendor never answered a single email. The first stage, disclosed in March, is remote code execution in the modem firmware from a malformed SIP video call. The second stage walks from that modem foothold into the Android kernel. No CVE, no bulletin, no response, no patch. On phones sold across more than 140 countries.
 
-## The Chain
+## The chain, end to end
 
-Stage one was disclosed in March 2026: remote code execution in Unisoc modem firmware through a malformed SIP video call. Stage two, published in August, is the privilege escalation that turns that modem foothold into kernel access.
+The full run needs three things: the attacker controls a private 4G network, the victim answers an incoming VoLTE video call, and stage one is already in place. The researchers built their test environment with an open-source 4G core, a software-defined radio for the air interface, and programmable SIMs. Researcher 0x50594d did the work; I'm reconstructing from the advisory.
 
-The full chain requires three things: an attacker who controls a private 4G cellular network, a victim who answers an incoming video call, and a modem-level foothold from the March RCE. The researchers built their proof-of-concept environment with an open-source 4G core network, a software-defined radio for the radio interface, and specialized SIM cards.
+Stage two is classified CWE-1189, improper isolation of shared resources on a SoC. The affected modem firmware ships in at least three chips: the T606 in the Motorola E13, the T612 in the Realme C33, the T7250 in the Xiaomi Redmi A5. Confirmed working on an E13 with a February 2025 patch and a Redmi A5 with a January 2026 patch.
 
-The privilege escalation is classified as CWE-1189, Improper Isolation of Shared Resources on System-on-a-Chip. The flaw lives in modem firmware shared by at least three Unisoc chipsets: the T606 in the Motorola E13, the T612 in the Realme C33, and the T7250 in the Xiaomi Redmi A5. Researchers confirmed the escalation on a Motorola E13 with a February 2025 security patch and a Xiaomi Redmi A5 with a January 2026 patch.
+## The escalation itself
 
-## The Technical Core
+Once code runs on the modem, the privesc is almost anticlimactic, and that's the point. The modem has an ARM Memory Protection Unit, and the exploit just rewrites its configuration through coprocessor registers:
 
-Once code is running on the modem, the escalation works by writing a full-access configuration to the modem's ARM Memory Protection Unit through coprocessor registers. That maps the entire 32-bit physical address space as readable, writable, and executable from modem context, including the pages where the Android kernel resides.
+```text
+# conceptually, from modem context:
+#   1. gain modem code exec (stage one, malformed SIP video call)
+#   2. reprogram the modem's MPU via coprocessor registers:
+#        full-access mapping of the entire 32-bit PA space
+#        X=1, W=1, R=1 for every region
+#   3. the Android kernel's pages are now RWX from the modem
+#   4. write payload into kernel memory, execute
+#      confirmed via kernel log output showing the payload ran
+```
 
-The condition that makes this possible is architectural: the modem processor and the application processor share physical memory within the Unisoc SoC, and there is no hardware-enforced boundary preventing modem-context code from modifying kernel memory. The MPU is the only thing standing between modem code and the kernel, and the exploit simply reconfigures it.
+The condition that makes this legal, so to speak, is architectural: the modem and application processors share physical memory in the Unisoc SoC, with no hardware boundary between modem-context writes and kernel pages. The MPU is the only fence, and a fence you can reconfigure from the inside isn't a boundary, it's a suggestion.
 
-Researchers confirmed kernel-level code execution on a test device by observing kernel log output showing the injected payload had run.
+Researchers verified kernel execution by watching the kernel log print output from injected code. When the kernel politely logs your payload's stdout, you're done.
 
-## Why This One Is Different
+## Why this one sits differently
 
-Mobile exploit chains usually get patched fast because the vendor has a security team and a bulletin process. This one has neither. The August 2026 Android Security Bulletin, published before the disclosure, does not address the vulnerability. No Unisoc security bulletin covers it. The researchers tried email and LinkedIn and got no response.
+Mobile exploit chains usually race a security team. This one has no race to lose. The August 2026 Android Security Bulletin came out before the disclosure and doesn't cover it. No Unisoc bulletin covers it. SSD's statement, in both March and August: "We have tried to reach out to the vendor through multiple channels (email and LinkedIn) but have not been able to receive any response."
 
-The affected devices are budget phones sold across more than 140 countries. The Motorola E13, Realme C33, and Xiaomi Redmi A5 are exactly the kind of devices that do not get long security support windows. Even if a fix existed tomorrow, the installed base would take years to update, and most of it would never update at all.
+The installed base is the part I keep thinking about. The E13, C33, and A5 are budget phones, the kind that get two years of patches if they're lucky, in markets where the answer to "is your phone updated" is "what's that." Even if Unisoc shipped a fix tomorrow, a meaningful share of these devices would never see it. A vulnerability on a device that cannot be patched is not a vulnerability report, it's a hardware decision that expired.
 
-There is also a separate Unisoc advisory from October 2025, CVE-2025-31718 with a CVSS score of 7.5, describing a modem input-validation flaw on the same chipset family. The pattern is consistent: the modem attack surface on these SoCs is not getting the attention it needs.
+There's precedent, and it rhymes. Kaspersky ICS CERT documented the same shared-memory condition on the UIS7862A, a Unisoc chip in vehicle head units, in November 2025, and described one lateral movement path through a hidden DMA peripheral as not fixable by software at all. Unisoc's last modem bug that got the full treatment, CVE-2022-20210, went through Check Point and landed in the Android bulletin. Nobody has committed to that process this time.
 
-## The Red Team Read
+## My read
 
-From an attacker's perspective, this chain is a reminder that the modem is a legitimate entry point, not a theoretical one. VoLTE video calls are a feature users answer without thinking. The requirement to control a private 4G network raises the bar, but private LTE/5G deployments are becoming common in enterprise and industrial settings, and the equipment to build one is open source and cheap.
+For anyone doing threat modeling on a fleet that includes budget Unisoc hardware: the modem is now a documented path from "answered a phone call" to "arbitrary kernel code," gated behind an attacker-controlled 4G network. Private LTE in enterprise and industrial settings is increasingly common, and the equipment to stand one up is open source and cheap. The chain is not something a random actor runs this quarter. It is absolutely something a capable actor runs on target-rich networks.
 
-The chain also demonstrates the value of persistence in disclosure. The March RCE and the August escalation were published separately, and the second stage explicitly builds on the first. For defenders, the lesson is that a disclosed modem RCE is not the end of the story. The follow-up escalation research is already in progress somewhere.
-
-## The Blue Team Read
-
-There is no patch to deploy and no detection rule that stops a malformed SIP video call at the radio layer. What defenders can do:
-
-- Track which devices in your environment use Unisoc chipsets and treat them as higher risk
-- Watch for unexpected VoLTE video call activity on corporate devices, especially from unknown numbers
-- Consider whether private 4G infrastructure in your environment is segmented from the rest of the network
-- Plan for the reality that some devices cannot be fixed, which makes them candidates for replacement or isolation
-
-The uncomfortable summary: a video call can now be a kernel compromise on a class of devices that will never receive a fix. That is not a vulnerability report, that is a hardware decision made years ago, and it is still shipping.
+Practical bits: inventory which devices in your fleet are Unisoc-based (model-to-SoC tables are findable), treat them as unpatchable for this class, get them off privileged segments, and watch for video calls from unknown numbers on corporate devices. And the disclosure lesson is one I keep relearning: publish what you have. SSD sat on a working chain for months waiting for a reply that never came. The users of those 140 countries' phones never got a say.

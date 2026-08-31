@@ -1,53 +1,54 @@
 +++
-title = "AmnesiaStealer: A Rust Stealer That Steals the Password to Steal More"
-date = "2026-09-24"
+title = "AmnesiaStealer: The macOS Stealer That Checks Your Password Before Using It"
+date = "2026-08-13"
 +++
 
-# AmnesiaStealer: A Rust Stealer That Steals the Password to Steal More
+# AmnesiaStealer: The macOS Stealer That Checks Your Password Before Using It
 
-Jamf Threat Labs documented a macOS stealer in August 2026 that is worth reading for one detail alone: it validates the password it captures before exfiltrating it. AmnesiaStealer, a Rust-based infostealer, displays a native prompt to capture the system password under the guise of an installer, then checks the entered password against the local directory service with `dscl` to make sure it is correct. If the check fails, it loops the dialog with "Incorrect password. Please try again." until the victim gets it right.
+Jamf Threat Labs published analysis on August 13 of a Rust-based macOS stealer, AmnesiaStealer, and there's one detail that puts it above the usual infostealer commodity pile: it validates the password you type before it exfiltrates. Native prompt, "installer" disguise, and your password gets checked against the local directory service with `dscl`. Wrong? "Incorrect password. Please try again," in a loop, until you type the right one. The malware QA's its own phishing.
 
-## The Chain
+## The chain
 
-The stealer spreads via a counterfeit GitHub download page titled "Download for macOS" that claims to be from a verified publisher. The page uses a ClickFix-style lure, instructing users to copy and paste a Base64-encoded command into the macOS Terminal app.
+Delivery is a counterfeit GitHub download page with a ClickFix lure: copy this Base64 blob into Terminal. The chain runs three stages: a shell script that downloads and launches the payload, then deletes itself; the Rust stealer itself, harvesting Keychain, browsers, Apple Notes, and Telegram; and a `stream_module`, pulled on command, giving the operator interactive hidden control of the victim's browser.
 
-The attack chain runs in three stages:
+The first stage is a password-protected ZIP (AV scanners hate this one trick). Inside, a Mach-O Rust binary with an encrypted configuration, modifiable at build time without code changes. The config holds the C2 endpoint, `debug.allllowef.space/send/`, and a `CLIPPER_ENABLED` toggle targeting Bitcoin, Ethereum, Monero, Solana, TRON, Ripple, Cosmos and the rest of the usual wallets.
 
-1. A shell script downloads and launches the payload
-2. A Rust infostealer harvests the Keychain, browsers, Apple Notes, and Telegram
-3. A `stream_module`, fetched on command, gives the operator hidden, interactive control of the victim's browser
+## The password loop
 
-The script retrieves a password-protected ZIP archive and deletes itself. Extracted from the archive is the first-stage Mach-O binary, a Rust stealer with an embedded encrypted configuration that can be modified at build level without code changes.
+```applescript
+# conceptual reconstruction of the credential capture
+repeat
+  set pwd to display dialog "Installer requires your password" ─→ text returned
+  do shell script "/usr/bin/dscl . -authcheck " & quoted form of pwd
+  if exit_code == 0 then
+    exit repeat
+  else
+    display dialog "Incorrect password. Please try again"
+  end if
+end repeat
+-- password now validated against the LOCAL DIRECTORY SERVICE
+```
 
-## The Configuration
+Then the password goes to work, and this is where the design shows its intent: piped into `sudo -S` for privileged reads, passed to `security unlock-keychain -p` to open the login keychain, and written to disk in cleartext, once into the staging dir as `pwd` and once in the user's home as `~/.pwd`. A fallback path writes `/tmp/tempAppleScript.scpt` and runs `osascript` if the native alert fails, though on Jamf's host the native path won.
 
-The embedded config includes the C2 endpoints, `debug.allllowef[.]space/send/`, and a toggle for a clipboard-hijacking module targeting cryptocurrencies: Bitcoin, Bitcoin Cash, Ethereum, TRON, Litecoin, Monero, Solana, Ripple, and Cosmos.
+`~/.pwd` is a forensic gift, sitting right there on disk. It's also the victim's whole account, handed over voluntarily by the victim, checked twice for correctness by the malware. The same password-validation behavior shows up in ClickLock Stealer, so this isn't one author's flourish, it's a pattern propagating through the macOS stealers.
 
-The Rust payload also performs host reconnaissance and geolocation profiling. Then comes the password capture.
+## What it does with the access
 
-## The Password Capture
+With the keychain open, the harvest list reads like a compliance nightmare:
 
-The stealer displays a native prompt to capture the system password under the guise of an installer. The entered password is validated against the local directory service via `dscl`, ensuring only the correct password is exfiltrated. If the check fails, it triggers a dialog loop until the correct password is entered.
+- 16 Chromium-family browsers (Chrome, Brave, Arc, Edge...): Cookies, Login Data, Web Data, History, Bookmarks, Local State, and the Extensions directory
+- Chrome Safe Storage read from the Keychain to decrypt the profile master keys
+- Safari cookies via TCC bypass CVE-2020-9771 on Catalina; works on macOS 26 only with Full Disk Access, which the stealer doesn't have. Small mercies.
+- Apple Notes, Telegram sessions, plus `.txt/.pdf/.rtf/.doc/.wallet/.key` files across Desktop, Documents, Downloads
+- An AppleScript mutes system sound first, because nothing says "legitimate installer" like silent operation
+- Persistence via a root LaunchDaemon impersonating Apple's crash reporter, which is a genuinely good hiding spot
+- Staging under `/tmp` in a 25-random-alphanumeric directory, archived, exfiltrated
 
-A fallback path writes `/tmp/tempAppleScript.scpt` and invokes `osascript` if the native alert fails. The captured password is then reused throughout the chain: piped into `sudo -S` for privileged reads, passed to `security unlock-keychain -p`, and written to disk in cleartext, both in the staging directory as `pwd` and in the user's home directory as `~/.pwd`.
+The `remote_stream` command triggers a second Rust binary that drives the browser over the Chrome DevTools Protocol, headless, across seven Chromium-family browsers, with a WebSocket relay for operator commands. CDP control is the part that should worry anyone who treats "cookies stolen" as the ceiling of stealer damage. With CDP, the operator *is* the browser, extensions, sessions, logged-in everything, from anywhere.
 
-The same behavior has been observed in another macOS stealer family called ClickLock Stealer, which suggests the pattern is spreading.
+## My read
 
-## Why This Matters
+None of this is a vulnerability. The CVE-2020-9771 abuse aside (patched years ago, still working against Catalina, which tells you about long-tail fleet reality), the chain is: user pastes a command, user types their password, malware checks the password is right, user's data leaves. macOS's security model assumes the user is the root of trust, and this entire class of attack is what happens when that assumption is monetized.
 
-The password validation is the detail that separates this from a typical stealer. Most stealers grab whatever the victim types and hope it is right. AmnesiaStealer refuses to exfiltrate a wrong password, which means the attacker gets a working credential every time, and the victim gets a dialog loop that makes them think the installer is broken.
-
-The cleartext password storage is the other notable detail. The password ends up in `~/.pwd` on disk. For forensics, that is a gift: the artifact is sitting right there. For the victim, it is the full compromise of their macOS account, because the attacker now has the password that unlocks the Keychain, sudo, and everything else.
-
-## The Blue Team Read
-
-For macOS defenders, the signals are:
-
-- Fake GitHub download pages for macOS software
-- ClickFix-style instructions to paste Base64 commands into Terminal
-- Native password prompts from unsigned installers
-- `~/.pwd` or `/tmp/tempAppleScript.scpt` artifacts
-- `dscl` validation calls from unexpected processes
-- Rust binaries with embedded encrypted configs connecting to unknown C2
-
-The deeper lesson is about the macOS trust model. The attack does not exploit a vulnerability. It asks the user to paste a command into Terminal, then asks for the password, then validates it. Every step is something the user does willingly. The defense is the same as it has always been: do not paste commands from web pages, do not enter your password into prompts you did not initiate, and do not download software from GitHub pages that are not the real project.
+Detection-wise, the disk artifacts are the cheap wins: `~/.pwd`, the `/tmp/tempAppleScript.scpt` fallback, a LaunchDaemon named like Apple's crash reporter that you didn't install, and Chromium processes launched headless by something that isn't Chrome's own updater. And `dscl` called from anything that isn't your MDM or directory tooling is worth a tripwire. The behavioral truth under it all: if your EDR can't tell you *why* a process read `~/Library/Keychains/` and then opened network connections to a `.space` domain, the Rust rewrite of the classic stealer playbook won't be the thing that tips you off. The tip-off will be the user saying the installer kept asking for their password. That's not a joke, it's the actual best detection signal this bug has: humans notice loops.

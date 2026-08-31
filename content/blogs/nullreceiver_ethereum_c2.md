@@ -1,36 +1,42 @@
 +++
-title = "NullReceiver: Hiding a C2 IP Inside an Empty Ethereum Transfer"
-date = "2026-09-21"
+title = "NullReceiver: A C2 Address Hidden in a made-up Ethereum Address"
+date = "2026-08-05"
 +++
 
-# NullReceiver: Hiding a C2 IP Inside an Empty Ethereum Transfer
+# NullReceiver: A C2 Address Hidden in a made-up Ethereum Address
 
-EtherHiding was already clever. Embed malicious code in a smart contract on a public blockchain, and your C2 infrastructure becomes takedown-proof, because nobody can delete a blockchain. North Korean groups adopted it, and defenders learned to watch the fixed destination addresses the technique requires. The new variant, documented by OpenSourceMalware and linked to North Korea, removes even that anchor.
+EtherHiding was already a good trick: put your C2 payload inside a smart contract on a public blockchain and the takedown playbook dies, because nobody can delete a blockchain. North Korean groups adopted it for Contagious Interview, their long-running fake-recruiter campaign, and defenders adapted by tracking the fixed destination contract addresses the technique required. OpenSourceMalware's Paul McCarty documented the next iteration in August, codenamed NullReceiver, which deletes the fixed address. The C2 IP now hides inside the bytes of a made-up recipient address on an ordinary-looking transfer.
 
-## The Technique
+## The mechanic
 
-NullReceiver encodes the C2 IP address directly in the bytes of the recipient address of a zero-value, zero-data Ethereum transfer. No smart contract, no payload field, no calldata. The malware looks up the attacker's wallet, reads the destination address of its most recent outbound transaction, and decodes a C2 IP straight from those address bytes.
+A zero-value, zero-data Ethereum transfer has a recipient address that must be 20 bytes. Nobody checks that the address is real. You can't. The malware does this:
 
-The name comes from the design: the destination address does not exist. It is a made-up address that exists only to carry the encoded IP. That is the improvement over EtherHiding, which requires a fixed, publicly known destination address that defenders can track as new transactions occur. NullReceiver has no fixed, watchable destination, because every transfer can use a different made-up address.
+```text
+1. look up a hard-coded attacker wallet:
+   0xa322e5f3d311d3080e6f0121063e9adc2490ef1a
+2. find its most recent outbound transaction
+3. read that transaction's destination ("To") address
+4. take the first 4 bytes, hex → decimal:
+   0xa6 0x58 0x86 0x3e  →  166.88.134.62
+5. connect to that IP
+```
 
-The technique was observed in two trojanized npm packages, `bianira-ui` and `fluid-type-ui`, published July 28, 2026. They are no longer available from npm, but statistics show a few hundred downloads: 109 for `bianira-ui` from an account named `npmuser1101`, 587 for `fluid-type-ui` from `npmuser3002`.
+No smart contract call. No calldata. The transaction looks like a wallet moving dust to another wallet, which is what wallets do all day, because they do. The address `0xa658863ea658863e68656c6c6f6970626f742121` that carried `166.88.134.62` decodes further: trailing bytes `68656c6c6f6970626f742121` spell ASCII "helloipbot!!". Whoever built this left a signature joke inside the fake address. The bot waves back.
 
-## The Attribution Thread
+Every lookup reads a brand-new throwaway destination, so there's no fixed, watchable endpoint. That's the delta against classic EtherHiding, where defenders could watch the known payload-carrying contract for new transactions. NullReceiver never reuses a destination. Sixty-eight transactions had run since July 27, 2026, the day before the two npm packages went live.
 
-EtherHiding was first publicly documented by Guardio Labs in October 2023, described as the "next level of bulletproof hosting." Google Threat Intelligence Group linked its use by North Korean groups to Contagious Interview, the long-running campaign that approaches targets on LinkedIn with fake job opportunities and assessment tasks that lead to malware deployment.
+## The delivery
 
-The NullReceiver evolution fits the pattern: the actors keep refining the technique to make defender tracking harder. The fixed destination address was the weak point, so they removed it.
+Two npm packages, `bianira-ui` (109 downloads, "npmuser1101") and `fluid-type-ui` (587, "npmuser3002"), published July 28, 2026, pulled from npm but still counted in the stats. They embed the wallet lookup and connect to the decoded IP. They don't call any contract and don't touch calldata. The JavaScript library that quietly does an ETH RPC query at runtime is the detection anchor, not the chain.
 
-## Why This Is Hard to Defend
+## Trade-offs worth naming
 
-Blockchain-based C2 breaks the standard takedown playbook. You cannot sinkhole a smart contract, you cannot seize a wallet, and you cannot block a blockchain. The best you can do is track the wallets and watch for the pattern.
+NullReceiver buys stealth by shrinking capacity. EtherHiding smuggles a full URL or script in contract storage; NullReceiver encodes four bytes per transaction. Four bytes is an IPv4 address and nothing else. The operators accepted that limit, presumably because the IP is all they need to hand off to a redirector they rotate cheaply. Each transaction costs gas, but tiny value transfers are cheap, cheaper than the earlier approach, per McCarty.
 
-NullReceiver makes even that harder. The wallet lookup is the only constant, and wallets are cheap to rotate. The C2 IP itself is hidden in a transaction that looks like nothing, a zero-value transfer to a random address, which is exactly what a normal wallet does all day.
+The attribution chain is the usual one: Guardio Labs documented EtherHiding in October 2023; GTIG tied its use by DPRK groups to Contagious Interview, the campaign that approaches security and crypto people on LinkedIn with job offers and "assessment" coding tasks that deploy malware. The victims of this delivery mechanism are exactly the people reading this blog post, which is why I bother writing it.
 
-For detection, the signal is not the blockchain, it is the malware that reads it. The huntable behavior is the npm package that queries Ethereum RPC services or reads wallet transactions at runtime. That is not normal behavior for a UI library, and it is the kind of thing that stands out once you know to look.
+## What I take from it
 
-## The CTI Read
+Blockchain-backed C2 removes "seize the server" from the playbook permanently. What's left is at the endpoint: why is a UI package resolving ENS or hitting Ethereum RPC? That's a behavior question, and it's answerable with dependency review and egress monitoring rather than indicators, because the infrastructure is infinite and fresh.
 
-The North Korea attribution matters for threat modeling. Contagious Interview targets people in the security and crypto industries with job lures. The assessment tasks are real-looking coding challenges that end in malware. The NullReceiver packages are the delivery mechanism for that campaign's next phase.
-
-For anyone in security or crypto who gets approached with a job assessment, the operational advice is unchanged and worth repeating: verify the company, verify the recruiter, and never run code from an assessment on a machine that matters. The people building these campaigns are now using blockchain dead drops to make their infrastructure impossible to take down. The defense has to happen before the code runs, because after it runs, the C2 will still be there.
+And the recruitment-lure angle stays the one that matters. If a "hiring assessment" asks you to run a codebase, and the dependencies include packages with two-digit download counts and wallet lookups in the bundle, that's not a coding test, it's the operation. The fake address on the blockchain says "helloipbot!!" to whoever decodes it. Don't be the person who runs it just to see.

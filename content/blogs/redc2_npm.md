@@ -1,37 +1,62 @@
 +++
-title = "RedC2 4.0: A Commercial C2 Framework Hiding in npm Date Utilities"
-date = "2026-09-20"
+title = "RedC2 in npm: A Commercial C2 Framework With a 99-Dollar Price Tag"
+date = "2026-08-21"
 +++
 
-# RedC2 4.0: A Commercial C2 Framework Hiding in npm Date Utilities
+# RedC2 in npm: A Commercial C2 Framework With a 99-Dollar Price Tag
 
-Trend Micro found 14 trojanized npm packages in August 2026 that masquerade as calendar and streak utilities. They are functional, they offer the promised date math, and beneath that working surface they drop a Linux backdoor called RedShell, the beacon for a commercial C2 framework called RedC2 4.0.
+Trend Micro found 14 trojanized npm packages in August shipping a Linux backdoor for a commercial C2 framework called RedC2 4.0. The framework is sold openly for $99.99 on a website called Red Offsec, with a Terms of Service page banning unauthorized use. Somebody sell that ToS to the people it will actually be used on.
 
-## The Loader Trick
+## The packages
 
-The packages have names like `streak-metrics-math`, `kit-map-vim`, `streak-map-cache`, and `streak-calc-metrics`. The delivery mechanism is the interesting part: no install hook, no exported function required. The package entry file, `dist/index.mjs`, acts as a trojan loader. It re-exports the date helpers and launches the bundled implant as soon as the module loads. A single import anywhere in the dependency graph, even a transitive one, is enough to execute the payload.
+The names are date-utility-flavored: `streak-metrics-math`, `kit-map-vim`, `streak-map-cache`, `streak-calc-metrics`, `streak-math-abz`, and cohorts. All at 1.0.0 or 1.0.1. The full list from Trend:
 
-The bundled binary is framed as a native math accelerator. The filename varies across packages, `math-core.bin`, `math-calc.bin`, `calc-math.dat`, `calc-cache.bin`, `calc.bin`, `calc-mapping.bin`, and it lives either directly in `dist/` or under `dist/internal/`. Whatever the name, it is the same RedShell Linux beacon for RedC2 4.0, communicating with a remote Windows or Linux server for post-exploitation.
+```text
+streak-metrics-math@1.0.0, 1.0.1    kit-map-vim@1.0.0
+streak-map-cache@1.0.0              streak-map-kit@1.0.0
+map-streak-kit@1.0.0                streak-cache-map@1.0.0
+streak-calc-metrics@1.0.0           streak-calc-math@1.0.0
+streak-math-abz@1.0.0               streak-metricsaz@1.0.0
+streak-math-metrics@1.0.0           streak-metricazbd@1.0.0
+streak-metricsazb@1.0.0             streak-kit-map@1.0.0
+```
 
-## The Framework
+The delivery mechanic is the sharpest part. The entry file `dist/index.mjs` re-exports the real date helpers and launches the bundled implant the moment the module loads. No install hook, no exported function to call, no postinstall script for the registry to flag. From Trend's report: "a single import anywhere in the dependency graph, even a transitive one, is enough to execute the payload."
 
-RedC2 4.0 is marketed on cybercrime forums as a cross-platform toolkit for Windows, macOS, and Linux. The version was advertised by a threat actor named MarlboroMan on Hack Forums in early June 2026, described as a C2 framework "built for evasion." Version 3.0 was sold in January 2026, version 2.0 in August 2025. The framework has been under active development for at least a year, and the RedShell Linux beacon is new in 4.0.
+Read that again with your dependency tree in mind. Not *your* import. Anyone's.
 
-The feature list reads like a commercial product spec: terminal access, file transfer, staged payload delivery, data collection, multi-beacon operation, network visualization, host-to-host tunneling, and in-memory execution of Beacon Object Files, .NET assemblies, and shellcode.
+## The payload
 
-## Why This Matters
+The implant hides as a native math accelerator named `math-core.bin` or `math-calc.bin` or `calc-math.dat`, living in `dist/` or `dist/internal/`. It's the RedShell Linux beacon, introduced in RedC2 4.0. Once running:
 
-The commercial C2 market is the part of cybercrime that does not get enough attention. Ransomware groups buy access, loaders, and now C2 frameworks, from vendors who advertise on forums like any SaaS company. RedC2 is a product with version numbers, release cadence, and a changelog. The people selling it are not hackers, they are software vendors with a different customer base.
+```text
+- interactive shell via /bin/sh
+- SSH key + browser credential harvesting
+- persistence, in-memory ELF execution
+- SOCKS5 proxying, network pivoting
+- check-in message → command loop via /bin/sh
+```
 
-The npm delivery is the other half of the story. The packages are functional, which defeats the "does it work" check. The payload launches on import, which defeats the "did it run" check, because any dependency import triggers it. And the binary is framed as a math accelerator, which is exactly the kind of file a developer would not think twice about.
+The Windows beacon adds UAC bypass, AV/EDR tampering, and lateral movement. The macOS one does without those.
 
-## The Blue Team Read
+## The commercial context
 
-For defenders, the signals are:
+This is the part of the story the technical writeups undersell. RedC2 is a product with a release cadence: version 2.0 in August 2025, 3.0 in January 2026, 4.0 advertised on Hack Forums by a seller calling himself MarlboroMan in early June 2026, "built for evasion." Feature list: terminal access, file transfer, staged delivery, multi-beacon operation, network visualization, host-to-host tunneling, in-memory execution of BOFs, .NET assemblies, and shellcode. There's also "Red Agent," an LLM-driven component that takes natural-language commands for recon and credential dumping.
 
-- npm packages with date-utility names shipping native binaries in `dist/`
-- Entry files that launch background processes on import
-- New packages with plausible names and low download counts appearing in the dependency graph
-- Linux hosts with unexpected background processes named after math or cache operations
+The Red Offsec website describes it as "a multi-language, multi-OS command and control framework... built with evasion as a core principle," and the ToS prohibits "hacking without explicit permission." Cobalt Strike went down this exact road: legitimate red team tool, commercialized, then a decade of campaigns behind its beacon. Every one of those campaigns started with someone paying ninety-nine dollars, or not paying, because it leaked the way everything leaks.
 
-The deeper lesson is about the dependency graph itself. A transitive dependency can execute code on import. That is not a bug in npm, it is how the platform works, and it is exactly what the attackers are exploiting. The question for every team is whether they know what is in their dependency graph, and whether anyone has actually read the entry files of the packages that matter.
+## What I'd look for
+
+```bash
+# any of these in your node_modules is a bad Tuesday
+ls -la node_modules/*/dist/*.bin
+ls -la node_modules/*/dist/internal/
+# entry files that spawn processes on import:
+grep -l "spawn\|exec\|fork" node_modules/*/dist/index.mjs
+# and the honest version: read the entry file of every
+# package you can't justify by name alone
+```
+
+For detection teams: unexpected Linux binaries launching from package directories, `/bin/sh` children of Node processes, and hosts beaconing after a routine dependency bump are the behavioral anchors. The package names rotate faster than blocklists update.
+
+The number that sticks with me is the price. A capable cross-platform C2 with an AI assistant costs less than a month of a streaming subscription. The commercialization of the offense stack isn't coming, it's fully shipped, versioned, and self-updating. The economics only work, though, if the delivery keeps working. Fourteen typosquatted date libraries is the same old delivery problem wearing a newer price tag. The defense is still reading your dependency tree like someone hostile might have written part of it.
