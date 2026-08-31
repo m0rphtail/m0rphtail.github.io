@@ -45,6 +45,7 @@ menu = [
 
 socials = [
     { name = "github", url = "https://github.com/m0rphtail/", icon = "github" },
+    { name = "x", url = "https://x.com/MorphTail", icon = "x" },
     { name = "linkedin", url = "https://linkedin.com/in/kshitijchitnis", icon = "linkedin" },
     { name = "email", url = "mailto:chitniskshitij@gmail.com", icon = "email" },
 ]
