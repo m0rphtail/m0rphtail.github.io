@@ -34,7 +34,7 @@ fancy_code = false
 dynamic_note = false           # a note that can be toggled
 mathjax = true
 mathjax_dollar_inline_enable = true
-stylesheets = ["custom-v2.css"]
+stylesheets = ["custom.css"]
 
 menu = [
     { name = "/blogs", url = "/blogs", weight = 1 },
