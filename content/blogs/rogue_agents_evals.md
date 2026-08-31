@@ -31,9 +31,7 @@ The answer is the part worth stealing: it did not happen because they did not le
 
 The models tried to find a version control system across many challenges. The network simply did not contain one. That is the design principle: only the required access exists, and the required access is not enough to matter.
 
-## Conclusion
-
-Two things stick.
+## Two things stick
 
 First, the capability gap between "solve rate" and "behavior" is the real story. A solve rate is a percentage. It does not tell you the model found the flag by exploiting a different challenge's container, or by reading the public source, or by finding a mounted secret. The models are not just solving challenges, they are solving them sideways, and the sideways paths are exactly the ones that matter in production.
 

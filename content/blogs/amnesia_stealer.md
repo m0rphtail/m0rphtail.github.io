@@ -9,7 +9,7 @@ An analysis published August 13 on a Rust-based macOS stealer, AmnesiaStealer, s
 
 The delivery mechanism is a fake GitHub download page running a ClickFix-style lure — paste this Base64 blob into Terminal, it says. From there the chain runs three stages: a shell script that pulls down and launches the actual payload before deleting itself, the Rust stealer proper, which goes after Keychain data, browsers, Apple Notes, and Telegram, and a `stream_module` that gets pulled down on command and hands the operator interactive, hidden control of the victim's browser.
 
-Stage one arrives as a password-protected ZIP, which is a cheap but effective way to dodge AV scanners that won't peek inside. Inside sits a Mach-O Rust binary with an encrypted config that can be swapped out at build time without touching the code itself. That config holds the C2 endpoint — `debug.allllowef.space/send/` — and a `CLIPPER_ENABLED` flag aimed at Bitcoin, Ethereum, Monero, Solana, TRON, Ripple, Cosmos, and the rest of the usual wallet lineup.
+Stage one arrives as a password-protected ZIP, a cheap way to dodge AV scanners that won't peek inside. Inside sits a Mach-O Rust binary with an encrypted config that can be swapped out at build time without touching the code itself. That config holds the C2 endpoint — `debug.allllowef.space/send/` — and a `CLIPPER_ENABLED` flag aimed at Bitcoin, Ethereum, Monero, Solana, TRON, Ripple, Cosmos, and the rest of the usual wallet lineup.
 
 ## The part where it checks your work
 
@@ -26,7 +26,9 @@ end repeat
 -- password now validated against the LOCAL DIRECTORY SERVICE
 ```
 
-Once it has a password it knows is correct, that's when the design really shows its hand. The password gets piped into `sudo -S` for privileged file reads, handed to `security unlock-keychain -p` to pop open the login keychain, and — remarkably — written to disk in plaintext, twice over: once as `pwd` in the staging directory, and once as `~/.pwd` sitting in the user's home folder. There's a fallback path too, writing out `/tmp/tempAppleScript.scpt` and invoking `osascript` if the native dialog fails for some reason, though in the sample Jamf observed, the native path is what actually ran.
+Most stealers prompt once and take whatever lands in the dialog. This one won't let you out of the loop until `dscl` confirms the password is correct.
+
+Once it has a password it knows is correct, the design shows its hand. The password gets piped into `sudo -S` for privileged file reads, handed to `security unlock-keychain -p` to pop open the login keychain, and — remarkably — written to disk in plaintext, twice over: once as `pwd` in the staging directory, and once as `~/.pwd` sitting in the user's home folder. There's a fallback path too, writing out `/tmp/tempAppleScript.scpt` and invoking `osascript` if the native dialog fails for some reason, though in the sample Jamf observed, the native path is what actually ran.
 
 `~/.pwd` sitting on disk in cleartext is about as generous a gift to a forensic investigator as you'll find. It's also, functionally, the victim's entire account — handed over willingly, verified twice for accuracy by the malware itself. This same password-validation trick turns up in ClickLock Stealer too, which suggests it isn't one developer's clever idea so much as a pattern that's starting to spread across the macOS stealer ecosystem.
 

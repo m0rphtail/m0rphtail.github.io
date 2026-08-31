@@ -47,10 +47,8 @@ The host indicators, verbatim:
 
 The writeup ships a YARA rule and a read-only PowerShell scanner that checks all of it. That's the right way to publish.
 
-## Conclusion
+## What it adds up to
 
 No infrastructure to sinkhole, no beacon to detect, no handshake to fingerprint. It just listens, on interfaces you already trust, inside a process your EDR almost certainly whitelists, and does nothing until its operator decides otherwise.
 
 The honest caveat: the assessment rests on a single binary with no collection context. No attribution, no victim, no proof it was ever deployed. It might be a research exercise that leaked. But built-to-be-side-loaded into a security vendor's agent, with a bespoke bytecode VM whose only job is to be invisible, doesn't read like ambition to me. It reads like someone who studied how responders work and built the thing they'd least like.
-
-If you run ESET on Windows and you've never diffed what's sitting next to `ERAAgent.exe`, do it this week. It's a five-minute check, and the alternative is that someone else does it for you.

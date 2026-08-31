@@ -42,7 +42,7 @@ On top of that, the decoded script does runtime mutation: placeholder values rep
 
 If reflective loading is blocked by environment controls, the loader falls back to a cascading LOLBin chain, `regsvcs.exe`, `installutil.exe`, `msbuild.exe`, `aspnet_compiler.exe`, trying each until one works. Securonix notes it "does not depend on any single LOLBin." That fallback list is basically a survey of which Microsoft-signed binaries developers have requested get blocked in hardened environments. The loader ships the answer to every hardening config, not just one.
 
-## Conclusion
+## Why this one is worth the study time
 
 Two things make this worth the study time.
 

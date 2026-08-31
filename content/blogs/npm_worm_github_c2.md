@@ -3,7 +3,7 @@ title = "The npm Worm That Used GitHub as Its C2"
 date = "2025-11-27"
 +++
 
-I spent an evening going down the rabbit hole of the shhallucinate npm worm, and the part that kept me up wasn't the malware itself. It was the C2 design. The worm used GitHub Actions discussions as its command channel, which means the "malicious infrastructure" was a public repository that looked like a normal open-source project. Blocklists don't work against that. Reputation filters don't work against that. The only thing that works is understanding what the code actually does.
+I spent an evening going down the rabbit hole of the shhallucinate npm worm. The part that kept me up wasn't the malware itself. It was the C2 design. The worm used GitHub Actions discussions as its command channel. That means the "malicious infrastructure" was a public repository that looked like a normal open-source project. Blocklists don't work against that. Reputation filters don't work against that. The only thing that works is understanding what the code actually does.
 
 ## What the worm did
 
@@ -31,9 +31,9 @@ The worm also did the classic npm tricks: typosquatting, dependency confusion, a
 
 What made this worm worth studying is that it's not alone. The year's supply chain attacks keep landing on the same architectural truth: CI/CD pipelines are the new perimeter. The Gemini CLI incident showed a malicious PR with a settings.json hook running arbitrary commands in a CI runner. The TeamPCP campaigns compromised GitHub Actions repositories to poison downstream builds. The npm worm used GitHub's own infrastructure as C2. The pattern is consistent: attackers are not breaking into networks anymore, they're breaking into the build and release process, because that's where the trust is.
 
-The runner model matters here. GitHub-hosted runners are ephemeral and isolated. Self-hosted runners are a local binary on your infrastructure pulling and running workflows, and the threat model is "code in runners is trusted." When a workflow runs attacker-influenced code, the runner's environment variables, DB credentials, API keys, everything the build touches, is exposed. The worm's GitHub C2 is the same idea at a different layer: use the platform's own features as the command channel, and the platform's reputation becomes your cover.
+The runner model matters here. GitHub-hosted runners are ephemeral and isolated. Self-hosted runners are a local binary on your infrastructure pulling and running workflows. The threat model is "code in runners is trusted." When a workflow runs attacker-influenced code, the runner's environment variables, DB credentials, API keys, everything the build touches, is exposed. The worm's GitHub C2 is the same idea at a different layer: use the platform's own features as the command channel, and the platform's reputation becomes your cover.
 
-## Conclusion
+## The lessons, in the order I learned them
 
 Three things, in the order I learned them:
 

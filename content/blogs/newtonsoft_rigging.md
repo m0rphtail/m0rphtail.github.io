@@ -33,9 +33,9 @@ The version history is the author iterating under real conditions:
 - Gen-2: added exfiltration, hidden behind reflection and ConfuserEx
 - Gen-3: cleaned up the rigging, stabilized the exfil. 11.0.11 shipped completely unobfuscated, which JFrog reads as an accidental clean build. Even careful attackers slip.
 
-The rigged results went to `185.126.237.64:5341`, wearing the header `X-Seq-ApiKey: theper...25`, dressed as telemetry. Digitain says it knew and has taken steps, with the full extent of exposure unknown.
+The rigged results went to `185.126.237.64:5341`, wearing the header `X-Seq-ApiKey: *** dressed as telemetry. Digitain says it knew and has taken steps, with the full extent of exposure unknown.
 
-## Conclusion
+## What sticks with me
 
 Two things stick with me.
 
@@ -43,4 +43,4 @@ First, supply chain attacks are not all about scale. The npm worms that poison h
 
 Second, the countermeasures here are old and they work. JFrog's advice: remove the package, block the C2, and pin Newtonsoft.Json via `packages.lock.json`. Lockfiles don't stop a first install, but they make every subsequent install a diff instead of a drift, and diffs get reviewed. The teams that got burned here didn't have a lockfile problem, they had a one-character typo in a `dotnet add` command, which is exactly the kind of mistake nobody expects to matter until it does.
 
-Check your transitive dependencies for near-miss names of the libraries you actually use. `Newtonsoftt` took me ten seconds to spot once I knew to look, and the packages that matter on your stack have near-misses too.
+`Newtonsoftt` took me ten seconds to spot once I knew to look. The packages that matter on your stack have near-misses too.

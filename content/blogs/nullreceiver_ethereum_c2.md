@@ -19,7 +19,7 @@ A zero-value, zero-data Ethereum transfer has a recipient address that must be 2
 5. connect to that IP
 ```
 
-No smart contract call. No calldata. The transaction looks like a wallet moving dust to another wallet, which is what wallets do all day, because they do. The address `0xa658863ea658863e68656c6c6f6970626f742121` that carried `166.88.134.62` decodes further: trailing bytes `68656c6c6f6970626f742121` spell ASCII "helloipbot!!". Whoever built this left a signature joke inside the fake address. The bot waves back.
+No smart contract call. No calldata. The transaction looks like a wallet moving dust to another wallet, which is what wallets do all day. The address `0xa658863ea658863e68656c6c6f6970626f742121` that carried `166.88.134.62` decodes further: trailing bytes `68656c6c6f6970626f742121` spell ASCII "helloipbot!!". Whoever built this left a signature joke inside the fake address.
 
 Every lookup reads a brand-new throwaway destination, so there's no fixed, watchable endpoint. That's the delta against classic EtherHiding, where defenders could watch the known payload-carrying contract for new transactions. NullReceiver never reuses a destination. Sixty-eight transactions had run since July 27, 2026, the day before the two npm packages went live.
 
@@ -33,7 +33,7 @@ NullReceiver buys stealth by shrinking capacity. EtherHiding smuggles a full URL
 
 The attribution chain is the usual one: Guardio Labs documented EtherHiding in October 2023; GTIG tied its use by DPRK groups to Contagious Interview, the campaign that approaches security and crypto people on LinkedIn with job offers and "assessment" coding tasks that deploy malware. The victims of this delivery mechanism are exactly the people reading this blog post, which is why I bother writing it.
 
-## Conclusion
+## What's left to defend
 
 Blockchain-backed C2 removes "seize the server" from the playbook permanently. What's left is at the endpoint: why is a UI package resolving ENS or hitting Ethereum RPC? That's a behavior question, and it's answerable with dependency review and egress monitoring rather than indicators, because the infrastructure is infinite and fresh.
 
