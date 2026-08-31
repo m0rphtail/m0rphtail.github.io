@@ -70,7 +70,7 @@ time {
 }
 
 /* Old post list spacing and title size */
-.list-item {
+.post-list .list-item, .tag-list .list-item {
   margin-bottom: 60px;
 }
 .post-header h1 {
