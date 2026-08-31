@@ -21,8 +21,3 @@ echo "aWN0ZnsxbnNwM2N0MHJfcjAwX2cwZXNfdGgwbmt9" | base64 -d
 ```
 
 #### flag >> `ictf{1nsp3ct0r_r00_g0es_th0nk}`
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

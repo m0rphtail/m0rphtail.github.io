@@ -45,7 +45,7 @@ This is the part of the story the technical writeups undersell. RedC2 is a produ
 
 The Red Offsec website describes it as "a multi-language, multi-OS command and control framework... built with evasion as a core principle," and the ToS prohibits "hacking without explicit permission." Cobalt Strike went down this exact road: legitimate red team tool, commercialized, then a decade of campaigns behind its beacon. Every one of those campaigns started with someone paying ninety-nine dollars, or not paying, because it leaked the way everything leaks.
 
-## What I'd look for
+## What to look for
 
 ```bash
 # any of these in your node_modules is a bad Tuesday
@@ -60,8 +60,3 @@ grep -l "spawn\|exec\|fork" node_modules/*/dist/index.mjs
 For detection teams: unexpected Linux binaries launching from package directories, `/bin/sh` children of Node processes, and hosts beaconing after a routine dependency bump are the behavioral anchors. The package names rotate faster than blocklists update.
 
 The number that sticks with me is the price. A capable cross-platform C2 with an AI assistant costs less than a month of a streaming subscription. The commercialization of the offense stack isn't coming, it's fully shipped, versioned, and self-updating. The economics only work, though, if the delivery keeps working. Fourteen typosquatted date libraries is the same old delivery problem wearing a newer price tag. The defense is still reading your dependency tree like someone hostile might have written part of it.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

@@ -51,8 +51,3 @@ The payload ships with a version number that reads like a SaaS changelog, and th
 What strikes me about the whole chain is the division of labor. A compromised website does the trust, a blockchain does the persistence, a CDN does the bandwidth, Windows' own binaries do the execution, a wordlist does the encoding, and a fake CAPTCHA does the social engineering. Not one component is sophisticated alone. The composite is a machine where every defensive control has a designated counter-layer: blocklists→blockchain, file AV→in-memory, ETW→hardware breakpoints, user caution→CAPTCHA theater.
 
 The detection anchor that still works, because it's the one thing the chain can't launder: ` rundll32.exe loading from a WebDAV UNC path` is a process/network behavior, not a file signature. Sysmon event 15 or any ESEN-equivalent catching `rundll32` with a `\\` path in the command line fires on all three WebDAV variants regardless of obfuscation. That, plus the boring human layer: nobody running a business has a legitimate reason to paste an admin command to solve a CAPTCHA. "I'm not a robot" that requires running code makes you exactly the robot.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

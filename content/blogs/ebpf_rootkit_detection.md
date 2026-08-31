@@ -40,7 +40,7 @@ The three families, VoidLink, LinkPro, Atomic Arch, use different helpers for di
 `BPF_PROG_LOAD` is the point of highest trust. Capture the full load-time fingerprint. Uncommon helpers like `bpf_probe_write_user()`, `bpf_override_return()`, and `bpf_send_signal()` deserve caution, especially together or from suspicious loaders.
 
 ```bash
-# what I'd log at BPF_PROG_LOAD time
+# what to log at BPF_PROG_LOAD time
 # helper IDs used, program type, attach target, loader identity
 # then alert on:
 #   bpf_probe_write_user (helper 36)  - user memory writes
@@ -56,7 +56,3 @@ LinkPro also leaks through `bpf_printk`: both handlers log "BPF cmd: %d, start_i
 The uncomfortable part is that eBPF rootkits hide in the same place EDR agents live. The kernel trusts eBPF programs because the loader is supposed to be trusted, and the loader is a root process. Once you are root, the kernel's own introspection tooling becomes the thing you lie to.
 
 The load-time angle is the one that survives. You cannot reliably detect a rootkit that is already shaping every read, but you can catch the load before it starts. That means treating `BPF_PROG_LOAD` telemetry as a first-class detection source, not a debugging aid. The window is small, the signal is real, and it is the only place the rootkit has not yet learned to lie.
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

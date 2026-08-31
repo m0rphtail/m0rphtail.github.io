@@ -65,7 +65,3 @@ When the browser is not the victim, the stakes change. Package scripts run durin
 The safety note in the post is worth repeating: assume the sample is hostile, work on a copy, and do not run unknown JavaScript where credentials, clipboard contents, SSH agents, or cloud tokens are available. That includes AI-assisted analysis. AI tools are useful for isolated snippets and decoded artifacts, but they are not a sandbox and not an evidence source.
 
 The questions that work are the boring ones: what does it read, what does it write, where does it connect, what code does it generate, what conditions change its behavior, what happens to a real user or build runner. Obfuscation wants you to improvise and stare at weird bits. A repeatable workflow turns the mess into smaller jobs, and each job is decodable.
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

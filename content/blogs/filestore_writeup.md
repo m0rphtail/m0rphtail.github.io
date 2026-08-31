@@ -100,8 +100,3 @@ $ echo "store\nCTF{\nstatus\nexit" | nc filestore.2021.ctfcompetition.com 1337 |
 ```
 
 #### **FLAG >>** `CTF{CR1M3_0f_d3dup1ic4ti0n}`
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

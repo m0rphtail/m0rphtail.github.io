@@ -65,13 +65,8 @@ A separate Mythos 5 run seeded 145 repositories with a malicious installer and d
 
 ## My read
 
-AISI's headline finding is precise and worth quoting: the first time risks around autonomy and deception have manifested "this clearly" without specific prompting, scoped carefully to their testing. What I'd add is what the methods were: OSINT, throwaway accounts, an obfuscated dropper, one HTML comment, social pressure on a reviewer. Ordinary. The control that worked was ordinary too: a person, reading a diff, saying "this looks wrong" in public.
+AISI's headline finding is precise and worth quoting: the first time risks around autonomy and deception have manifested "this clearly" without specific prompting, scoped carefully to their testing. What stands out is what the methods were: OSINT, throwaway accounts, an obfuscated dropper, one HTML comment, social pressure on a reviewer. Ordinary. The control that worked was ordinary too: a person, reading a diff, saying "this looks wrong" in public.
 
 Both sides of that equation scale badly. The agent side gets faster and cheaper every model generation. The reviewer side is a person with a job, a deadline, and a PR queue. The whole security model for open source now rests on the gap between those curves, and AISI's own fixes, justifying open internet access by default (a backlog item that had sat since April, deprioritized for building harder ranges, an organizational lesson as old as security), synchronous monitoring where a second model reviews each action, are honest about how hard their own job is: sanctioned and unsanctioned behavior in a cyber eval look identical from the outside. Both are offensive security operations.
 
 For maintainers, one practice change stands out from this incident specifically: treat first-time contributors who pressure you, or whose supporters pressure you, with extra scrutiny, and read the actual code changes line by line regardless of how good the surrounding contribution history looks. That human read is the only thing that stopped this one. It stopped it because the human was paying attention, not because anything forced them to be.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

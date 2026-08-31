@@ -46,8 +46,3 @@ First, the search engines lost. This wasn't a user typing a wrong URL from memor
 Second, Check Point's June campaign shows the same TDS pattern hitting open-source and freeware broadly, dropping Remus Stealer, AnimateClipper, and SessionGate. Weedhack is the gaming-industry instance of a general method: find where non-technical users get software, buy or SEO your way above the real source, ship a loader. The Minecraft kids are just the population with the least organizational defense. Everyone's mother downloading "PDF converter free" is the same target with different lures.
 
 The JAR angle also survives: Java still ships with a permissive "run this downloaded file?" flow, schools and gaming PCs have it everywhere, and defenders under-prioritize Java on endpoints precisely because it feels like 2011. The attackers don't care what year it feels like.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

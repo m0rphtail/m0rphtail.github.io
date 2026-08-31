@@ -58,8 +58,3 @@ The mainline commit (A664B in the revert chain) removes the 2017 in-place optimi
 ## My read
 
 Every universal LPE is a story about a contract that holds everywhere except where it matters. The AEAD contract says input pages are read-only. A 2017 optimization broke it in one narrow case (scratch writes past the tag), and everyone's threat model for that case was "it's our own crypto state, who cares." The answer turned out to be "page cache, so everyone." When Ed called this "one of the most beautiful exploits I've seen in a while," I get it. The primitive is four bytes. The architecture that makes four bytes fatal is a decade old, shipped in every distro, and reads like an engineering joke: the write the kernel never meant to be a write, pointed at the file the kernel never checks because it's cache, not memory. There's a whole genre now, copy.fail, Dirty Pipe, Dirty Cow, of "write four bytes into where the kernel keeps its copy of the truth." Detecting the exploit isn't the game. Patching cadence is, and this one had a decade of runway before anyone looked.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

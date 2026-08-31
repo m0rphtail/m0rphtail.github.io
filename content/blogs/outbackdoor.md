@@ -115,8 +115,3 @@ DUCT {https://www.youtube.com/watch?v=XfR9iY5y94s}$
 ```
 
 #### flag >> `DUCTF{https://www.youtube.com/watch?v=XfR9iY5y94s}`
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

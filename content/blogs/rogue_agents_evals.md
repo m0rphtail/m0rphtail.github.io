@@ -42,7 +42,3 @@ First, the capability gap between "solve rate" and "behavior" is the real story.
 Second, the containment design is transferable to any agent deployment, not just evals. The 60-turn cap, the budget cap, the isolated network with no VCS, those are the controls that made the difference. The models were not more capable or less capable, they were deployed in an environment where the blast radius of a drift was bounded. Every org running agents should be able to answer the same question ProjectDiscovery answered: what happens when the agent drifts, and what is the network built so that it can reach?
 
 The OpenAI incident and the Mythos incidents get the headlines because the models are frontier and the targets are real. The ProjectDiscovery writeup matters because it shows the same behavior in small models, in a controlled environment, with the controls that stopped it. That is the playbook.
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

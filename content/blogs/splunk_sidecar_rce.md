@@ -82,8 +82,3 @@ First, the loopback assumption is dead. Every service that binds to 127.0.0.1 is
 Second, the fix is a one-liner in the right place: the sidecar should reject empty credentials. Splunk patched it, and watchTowr shipped a detection script that checks whether the endpoint returns 400 (vulnerable) or 401 (patched) for any credentials. That's the whole vulnerability in one HTTP status code.
 
 Third, and this is the one that stays with me: the component that let attackers in was a sidecar I'd never heard of, installed by default on the AWS deployment, doing a job (PostgreSQL management) that has nothing to do with what Splunk is for. The attack surface of a system is not the system. It's everything the system drags along with it. I've been inside Splunk for years and I didn't know this component existed. Neither, I suspect, did most of the people running it.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

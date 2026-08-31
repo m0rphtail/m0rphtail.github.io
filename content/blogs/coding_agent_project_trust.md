@@ -47,7 +47,7 @@ The social engineering pattern is documented. Microsoft's Contagious Interview c
 
 The hook path got attention, so the review gates went up. The MCP and PATH paths did not need a model response or approval, which is exactly why they work.
 
-## What I'd do
+## What to do
 
 The honest answer is that a reviewer cannot win this game. A project can influence execution through hooks, skills, MCP servers, editor tasks, dev-container settings, environment variables, runtime startup files, and ordinary executables. The attacker needs one hiding place. The reviewer has to find them all.
 
@@ -74,7 +74,3 @@ For the Contagious Interview pattern specifically: a take-home that requires clo
 ## My read
 
 The interesting part is how the defense evolved. Codex put hooks behind a review gate, and the research moved sideways to MCP. That is the pattern of this whole space: every control creates a new hiding place, and the hiding places are all "features" that assign executable meaning to project content. The only durable defense is isolation, not inspection. Treat the repo as hostile until proven otherwise, because the agent's trust prompt is not a security boundary, it is a UX feature.
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

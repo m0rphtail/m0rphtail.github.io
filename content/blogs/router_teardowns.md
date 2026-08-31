@@ -73,8 +73,3 @@ The disclosure ending is the part that should bother regulators more than it doe
 ## What I take from it
 
 Firmware encryption on a router isn't security, it's an admission. You encrypt when you have something to hide, occasionally a legitimate IP concern, usually backdoor passwords. The Tenda pattern is a decade long and counting, and every break follows the same shape: not a clever memory-corruption, but a design so bad the firmware tells you the answer on a console tap. The practical defense hasn't changed since the first backdoor story: if you ship consumer networking gear with any credential material derived from secrets *stored on the same device as the credential*, you've built a self-defeating scheme, and someone with a $10 UART adapter and a free afternoon will prove it.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

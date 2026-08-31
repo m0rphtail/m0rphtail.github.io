@@ -53,8 +53,3 @@ First, the URL trick is a transferable idea, and transferable ideas are the ones
 Second, the defensive anchor that survives all of it is process ancestry and in-memory execution artifacts. The chain can mutate URLs, hashes, and scripts all it wants; it cannot easily change `wscript.exe → powershell.exe -bypass → in-memory .NET` without giving up the delivery. That's where the YARA-in-memory scanning and AMSI coverage belong, and it's why AMSI tampering keeps being the escalation of choice for these families. The battle isn't over the payload, it's over whether the loader can run unsigned code in a script host at all. Everything after that step is negotiable; nothing before it is.
 
 For PureLogs, the MaaS angle stays the economic story: a subscription stealer with support, delivered through a chain whose loader engineering is better than most APT tooling. Commodity is a spectrum, and at the top end, the only difference from targeted ops is the victim selection algorithm.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

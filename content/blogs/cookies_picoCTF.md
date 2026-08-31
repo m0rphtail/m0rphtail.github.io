@@ -20,8 +20,3 @@ for name in {0..20} ;do curl -i -s -k -X $'GET' \
     -b $'name='$name'' \
     $'http://mercury.picoctf.net:6418/check' | grep pico ;done
 ```
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

@@ -52,8 +52,3 @@ The `remote_stream` command triggers a second Rust binary that drives the browse
 None of this is a vulnerability. The CVE-2020-9771 abuse aside (patched years ago, still working against Catalina, which tells you about long-tail fleet reality), the chain is: user pastes a command, user types their password, malware checks the password is right, user's data leaves. macOS's security model assumes the user is the root of trust, and this entire class of attack is what happens when that assumption is monetized.
 
 Detection-wise, the disk artifacts are the cheap wins: `~/.pwd`, the `/tmp/tempAppleScript.scpt` fallback, a LaunchDaemon named like Apple's crash reporter that you didn't install, and Chromium processes launched headless by something that isn't Chrome's own updater. And `dscl` called from anything that isn't your MDM or directory tooling is worth a tripwire. The behavioral truth under it all: if your EDR can't tell you *why* a process read `~/Library/Keychains/` and then opened network connections to a `.space` domain, the Rust rewrite of the classic stealer playbook won't be the thing that tips you off. The tip-off will be the user saying the installer kept asking for their password. That's not a joke, it's the actual best detection signal this bug has: humans notice loops.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

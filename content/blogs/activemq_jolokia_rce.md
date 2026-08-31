@@ -66,8 +66,3 @@ The finding method is the part I keep turning over. Sunkavally's workflow: promp
 I've been skeptical of AI-assisted vuln hunting, mostly because the demos are cherry-picked. But this is a different shape: the LLM didn't find a bug by fuzzing or pattern-matching a known class. It read the allowlist, noticed the blanket `*` on operations, and asked what an attacker could do with `addNetworkConnector`. That's reasoning about a security boundary, not pattern matching. The human validated it, built the exploit chain, and shipped the writeup.
 
 The uncomfortable part: this bug sat in the code for 13 years. The allowlist fix from 2022 was reviewed, shipped, and deployed, and the hole it left was invisible to everyone until an LLM read the config and asked the right question. I don't know if that means the LLMs are getting good or the review process was always this porous. Probably both.
-
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

@@ -45,7 +45,7 @@ find / -name "Udydn.class" -o -name "Moo97.class" 2>/dev/null
 # missing or truncated server.log is itself a finding
 ```
 
-## What I'd do
+## What to do
 
 ```text
 1. Patch now. Emergency patches for v24, v25, v26.
@@ -60,7 +60,3 @@ find / -name "Udydn.class" -o -name "Moo97.class" 2>/dev/null
 ```
 
 The 2023 version of this story, CVE-2023-27350, went from disclosure to Cl0p and LockBit in single-digit days. The current window between IOC publication and ransomware deployment is where the outcome gets decided. The indicators are the part that cannot wait.
-
----
-
-*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*
