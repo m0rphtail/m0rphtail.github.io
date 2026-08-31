@@ -5,7 +5,7 @@ date = "2025-08-08"
 
 # MSG_OOB: The Esoteric Kernel Feature That Became a Sandbox Escape
 
-Project Zero's Jann Horn published a writeup in August 2025 that I read twice, because it connects three things I thought I understood: an obscure kernel feature almost nobody uses, a sandbox that exposes more than it should, and a use-after-free that took a specific sequence of syscalls to hit. The bug is CVE-2025-38236, in Linux's `MSG_OOB` support for UNIX domain sockets, and the exploit goes from Chrome renderer code execution to kernel.
+A Project Zero writeup from August 2025 connects three things I thought I understood: an obscure kernel feature almost nobody uses, a sandbox that exposes more than it should, and a use-after-free that took a specific sequence of syscalls to hit. The bug is CVE-2025-38236, in Linux's `MSG_OOB` support for UNIX domain sockets, and the exploit goes from Chrome renderer code execution to kernel.
 
 ## The feature nobody uses
 

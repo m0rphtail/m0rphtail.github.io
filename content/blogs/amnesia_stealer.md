@@ -5,7 +5,7 @@ date = "2026-08-13"
 
 # AmnesiaStealer: The macOS Stealer That Checks Your Password Before Using It
 
-Jamf Threat Labs published analysis on August 13 of a Rust-based macOS stealer, AmnesiaStealer, and there's one detail that puts it above the usual infostealer commodity pile: it validates the password you type before it exfiltrates. Native prompt, "installer" disguise, and your password gets checked against the local directory service with `dscl`. Wrong? "Incorrect password. Please try again," in a loop, until you type the right one. The malware QA's its own phishing.
+The August 13 analysis of a Rust-based macOS stealer, AmnesiaStealer, has one detail that puts it above the usual infostealer commodity pile: it validates the password you type before it exfiltrates. Native prompt, "installer" disguise, and your password gets checked against the local directory service with `dscl`. Wrong? "Incorrect password. Please try again," in a loop, until you type the right one. The malware QA's its own phishing.
 
 ## The chain
 

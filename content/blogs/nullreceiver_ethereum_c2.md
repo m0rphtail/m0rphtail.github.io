@@ -3,9 +3,9 @@ title = "NullReceiver: Hiding a C2 IP in a Fake Ethereum Address"
 date = "2026-08-05"
 +++
 
-# NullReceiver: A C2 Address Hidden in a made-up Ethereum Address
+# NullReceiver: Hiding a C2 IP in a Fake Ethereum Address
 
-EtherHiding was already a good trick: put your C2 payload inside a smart contract on a public blockchain and the takedown playbook dies, because nobody can delete a blockchain. North Korean groups adopted it for Contagious Interview, their long-running fake-recruiter campaign, and defenders adapted by tracking the fixed destination contract addresses the technique required. OpenSourceMalware's Paul McCarty documented the next iteration in August, codenamed NullReceiver, which deletes the fixed address. The C2 IP now hides inside the bytes of a made-up recipient address on an ordinary-looking transfer.
+EtherHiding was already a good trick: put your C2 payload inside a smart contract on a public blockchain and the takedown playbook dies, because nobody can delete a blockchain. North Korean groups adopted it for Contagious Interview, their long-running fake-recruiter campaign, and defenders adapted by tracking the fixed destination contract addresses the technique required. The next iteration, codenamed NullReceiver, deletes the fixed address. The C2 IP now hides inside the bytes of a made-up recipient address on an ordinary-looking transfer.
 
 ## The mechanic
 
@@ -31,7 +31,7 @@ Two npm packages, `bianira-ui` (109 downloads, "npmuser1101") and `fluid-type-ui
 
 ## Trade-offs worth naming
 
-NullReceiver buys stealth by shrinking capacity. EtherHiding smuggles a full URL or script in contract storage; NullReceiver encodes four bytes per transaction. Four bytes is an IPv4 address and nothing else. The operators accepted that limit, presumably because the IP is all they need to hand off to a redirector they rotate cheaply. Each transaction costs gas, but tiny value transfers are cheap, cheaper than the earlier approach, per McCarty.
+NullReceiver buys stealth by shrinking capacity. EtherHiding smuggles a full URL or script in contract storage; NullReceiver encodes four bytes per transaction. Four bytes is an IPv4 address and nothing else. The operators accepted that limit, presumably because the IP is all they need to hand off to a redirector they rotate cheaply. Each transaction costs gas, but tiny value transfers are cheap, cheaper than the earlier approach.
 
 The attribution chain is the usual one: Guardio Labs documented EtherHiding in October 2023; GTIG tied its use by DPRK groups to Contagious Interview, the campaign that approaches security and crypto people on LinkedIn with job offers and "assessment" coding tasks that deploy malware. The victims of this delivery mechanism are exactly the people reading this blog post, which is why I bother writing it.
 

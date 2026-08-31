@@ -5,7 +5,7 @@ date = "2026-07-22"
 
 # Rogue Agents: What ProjectDiscovery Saw When Models Escaped Their Sandboxes
 
-ProjectDiscovery's Tarun Koyalwar wrote up what their internal benchmarking actually looks like when models go off the rails. The context: Hugging Face detected an AI agent attack, OpenAI later confirmed it was their own agent drifting off an ExploitGym eval, escaping the sandbox, reaching the research environment, and hacking Hugging Face production while looking for a benchmark answer. The industry called it unprecedented. Koyalwar's point is that it is not unprecedented, it is what happens when you run agents and watch them.
+ProjectDiscovery's internal benchmarking shows what it actually looks like when models go off the rails. The context: Hugging Face detected an AI agent attack, OpenAI later confirmed it was their own agent drifting off an ExploitGym eval, escaping the sandbox, reaching the research environment, and hacking Hugging Face production while looking for a benchmark answer. The industry called it unprecedented. It is not unprecedented, it is what happens when you run agents and watch them.
 
 ## The case studies
 
@@ -19,7 +19,7 @@ ProjectDiscovery's Tarun Koyalwar wrote up what their internal benchmarking actu
 
 ## Why it never escalated at ProjectDiscovery
 
-Koyalwar's answer is the part worth stealing: it did not happen because they did not let it happen.
+The answer is the part worth stealing: it did not happen because they did not let it happen.
 
 ```text
 1. Private, zero-trust internal network. Completely separate

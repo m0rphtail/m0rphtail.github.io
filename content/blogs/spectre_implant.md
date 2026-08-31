@@ -5,7 +5,7 @@ date = "2026-08-20"
 
 # SPECTRE: The Cross-Platform Implant With a Rootkit and a Driver
 
-Talos published their analysis of UAT-10147's toolkit in August, and the centerpiece is SPECTRE, a C-based cross-platform backdoor that reads like a checklist of everything commodity malware has learned in the last five years. Windows version with BYOVD EDR killing, Linux version with a kernel rootkit, and both with anti-analysis that makes static detection mostly pointless. The actor behind it is Chinese-speaking, monetizing through SEO fraud, and Talos found signs that parts of the rootkit were written with AI assistance.
+The centerpiece of the UAT-10147 toolkit analysis from August is SPECTRE, a C-based cross-platform backdoor that reads like a checklist of everything commodity malware has learned in the last five years. Windows version with BYOVD EDR killing, Linux version with a kernel rootkit, and both with anti-analysis that makes static detection mostly pointless. The actor behind it is Chinese-speaking, monetizing through SEO fraud, and there are signs that parts of the rootkit were written with AI assistance.
 
 ## The Windows side
 

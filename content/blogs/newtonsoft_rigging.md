@@ -5,7 +5,7 @@ date = "2026-07-22"
 
 # The Newtonsoft.Json Fork That Rigged a Betting Platform
 
-JFrog published a finding in July that I keep coming back to: a typosquatted fork of Newtonsoft.Json on NuGet that is a completely normal JSON library for everyone, and a weapon for exactly one target. No credential theft, no persistence, no lateral movement. Its whole purpose is rigging the results of one crash game on one betting platform.
+A typosquatted fork of Newtonsoft.Json on NuGet keeps coming back to me: it is a completely normal JSON library for everyone, and a weapon for exactly one target. No credential theft, no persistence, no lateral movement. Its whole purpose is rigging the results of one crash game on one betting platform.
 
 ## The package
 
@@ -23,7 +23,7 @@ var settings = new JsonSerializerSettings();
 JsonConvert.DefaultSettings = () => settings;   // ← backdoor arms HERE
 ```
 
-The malicious behavior begins only after the host initializes `JsonConvert.DefaultSettings`, can only succeed on systems exposing the target's specific game backend method, and only fires after a randomized delay. JFrog's Guy Korolevski put it plainly: non-targeted consumers see a working JSON library and no rigging behavior, which is exactly what makes the typosquat so effective.
+The malicious behavior begins only after the host initializes `JsonConvert.DefaultSettings`, can only succeed on systems exposing the target's specific game backend method, and only fires after a randomized delay. The analysis put it plainly: non-targeted consumers see a working JSON library and no rigging behavior, which is exactly what makes the typosquat so effective.
 
 Run it in a sandbox: functional date math, no network, no obvious ugliness. Static analysis: it's a real fork of a real library with real commits. Reputation checks: 1,200 downloads, plausible version numbers. Nothing fires because nothing is wrong, unless you're Digitain.
 

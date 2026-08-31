@@ -5,7 +5,7 @@ date = "2026-08-03"
 
 # Tenda, Temu, and the Root Password Printed on the Serial Console
 
-Ed at Low Level bought a Tenda AC10 V6 off Amazon, found a bug so dumb it deserved verification, and ended up decrypting the entire firmware image with keys harvested from a factory reset. The whole thing is the best argument I've seen in months for why consumer router security is where it is.
+A Tenda AC10 V6 bought off Amazon turned out to have a bug so dumb it deserved verification, and the exercise ended with the entire firmware image decrypted using keys harvested from a factory reset. It's the best argument I've seen in months for why consumer router security is where it is.
 
 ## The roadblock chain
 

@@ -5,7 +5,7 @@ date = "2026-08-24"
 
 # Weedhack: SEO Poisoning the Minecraft Client Scene
 
-McAfee Labs' August report on Weedhack documents something that sounds trivial until you look at the search results yourself: malicious clones of Minecraft client download sites outranking the real projects on Google, Bing, Brave, and DuckDuckGo. Both the Xenon Client and Nova Client spoofs sat at the top of results across multiple engines while the legitimate clients, which live on GitHub and Modrinth, ranked below them. The kids downloading cheats are the detection canary for everyone else. When the first result for a tool is the attacker, the trust model of the entire search web has a bug.
+The Weedhack analysis from August documents something that sounds trivial until you look at the search results yourself: malicious clones of Minecraft client download sites outranking the real projects on Google, Bing, Brave, and DuckDuckGo. Both the Xenon Client and Nova Client spoofs sat at the top of results across multiple engines while the legitimate clients, which live on GitHub and Modrinth, ranked below them. The kids downloading cheats are the detection canary for everyone else. When the first result for a tool is the attacker, the trust model of the entire search web has a bug.
 
 ## The setup
 

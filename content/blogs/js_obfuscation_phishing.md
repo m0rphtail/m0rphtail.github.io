@@ -3,9 +3,8 @@ title = "JavaScript Obfuscation: From Party Trick to Phishing Kit"
 date = "2026-08-27"
 +++
 
-# JavaScript Obfuscation: From Party Trick to Phishing Kit
 
-Talos's James Hodgkinson wrote the kind of post I wish existed when I started triaging phishing pages: a practical catalog of JavaScript obfuscation, what each trick looks like, and how to get past it. The core message is that obfuscation is not one grand technique, it is a pile of smaller tricks stacked until the useful behavior disappears under ceremony. And the workflow to beat it is boring on purpose.
+When I first started triaging phishing pages, I really wished for a practical guide to JavaScript obfuscation, something that broke down what the tricks looked like and how to get past them. The main point is that obfuscation isn't some single, massive technique; it's just a bunch of small tricks piled together until the actual behavior gets hidden. The best way to beat it is actually pretty boring, and that's by design.
 
 ## The definitions that matter
 

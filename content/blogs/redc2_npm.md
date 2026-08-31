@@ -3,7 +3,7 @@ title = "RedC2: A $99 C2 Framework Shipping Through npm"
 date = "2026-08-21"
 +++
 
-# RedC2 in npm: A Commercial C2 Framework With a 99-Dollar Price Tag
+# RedC2: A $99 C2 Framework Shipping Through npm
 
 Trend Micro found 14 trojanized npm packages in August shipping a Linux backdoor for a commercial C2 framework called RedC2 4.0. The framework is sold openly for $99.99 on a website called Red Offsec, with a Terms of Service page banning unauthorized use. Somebody sell that ToS to the people it will actually be used on.
 

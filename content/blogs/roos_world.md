@@ -4,7 +4,7 @@ date = "2021-08-02"
 updated = "2024-07-12"
 +++
 
-# Roos World
+# Roos world Writeup (ImaginaryCTF 2021)
 
 The source code of the webpage had a comment written in `JSFuck`.
 

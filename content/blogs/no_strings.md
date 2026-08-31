@@ -4,7 +4,7 @@ date = "2021-09-28"
 updated = "2024-07-12"
 +++
 
-# no strings
+# no strings Writeup (DownUnder CTF 2021)
 
 > This binary contains a free flag. No strings attached, seriously!
 > 

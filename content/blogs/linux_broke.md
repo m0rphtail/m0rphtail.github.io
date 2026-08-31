@@ -5,7 +5,7 @@ date = "2026-07-15"
 
 # copy.fail: Four Bytes of Scratch Data and You're Root
 
-A 732-byte Python script that makes you root on every Linux distro since 2017, no offsets, no KASLR defeat, no race to win on your particular kernel build. Ed at Low Level did the full teardown of the bug behind it, and even with a beautified PoC in front of me, I had to draw the scatterlists on paper. This is a memory corruption bug where nothing gets corrupted. That's why it's beautiful, and why it's hard to fix.
+A 732-byte Python script that makes you root on every Linux distro since 2017, no offsets, no KASLR defeat, no race to win on your particular kernel build. Even with a beautified PoC in front of me, I had to draw the scatterlists on paper. This is a memory corruption bug where nothing gets corrupted. That's why it's beautiful, and why it's hard to fix.
 
 ## The setup: AF_ALG
 
@@ -57,4 +57,4 @@ The mainline commit (A664B in the revert chain) removes the 2017 in-place optimi
 
 ## My read
 
-Every universal LPE is a story about a contract that holds everywhere except where it matters. The AEAD contract says input pages are read-only. A 2017 optimization broke it in one narrow case (scratch writes past the tag), and everyone's threat model for that case was "it's our own crypto state, who cares." The answer turned out to be "page cache, so everyone." When Ed called this "one of the most beautiful exploits I've seen in a while," I get it. The primitive is four bytes. The architecture that makes four bytes fatal is a decade old, shipped in every distro, and reads like an engineering joke: the write the kernel never meant to be a write, pointed at the file the kernel never checks because it's cache, not memory. There's a whole genre now, copy.fail, Dirty Pipe, Dirty Cow, of "write four bytes into where the kernel keeps its copy of the truth." Detecting the exploit isn't the game. Patching cadence is, and this one had a decade of runway before anyone looked.
+Every universal LPE is a story about a contract that holds everywhere except where it matters. The AEAD contract says input pages are read-only. A 2017 optimization broke it in one narrow case (scratch writes past the tag), and everyone's threat model for that case was "it's our own crypto state, who cares." The answer turned out to be "page cache, so everyone." The phrase "one of the most beautiful exploits I've seen in a while" stuck with me. I get it. The primitive is four bytes. The architecture that makes four bytes fatal is a decade old, shipped in every distro, and reads like an engineering joke: the write the kernel never meant to be a write, pointed at the file the kernel never checks because it's cache, not memory. There's a whole genre now, copy.fail, Dirty Pipe, Dirty Cow, of "write four bytes into where the kernel keeps its copy of the truth." Detecting the exploit isn't the game. Patching cadence is, and this one had a decade of runway before anyone looked.

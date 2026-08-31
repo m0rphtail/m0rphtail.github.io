@@ -5,7 +5,7 @@ date = "2026-08-24"
 
 # WordlistLoader: Shellcode Hidden as Plain English Words
 
-Gen Digital's August report on WordlistLoader has the most novel encoding trick I've seen in a consumer-facing malware chain this year: the shellcode is stored as a sequence of plain English words, one word per byte. A lookup-table cipher where the ciphertext reads like grocery lists. AV parsers see words; the loader sees bytes. There's even a variant that swaps the wordlist for 16-byte UUID-encoded chunks, because one encoding scheme is a signature waiting to happen.
+The WordlistLoader analysis from August has the most novel encoding trick I've seen in a consumer-facing malware chain this year: the shellcode is stored as a sequence of plain English words, one word per byte. A lookup-table cipher where the ciphertext reads like grocery lists. AV parsers see words; the loader sees bytes. There's even a variant that swaps the wordlist for 16-byte UUID-encoded chunks, because one encoding scheme is a signature waiting to happen.
 
 ## The chain
 

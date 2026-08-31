@@ -5,11 +5,11 @@ date = "2026-06-18"
 
 # The SIEM That Lets You In: Splunk's Pre-Auth RCE
 
-I spend my working day inside Splunk. So when watchTowr Labs published their analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, I read it the way you'd read a report about your own house. The vulnerability is in the PostgreSQL Sidecar Service, a component I had never heard of, which is exactly the problem.
+I spend my working day inside Splunk. So when the analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, came out, I read it the way you'd read a report about your own house. The vulnerability is in the PostgreSQL Sidecar Service, a component I had never heard of, which is exactly the problem.
 
 ## The advisory said less than it hinted
 
-Splunk's June 10 advisory had the shape of something serious: no authentication required, CVSS 9.8, and a name long enough to be a sentence. But it didn't say "RCE" anywhere. That combination, high score, no explicit impact, is the kind of thing that makes researchers suspicious. watchTowr's writeup is a masterclass in what to do with that suspicion.
+Splunk's June 10 advisory had the shape of something serious: no authentication required, CVSS 9.8, and a name long enough to be a sentence. But it didn't say "RCE" anywhere. That combination, high score, no explicit impact, is the kind of thing that makes researchers suspicious. The writeup is a masterclass in what to do with that suspicion.
 
 The first question was deployment scope. Reading the advisory carefully:
 

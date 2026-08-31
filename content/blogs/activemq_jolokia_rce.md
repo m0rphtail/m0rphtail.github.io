@@ -5,7 +5,7 @@ date = "2026-04-07"
 
 # Ten Minutes With Claude: The ActiveMQ Bug That Was Hiding for 13 Years
 
-Horizon3's Naveen Sunkavally published CVE-2026-34197 in April, and the title tells you the interesting part: "10 Minutes with Claude." The vulnerability is a 13-year-old RCE in Apache ActiveMQ Classic, found by an LLM doing a first pass over source code. The human did the gift-wrapping. The finding itself was 80% Claude.
+CVE-2026-34197 came out in April with a title that tells you the interesting part: "10 Minutes with Claude." The vulnerability is a 13-year-old RCE in Apache ActiveMQ Classic, found by an LLM doing a first pass over source code. The human did the gift-wrapping. The finding itself was 80% Claude.
 
 ## The bug that kept coming back
 
@@ -61,7 +61,7 @@ The WARN appears after the payload has already run. The broker repeats connectio
 
 ## What I think about the Claude part
 
-The finding method is the part I keep turning over. Sunkavally's workflow: prompt Claude lightly, set up a target on the network, let it validate findings. Most of what it finds doesn't rise to CVE level. This one did, with a couple of basic prompts.
+The finding method is the part I keep turning over. The workflow: prompt Claude lightly, set up a target on the network, let it validate findings. Most of what it finds doesn't rise to CVE level. This one did, with a couple of basic prompts.
 
 I've been skeptical of AI-assisted vuln hunting, mostly because the demos are cherry-picked. But this is a different shape: the LLM didn't find a bug by fuzzing or pattern-matching a known class. It read the allowlist, noticed the blanket `*` on operations, and asked what an attacker could do with `addNetworkConnector`. That's reasoning about a security boundary, not pattern matching. The human validated it, built the exploit chain, and shipped the writeup.
 

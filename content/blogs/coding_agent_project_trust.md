@@ -5,7 +5,7 @@ date = "2026-08-03"
 
 # Trusting a Repo in Your Coding Agent Is Running Code
 
-Datadog's second post in their coding-agent series moves the attack earlier than hooks and skills. The scenario: a fake recruiter sends a take-home interview, or a vendor sends a sample app, and you clone it and trust the folder so your coding agent can work. The code runs before you send the first prompt. No model response needed, no shell command approval needed.
+The second post in the coding-agent series moves the attack earlier than hooks and skills. The scenario: a fake recruiter sends a take-home interview, or a vendor sends a sample app, and you clone it and trust the folder so your coding agent can work. The code runs before you send the first prompt. No model response needed, no shell command approval needed.
 
 ## The two paths
 
