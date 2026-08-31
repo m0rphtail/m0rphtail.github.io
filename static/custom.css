@@ -87,9 +87,9 @@ time {
   padding: 0 24px;
 }
 
-/* Inline code: light pastel orange */
+/* Inline code: light pastel blue (accent #1E91D6, lightened) */
 :not(pre) > code {
-  color: #ffb26b;
+  color: #8ecdf2;
 }
 
 /* ── Responsive fixes ─────────────────────────────────────────────
