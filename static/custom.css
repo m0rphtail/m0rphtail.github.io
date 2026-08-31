@@ -1,7 +1,8 @@
 /* kchitnis.com theme override — restore the pre-upgrade look on top of the updated apollo theme */
 
-/* Blue primary (was #ef5350 in upstream) */
-:root, html.light, html.dark {
+/* Blue primary (was #ef5350 in upstream) — use :root.light/:root.dark to match
+   the theme's own specificity (html.light loses to :root.light) */
+:root.light, :root.dark, :root {
   --primary-color: #1E91D6;
 }
 
@@ -43,6 +44,13 @@ a.zola-anchor {
   border-bottom: none;
 }
 
+/* No underline on social icon links (as in the old theme) */
+.social {
+  border-bottom: unset;
+  background-image: unset;
+  padding: 2px;
+}
+
 /* Old hr */
 hr {
   border: 0;
@@ -57,7 +65,7 @@ time {
 
 /* Old post list spacing and title size */
 .list-item {
-  margin-bottom: 30px;
+  margin-bottom: 45px;
 }
 .post-header h1 {
   margin: 0;
