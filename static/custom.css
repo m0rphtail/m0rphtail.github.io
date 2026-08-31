@@ -3,7 +3,7 @@
 /* Blue primary (was #ef5350 in upstream) — use :root.light/:root.dark to match
    the theme's own specificity (html.light loses to :root.light) */
 :root.light, :root.dark, :root {
-  --primary-color: #1E91D6;
+  --primary-color: #0077b6;
 }
 
 /* Fonts: back to Jetbrains Mono body + Space Grotesk headers (upstream switched to Zed) */
@@ -87,9 +87,9 @@ time {
   padding: 0 24px;
 }
 
-/* Inline code: light pastel blue (accent #1E91D6, lightened) */
+/* Inline code: light pastel blue (accent #0077b6, lightened) */
 :not(pre) > code {
-  color: #8ecdf2;
+  color: #0096c7;
 }
 
 /* ── Responsive fixes ─────────────────────────────────────────────
