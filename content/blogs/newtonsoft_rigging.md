@@ -46,3 +46,8 @@ First, supply chain attacks are not all about scale. The npm worms that poison h
 Second, the countermeasures here are old and they work. JFrog's advice: remove the package, block the C2, and pin Newtonsoft.Json via `packages.lock.json`. Lockfiles don't stop a first install, but they make every subsequent install a diff instead of a drift, and diffs get reviewed. The teams that got burned here didn't have a lockfile problem, they had a one-character typo in a `dotnet add` command, which is exactly the kind of mistake nobody expects to matter until it does.
 
 Check your transitive dependencies for near-miss names of the libraries you actually use. `Newtonsoftt` took me ten seconds to spot once I knew to look, and the packages that matter on your stack have near-misses too.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

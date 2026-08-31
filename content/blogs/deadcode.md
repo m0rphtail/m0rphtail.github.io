@@ -123,3 +123,8 @@ DUCTly0u_br0ught_m5_b4ck_t0_11f3_mn423kcv}$
 ```
 
 #### flag >> `DUCTF{y0u_br0ught_m3_b4ck_t0_l1f3_mn423kcv}`
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

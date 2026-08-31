@@ -1,5 +1,5 @@
 +++
-title = "The npm Worm and GitHub as C2: Reading Supply Chain Attacks Like a Threat Intel Analyst"
+title = "The npm Worm That Used GitHub as Its C2"
 date = "2025-11-27"
 +++
 
@@ -44,3 +44,8 @@ First, when you see a package that works but does something weird with GitHub's 
 Second, the fix for the C2 problem is egress policy, not blocklists. You can't block github.com. You can restrict which processes and which service accounts are allowed to reach it, and you can monitor the API calls they make. The question isn't "is this host talking to GitHub," it's "why is this process talking to GitHub."
 
 Third, the supply chain lesson generalizes: the packages that matter are the ones that look normal. The worm's camouflage, functional code, plausible name, normal-looking C2, is the baseline now. The defense is reading the code, not scanning the hashes. I keep coming back to that because it's the one thing that doesn't change no matter how the infrastructure evolves: someone has to actually read what the code does before it runs.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

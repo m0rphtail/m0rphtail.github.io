@@ -56,3 +56,8 @@ No infrastructure to sinkhole, no beacon to detect, no handshake to fingerprint.
 The honest caveat, which Reichel states himself: the assessment rests on a single binary with no collection context. No attribution, no victim, no proof it was ever deployed. It might be a research exercise that leaked. But built-to-be-side-loaded into a security vendor's agent, with a bespoke bytecode VM whose only job is to be invisible, doesn't read like ambition to me. It reads like someone who studied how responders work and built the thing they'd least like.
 
 If you run ESET on Windows and you've never diffed what's sitting next to `ERAAgent.exe`, do it this week. It's a five-minute check, and the alternative is that someone else does it for you.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

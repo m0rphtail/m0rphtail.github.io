@@ -133,3 +133,8 @@ DUCTF[fOrm4t_5p3c1f13r_m3dsg!}
 ```
 
 #### **flag >>** ` DUCTF{f0rm4t_5p3c1f13r_m3dsg!}`
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

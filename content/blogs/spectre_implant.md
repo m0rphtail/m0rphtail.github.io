@@ -36,3 +36,8 @@ The tooling spread is the story: custom SPECTRE, the Specter rootkit, BadIIS, Qu
 The BYOVD pattern is the part I'd flag for anyone running Windows servers. RTCore64 and DBUtil have been signed, abused, revoked, and abused again for years, and they're still the go-to for killing EDR. If your EDR doesn't monitor driver loads, it can be turned off by a driver that Microsoft already knows about. The detection is driver-load telemetry, not malware signatures.
 
 The AI-assisted rootkit is the part I'd flag for everyone else. Talos's assessment is careful, portions of the code suggest AI assistance, but the direction is clear. The same LLM that helps me write detection queries is helping someone write kernel rootkits. The asymmetry isn't in the tools anymore, it's in who's using them and how fast they iterate. SPECTRE is what that looks like when it ships.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

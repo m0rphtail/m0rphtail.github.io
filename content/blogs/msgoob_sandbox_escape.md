@@ -49,3 +49,8 @@ Two takeaways from the exploit work stuck with me:
 The conclusion Jann draws is the one I'd underline: Chrome's Linux renderer sandbox exposes kernel attack surface that is never legitimately used in the sandbox. `MSG_OOB` isn't used by Chrome, isn't used by almost anyone, and was still reachable from inside the sandbox because the sandbox filters syscalls, not flags. The kernel contributes by exposing esoteric features through the same syscalls as core functionality.
 
 The fix on Chrome's side was to block `MSG_OOB` in renderers. The fix on the kernel side was the commit. The lesson on my side: when you build a sandbox, you're not just restricting what the code can do, you're defining the attack surface of everything underneath it. Every flag, every obscure feature, every "nobody uses this" path is a potential bridge. The features nobody uses are the ones nobody audits, and the ones nobody audits are the ones that end up in a writeup like this.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

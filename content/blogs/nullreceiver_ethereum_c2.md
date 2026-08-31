@@ -1,5 +1,5 @@
 +++
-title = "NullReceiver: A C2 Address Hidden in a made-up Ethereum Address"
+title = "NullReceiver: Hiding a C2 IP in a Fake Ethereum Address"
 date = "2026-08-05"
 +++
 
@@ -40,3 +40,8 @@ The attribution chain is the usual one: Guardio Labs documented EtherHiding in O
 Blockchain-backed C2 removes "seize the server" from the playbook permanently. What's left is at the endpoint: why is a UI package resolving ENS or hitting Ethereum RPC? That's a behavior question, and it's answerable with dependency review and egress monitoring rather than indicators, because the infrastructure is infinite and fresh.
 
 And the recruitment-lure angle stays the one that matters. If a "hiring assessment" asks you to run a codebase, and the dependencies include packages with two-digit download counts and wallet lookups in the bundle, that's not a coding test, it's the operation. The fake address on the blockchain says "helloipbot!!" to whoever decodes it. Don't be the person who runs it just to see.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

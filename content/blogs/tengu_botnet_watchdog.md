@@ -52,3 +52,8 @@ The watchdog abuse also changes what I monitor. A device that reboots unexpected
 And the boring part still applies: Telnet exposed to the internet and default credentials are how this family gets in. Nozomi's honeypots caught the dropper exactly the way Mirai has always moved. If Telnet is still reachable on your estate, none of the clever analysis above will matter, because the question is when, not whether.
 
 The report names no vendor, operator, or victim count, so treat it as a capability document. But the capability is the interesting part. The malware that gets in through a default password now defends itself better than the hardware it runs on.
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

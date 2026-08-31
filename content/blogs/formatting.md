@@ -17,3 +17,8 @@ hello_{a.__init__.__globals__}
 and we get the flag
 
 #### flag >> `ictf{c4r3rul_w1th_f0rmat_str1ngs_4a2bd219}`
+
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*

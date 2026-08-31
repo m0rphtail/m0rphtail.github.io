@@ -1,49 +1,66 @@
 +++
-title = "PaperCut Zero-Day: Reading the IOCs While We Wait for the Details"
+title = "PaperCut's Pre-Auth RCE: What the IOCs and the Payload Tell Us"
 date = "2026-08-28"
 +++
 
-# PaperCut Zero-Day: Reading the IOCs While We Wait for the Details
+# PaperCut's Pre-Auth RCE: What the IOCs and the Payload Tell Us
 
-PaperCut warned customers on August 28 that a vulnerability in all versions of PaperCut NG and MF is being actively exploited. Emergency patches shipped for v25 and v26, customer incidents are confirmed, and the technical details of the flaw itself are still under wraps. That's a strange situation to write in, but it's also a useful exercise, because the IOCs they did publish say a lot about what the attacker is doing and what they know about PaperCut's logging.
+PaperCut warned on August 27 that a pre-auth RCE was being exploited against NG and MF, with confirmed customer incidents. Huntress then did what every vendor should do: they reproduced the full chain against a stock PaperCut NG 25.0.11.75758 server, and they published the payload analysis. Two CVEs came out of it. CVE-2026-81578 is an improper access control flaw in the web management interface that lets an unauthenticated attacker modify system configuration. CVE-2026-82078 is an unsafe dynamic class-loading flaw in the database connection utilities that executes arbitrary Java bytecode. Chained, they are pre-auth RCE.
 
-## What actually leaked
+## The bug shape
 
-Three indicators, and each one is a sentence about the attacker:
+The authorization flaw is subtle. A crafted request can refer to one page that is rendered for the response, and another page that owns the component or action being executed. PaperCut's authorization check trusts the rendered page and misses the permissions required by the component behind it. An unauthenticated request can change server configuration, reach sensitive endpoints, and execute arbitrary attacker-controlled code.
 
-**Suspicious post-exploitation from `pc-app.exe`.** The PaperCut Application Server process is abused server-side, as you'd expect for a print management product. The word "post-exploitation" in the advisory matters more than the process name. They're not just triggering the bug and leaving, they're doing hands-on work inside it.
+## What the attackers actually did
 
-**Missing, truncated, or deleted `server.log` files.** This is my favorite kind of IOC because it's attacker psychology in artifact form. They read the logs first, learned what the logs record, and removed them. That means the entry vector may be unrecoverable from the application layer, and the investigation has to live in EDR telemetry, process creation, and network flow instead.
+Huntress saw exploitation in two customer environments. The activity was limited, one incident lasted under two minutes. The payload was a Java .class file delivered as hex in the server log, dropped to `lib/Udydn.class` relative to the installation directory, with a second copy at `lib/Moo97.class`.
 
-**Two specific error strings:**
+The .class file is OS-agnostic. Decompiled with Fernflower, it runs commands on Linux or Windows to profile the system and list the directory, writes output to `Udydn.out` in a `/data/content/` path, then deletes the output and itself. The observed commands were base64-encoded in the log, decoding to `whoami & ver`, the Windows recon one-liner.
+
+```text
+server.log artifacts:
+  d2hvYW1pICYgdmVy  →  whoami & ver
+  hex-encoded .class → lib/Udydn.class, lib/Moo97.class
+  output: Udydn.out, Udydn.cmd (deleted after execution)
+```
+
+The self-deletion is the tell. This payload was built to leave nothing behind except the log it came in through, and the log is the artifact Huntress used to find it.
+
+## Detection
+
+The log strings from the original advisory still hold, plus the new ones:
 
 ```text
 ERROR No suitable driver found for jdbc:no:x
 ERROR DatabaseUtils - Database error looking up cardID: VALUES CAST
+base64: d2hvYW1pICYgdmVy
+files: lib/Udydn.class, lib/Moo97.class, Udydn.out, Udydn.cmd
 ```
 
-I've read that `jdbc:no:x` line a dozen times. JDBC URLs look like `jdbc:<subprotocol>:...`, and `no` is not a driver any Java runtime ships with. The most plausible read: something fed an attacker-controlled or malformed JDBC URL into PaperCut's database layer, and the driver loader choked on it. The `cardID` line suggests the database query path, the one that resolves print-card balances, got input it wasn't built for. Whatever the flaw turns out to be, it touches the JDBC configuration or query path. If you run PaperCut and you find those strings, that's not noise. Nothing in normal operation generates a `jdbc:no:` URL.
+```bash
+# hunt across PaperCut hosts
+grep -r "jdbc:no:x" /path/to/server/logs/
+grep -r "d2hvYW1pICYgdmVy" /path/to/server/logs/
+find / -name "Udydn.class" -o -name "Moo97.class" 2>/dev/null
+# missing or truncated server.log is itself a finding
+```
 
-## The 2023 echo
-
-PaperCut has been here before. CVE-2023-27350, CVSS 9.8, unauthenticated RCE on NG and MF, was exploited in the wild within days of disclosure by Russian state actors and by Lace Tempest, who used it to drop Cl0p and LockBit ransomware. Print management servers are a target class for reasons that haven't changed: internet-exposed for remote printing by default in too many orgs, running as a service account with domain-level access, and treated as infrastructure nobody thinks about. The 2023 campaign turned print servers into ransomware distribution nodes. If this year's flaw follows the same curve, the current window between IOC publication and ransomware deployment is where everyone's luck gets decided.
-
-## What I'd do, in order
+## What I'd do
 
 ```text
-1. Patch now. The v25/v26 emergency patch is the only fix.
-   Nothing else makes an unpatched server safe.
-2. Cut exposure THIS HOUR, not after patching:
-   firewall/network ACL the web interfaces to trusted IPs.
-   PaperCut's own words: "Take this action now, even if you
-   have not observed suspicious activity." Listen to them.
-3. Hunt the two log strings across every PaperCut host.
-   Both are exact-match greppable. Zero false-positive risk.
+1. Patch now. Emergency patches for v24, v25, v26.
+   Release 2 came out the next day, install that too.
+2. Remove the application server from the public internet
+   TODAY. PaperCut's own words: take this action now even
+   if you have not observed suspicious activity.
+3. Hunt the log strings and file names above.
 4. Treat absent/truncated server.log as a finding.
-   Log deletion IS the indicator. Forensic problem, yes,
-   but also the loudest possible alarm.
-5. Sweep pc-app.exe child processes, network connections,
-   and file writes in EDR for the post-exploitation window.
+5. Check for the .class files and any recent Java
+   execution from the PaperCut service account.
 ```
 
-One more thing worth saying. Everyone compares zero-day announcements against the patch they wish existed. What PaperCut did here, shipping indicators before the writeup, is the correct order for active exploitation. Details feed the patch cycle; indicators feed tonight's hunt. Given that 2023's version went from disclosure to Cl0p in single-digit days, the indicators are the part that can't wait.
+The 2023 version of this story, CVE-2023-27350, went from disclosure to Cl0p and LockBit in single-digit days. The current window between IOC publication and ransomware deployment is where the outcome gets decided. The indicators are the part that cannot wait.
+
+---
+
+*I'm Kshitij, a detection engineer looking for SOC/IR/CTI roles. If this was useful, [connect on LinkedIn](https://linkedin.com/in/kshitijchitnis) or [browse my GitHub](https://github.com/m0rphtail/).*
