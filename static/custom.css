@@ -1,0 +1,6 @@
+/* kchitnis.com theme override — blue primary (was #ef5350) */
+:root,
+html.light,
+html.dark {
+  --primary-color: #1E91D6;
+}
