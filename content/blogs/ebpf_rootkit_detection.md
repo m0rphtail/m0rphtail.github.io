@@ -38,7 +38,6 @@ VoidLink, LinkPro, and a third family called Atomic Arch each lean on different 
 That makes `BPF_PROG_LOAD` the highest-trust moment to instrument. Capture a full fingerprint right there. A handful of helpers are rare enough in legitimate code that seeing them at all is worth attention, especially in combination or coming from an unfamiliar loader: `bpf_probe_write_user()`, `bpf_override_return()`, `bpf_send_signal()`.
 
 ```bash
-# what to log at BPF_PROG_LOAD time
 # helper IDs used, program type, attach target, loader identity
 # then alert on:
 #   bpf_probe_write_user (helper 36)  - user memory writes

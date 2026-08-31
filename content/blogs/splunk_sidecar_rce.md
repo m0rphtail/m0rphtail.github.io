@@ -3,8 +3,6 @@ title = "The SIEM That Lets You In: Splunk's Pre-Auth RCE"
 date = "2026-06-18"
 +++
 
-# The SIEM That Lets You In: Splunk's Pre-Auth RCE
-
 I spend my working day inside Splunk. So when the analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, came out, I read it the way you'd read a report about your own house. The vulnerability is in the PostgreSQL Sidecar Service, a component I had never heard of, which is exactly the problem.
 
 ## The advisory said less than it hinted

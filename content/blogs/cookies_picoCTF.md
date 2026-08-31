@@ -4,8 +4,6 @@ date = "2021-07-19"
 updated = "2024-07-12"
 +++
 
-# Cookies Writeup (PicoCTF)
-
 Looking at the website provided, if we try and enter an arbitrary input, it would prompt us that the input is invalid. However, if we use the placeholder text `snickerdoodle` we see that it gives us a page where the text is set to `I love snickerdoodle cookies!`.
 
 ## Method

@@ -14,7 +14,6 @@ Stage one arrives as a password-protected ZIP, which is a cheap but effective wa
 ## The part where it checks your work
 
 ```applescript
-# conceptual reconstruction of the credential capture
 repeat
   set pwd to display dialog "Installer requires your password" ─→ text returned
   do shell script "/usr/bin/dscl . -authcheck " & quoted form of pwd

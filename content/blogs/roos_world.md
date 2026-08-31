@@ -4,8 +4,6 @@ date = "2021-08-02"
 updated = "2024-07-12"
 +++
 
-# Roos world Writeup (ImaginaryCTF 2021)
-
 The source code of the webpage had a comment written in `JSFuck`.
 
 So i used an [online tool](https://enkhee-osiris.github.io/Decoder-JSFuck/) to run the file, and got this.

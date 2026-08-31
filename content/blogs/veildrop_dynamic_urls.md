@@ -3,8 +3,6 @@ title = "VEIL#DROP: The Malware That Builds a New URL for Every Victim"
 date = "2026-07-01"
 +++
 
-# VEIL#DROP: The Malware That Builds a New URL for Every Victim
-
 The VEIL#DROP analysis from July ends in the PureLogs stealer, and the component that earns the study is the loader's URL construction: it builds the next-stage blogspot URL *at runtime*, inserting a random number of forward slashes into the path so that every single victim fetches a syntactically unique URL pointing at the same resource. A URL filter with exact-match signatures just died of old age.
 
 ## The chain

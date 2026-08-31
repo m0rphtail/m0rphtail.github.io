@@ -3,8 +3,6 @@ title = "The Newtonsoft.Json Fork That Rigged a Betting Platform"
 date = "2026-07-22"
 +++
 
-# The Newtonsoft.Json Fork That Rigged a Betting Platform
-
 A typosquatted fork of Newtonsoft.Json on NuGet keeps coming back to me: it is a completely normal JSON library for everyone, and a weapon for exactly one target. No credential theft, no persistence, no lateral movement. Its whole purpose is rigging the results of one crash game on one betting platform.
 
 ## The package

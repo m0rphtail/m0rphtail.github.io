@@ -3,8 +3,6 @@ title = "NullReceiver: Hiding a C2 IP in a Fake Ethereum Address"
 date = "2026-08-05"
 +++
 
-# NullReceiver: Hiding a C2 IP in a Fake Ethereum Address
-
 EtherHiding was already a good trick: put your C2 payload inside a smart contract on a public blockchain and the takedown playbook dies, because nobody can delete a blockchain. North Korean groups adopted it for Contagious Interview, their long-running fake-recruiter campaign, and defenders adapted by tracking the fixed destination contract addresses the technique required. The next iteration, codenamed NullReceiver, deletes the fixed address. The C2 IP now hides inside the bytes of a made-up recipient address on an ordinary-looking transfer.
 
 ## The mechanic

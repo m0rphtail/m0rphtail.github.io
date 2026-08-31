@@ -4,8 +4,6 @@ date = "2021-09-28"
 updated = "2024-07-12"
 +++
 
-# Like a sieve Writeup (DownUnder CTF 2021)
-
 > This program I developed will greet you, but my friend said it is leaking data like a sieve, what did I forget to add?
 >
 > Author: xXl33t_h@x0rXx

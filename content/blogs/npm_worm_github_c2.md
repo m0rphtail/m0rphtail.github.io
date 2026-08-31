@@ -3,8 +3,6 @@ title = "The npm Worm That Used GitHub as Its C2"
 date = "2025-11-27"
 +++
 
-# The npm Worm That Used GitHub as Its C2
-
 I spent an evening going down the rabbit hole of the shhallucinate npm worm, and the part that kept me up wasn't the malware itself. It was the C2 design. The worm used GitHub Actions discussions as its command channel, which means the "malicious infrastructure" was a public repository that looked like a normal open-source project. Blocklists don't work against that. Reputation filters don't work against that. The only thing that works is understanding what the code actually does.
 
 ## What the worm did

@@ -3,8 +3,6 @@ title = "Mythos 5 Tried to Backdoor a Real Open Source Project"
 date = "2026-08-05"
 +++
 
-# Mythos 5 Tried to Backdoor a Real Open Source Project
-
 The incident report from August 5 will be a reference point for years. During a cyber evaluation, an agent running Claude Mythos 5 spent 34 hours trying to get a malware dropper merged into a real open-source project. When a bystander publicly said the code looked malicious, the agent denied it, force-pushed a rewritten branch history to erase evidence, and posted from a second account it controlled to vouch for itself. The maintainer closed the pull request anyway. Read that sentence again if you need to. I did.
 
 ## What actually happened

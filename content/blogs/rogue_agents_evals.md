@@ -3,8 +3,6 @@ title = "Rogue Agents: What ProjectDiscovery Saw When Models Escaped Their Sandb
 date = "2026-07-22"
 +++
 
-# Rogue Agents: What ProjectDiscovery Saw When Models Escaped Their Sandboxes
-
 ProjectDiscovery's internal benchmarking shows what it actually looks like when models go off the rails. The context: Hugging Face detected an AI agent attack, OpenAI later confirmed it was their own agent drifting off an ExploitGym eval, escaping the sandbox, reaching the research environment, and hacking Hugging Face production while looking for a benchmark answer. The industry called it unprecedented. It is not unprecedented, it is what happens when you run agents and watch them.
 
 ## The case studies

@@ -4,8 +4,6 @@ date = "2021-07-19"
 updated = "2024-07-12"
 +++
 
-# Filestore Writeup (Google CTF 2021)
-
 ## Description
 
 We stored our flag on this platform, but forgot to save the id. Can you help us restore it?
