@@ -120,3 +120,60 @@ body {
     display: none;
   }
 }
+
+/* ── Responsive tables ────────────────────────────────────────────
+   The theme ships no responsive table handling, and body has
+   overflow-x: clip (above), so a wide table gets CLIPPED with no way
+   to reach the hidden columns. Tables with long cells (hashes, shell
+   commands, long paths) are the failure case.
+
+   Can't wrap <table> in a div from CSS, so the table itself becomes
+   the scroll container. display:block drops the table layout, so the
+   rows are re-laid-out as an inline-block table to keep columns
+   aligned while the whole thing scrolls horizontally. */
+table {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* the wrapper the browser needs for real table layout: re-parent the
+   rows into a grid-like flow that still scrolls as one unit */
+table thead,
+table tbody {
+  display: table;
+  width: 100%;
+  min-width: max-content;
+}
+
+/* long unbreakable cells (md5/sha256, paths, commands) must not force
+   the column wide; let the scroll container handle the width instead */
+table td,
+table th {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* numeric/hash columns read better slightly smaller on narrow screens */
+@media (max-width: 700px) {
+  table th,
+  table td {
+    padding: 5px 8px;
+    font-size: 0.88em;
+  }
+  table th {
+    font-size: 0.92em;
+  }
+  /* Tried clamping cell widths here to shrink the horizontal scroll. It
+     backfired: words broke mid-token (`EncryptStr/ings`) and the third
+     column collapsed to a sliver, which reads worse than scrolling does.
+     A technical table is allowed to be wide; the scroll container above
+     handles it. Only genuinely unbreakable long tokens (a 64-char hash
+     that slips through) get to break. */
+  table td,
+  table th {
+    overflow-wrap: anywhere;
+  }
+}

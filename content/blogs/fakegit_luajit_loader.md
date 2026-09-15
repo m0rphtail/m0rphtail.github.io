@@ -18,13 +18,28 @@ Then came the tell. Every link in the README pointed to the same ZIP file. Not t
 
 ## What was in the zip
 
-| File | Size | MD5 | SHA-1 | SHA-256 |
-| --- | --- | --- | --- | --- |
-| `Launcher.cmd` | 28 B | `fc3979a7ae6f3b0d64986c93b7911991` | `ab9685d1f483f40a5bd995173519a12473fa450f` | `ce1e33483d353200a266b3bc383ccf500e5a760c6dcd8218747260f5bbe39509` |
-| `luajit.exe` | 878,080 B | `bff3a81de5ffacbeddd5de793cede666` | `d49590bfb8b160595382339433535c481ce425ac` | `f3e34c9e36f3be065d80d456281d31dd1cc85eb4980db7fa8c1b0eb6f29c25d8` |
-| `uix.txt` | 309,352 B | `fe67c54a6387db6bf31f73ea6d695c12` | `97134dbb856b11be3b018508e980f58622bc5350` | `8cede35b80b1deaf732c2b178d908f91b3e7a0c114d06dfae9075b8a9bf78b8f` |
-| 2nd-stage blob (still encrypted as extracted) | 8,514 B | | | `3516ff63d6bfddcc8250bb8b63a9dddeec0cb9fd43747e1c6a0b9e84c332ad0d` |
-| 2nd-stage plaintext (`ffi.cdef`, in memory after decryption) | 8,514 B | | | `b74f433a796448f2cedb5acd393db3f987d1c7cdb8af2fa1d2a32c66229be5b8` |
+```text
+Launcher.cmd      28 B
+  md5             fc3979a7ae6f3b0d64986c93b7911991
+  sha1            ab9685d1f483f40a5bd995173519a12473fa450f
+  sha256          ce1e33483d353200a266b3bc383ccf500e5a760c6dcd8218747260f5bbe39509
+
+luajit.exe        878,080 B
+  md5             bff3a81de5ffacbeddd5de793cede666
+  sha1            d49590bfb8b160595382339433535c481ce425ac
+  sha256          f3e34c9e36f3be065d80d456281d31dd1cc85eb4980db7fa8c1b0eb6f29c25d8
+
+uix.txt           309,352 B
+  md5             fe67c54a6387db6bf31f73ea6d695c12
+  sha1            97134dbb856b11be3b018508e980f58622bc5350
+  sha256          8cede35b80b1deaf732c2b178d908f91b3e7a0c114d06dfae9075b8a9bf78b8f
+
+2nd-stage blob    8,514 B   (still encrypted as extracted)
+  sha256          3516ff63d6bfddcc8250bb8b63a9dddeec0cb9fd43747e1c6a0b9e84c332ad0d
+
+2nd-stage plaintext  8,514 B   (ffi.cdef, in memory after decryption)
+  sha256          b74f433a796448f2cedb5acd393db3f987d1c7cdb8af2fa1d2a32c66229be5b8
+```
 
 `luajit.exe` contains no malicious code. Static analysis found KERNEL32-only imports, no resources, no overlay, no TLS callbacks, no delay imports, no embedded C2, and exactly one URL string (`http://luajit.org/`). It is abused the same way `mshta` or `rundll32` is: a legitimate interpreter that will happily run someone else's script.
 
@@ -154,17 +169,21 @@ All 996 strings came out clean, and the separate 8,514-byte blob decrypts to coh
 
 ## What it does once running
 
-Everything below is reconstructed from the decrypted strings and the decrypted `ffi.cdef` header. Grouped by what the loader is actually trying to achieve:
+Everything below is reconstructed from the decrypted strings and the decrypted `ffi.cdef` header. Grouped by what the loader is actually trying to achieve.
 
-| Capability | How it works |
-| --- | --- |
-| **Reach Windows without imports** | The `ffi.cdef` header declares the full Win32 surface, including PE structures (`IMAGE_DOS_HEADER`, `IMAGE_NT_HEADERS32/64`, `IMAGE_EXPORT_DIRECTORY`), loader walking structures (`PEB`, `PEB_LDR_DATA`, `LDR_DATA_TABLE_ENTRY`, `UNICODE_STRING`), `RtlInitUnicodeString`, and `LdrLoadDll`. APIs get resolved by walking the loader list at runtime, so the import table shows nothing suspicious. |
-| **Profile the host** | Computer name, user name, `GetSystemMetrics`, `VerifyVersionInfoW` (OS build), `IsWow64Process`, `GetTokenInformation` with `TOKEN_ELEVATION` (is the process admin?), the `MachineGuid` registry value as a unique host ID, and `ip-api[.]com` for geolocation. The C2 parameters confirm it: `guid= os= arch= user= computer= country= city= timezone= loaderId= taskId= brand= location= query=`. |
-| **Survive reboots, three ways** | A Run key plus the matching `Explorer\StartupApproved\Run` entry, a scheduled task created both ways (`schtasks` and PowerShell `Register-ScheduledTask`), and file drops including `C:/Windows/System32/oobe/Setup.exe` registered with `/rl highest`. |
-| **Blind the defences** | `Add-MpPreference -ExclusionPath $env:SystemDrive -ExclusionExtension .exe, .dll -Force` through hidden PowerShell. One command, and every `.exe` and `.dll` on the system drive is exempt from Defender. |
-| **Run code it retrieves** | `VirtualAlloc` + `VirtualProtect` + `CreateThread` with the `LPTHREAD_START_ROUTINE` signature, which means in-memory shellcode and PE execution. Files also get written to disk and launched through `rundll32`, `WinExec`, `cmd /c`, or PowerShell. Handled extensions: `.exe .dll .bin .luac .json .bat .cmd .ps1`. |
-| **Watch the screen** | `GetDC` into `CreateDIBSection` and `BitBlt`, with full bitmap headers. A screenshot pipeline writing `.bmp`. |
-| **Stay quiet** | `GetConsoleWindow` + `ShowWindow(SW_HIDE)` for the console, and a `CreateMutexW` single-instance guard. The mutex call is confirmed structurally: the resolver leaf decodes to `CreateMutexW` and invokes it as `CreateMutexW(NULL, FALSE, name)`, so the name comes from a runtime table lookup rather than a hardcoded literal. |
+**Reach Windows without imports.** The `ffi.cdef` header declares the full Win32 surface: PE structures (`IMAGE_DOS_HEADER`, `IMAGE_NT_HEADERS32/64`, `IMAGE_EXPORT_DIRECTORY`), loader walking structures (`PEB`, `PEB_LDR_DATA`, `LDR_DATA_TABLE_ENTRY`, `UNICODE_STRING`), `RtlInitUnicodeString`, and `LdrLoadDll`. APIs get resolved by walking the loader list at runtime, so the import table shows nothing suspicious.
+
+**Profile the host.** Computer name, user name, `GetSystemMetrics`, `VerifyVersionInfoW` (OS build), `IsWow64Process`, `GetTokenInformation` with `TOKEN_ELEVATION` (is the process admin?), the `MachineGuid` registry value as a unique host ID, and `ip-api[.]com` for geolocation. The C2 parameters confirm it: `guid= os= arch= user= computer= country= city= timezone= loaderId= taskId= brand= location= query=`.
+
+**Survive reboots, three ways.** A Run key plus the matching `Explorer\StartupApproved\Run` entry, a scheduled task created both ways (`schtasks` and PowerShell `Register-ScheduledTask`), and file drops including `C:/Windows/System32/oobe/Setup.exe` registered with `/rl highest`.
+
+**Blind the defences.** `Add-MpPreference -ExclusionPath $env:SystemDrive -ExclusionExtension .exe, .dll -Force` through hidden PowerShell. One command, and every `.exe` and `.dll` on the system drive is exempt from Defender.
+
+**Run code it retrieves.** `VirtualAlloc` + `VirtualProtect` + `CreateThread` with the `LPTHREAD_START_ROUTINE` signature, which means in-memory shellcode and PE execution. Files also get written to disk and launched through `rundll32`, `WinExec`, `cmd /c`, or PowerShell. Handled extensions: `.exe .dll .bin .luac .json .bat .cmd .ps1`.
+
+**Watch the screen.** `GetDC` into `CreateDIBSection` and `BitBlt`, with full bitmap headers. A screenshot pipeline writing `.bmp`.
+
+**Stay quiet.** `GetConsoleWindow` + `ShowWindow(SW_HIDE)` for the console, and a `CreateMutexW` single-instance guard. The mutex call is confirmed structurally: the resolver leaf decodes to `CreateMutexW` and invokes it as `CreateMutexW(NULL, FALSE, name)`, so the name comes from a runtime table lookup rather than a hardcoded literal.
 
 The DLLs it reaches for: `kernel32`, `ntdll`, `wininet`, `advapi32`, `shlwapi`, `shell32`, `winbrand`, and `user32`/`gdi32`. It leans on the LuaJIT `bit` library throughout, plus `ffi`, `cdef`, `cast`, `sizeof`, and casts like `ulong[1]` and `TOKEN_ELEVATION[1]`. None of this would survive a plain Lua interpreter, which is why the interpreter ships in the ZIP.
 
