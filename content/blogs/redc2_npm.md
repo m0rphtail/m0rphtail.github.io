@@ -3,11 +3,11 @@ title = "RedC2: A $99 C2 Framework Shipping Through npm"
 date = "2026-08-21"
 +++
 
-Trend Micro found 14 trojanized npm packages in August shipping a Linux backdoor for a commercial C2 framework called RedC2 4.0. The framework is sold openly for $99.99 on a website called Red Offsec, with a Terms of Service page banning unauthorized use. Somebody sell that ToS to the people it will actually be used on.
+Trend Micro identified 14 trojanized npm packages delivering a Linux implant for RedC2 4.0, a commercial command-and-control framework sold openly on the web for $99.99 under the name Red Offsec.
 
-## The packages
+## Targeted packages
 
-The names are date-utility-flavored: `streak-metrics-math`, `kit-map-vim`, `streak-map-cache`, `streak-calc-metrics`, `streak-math-abz`, and cohorts. All at 1.0.0 or 1.0.1. The full list from Trend:
+The packages mimicked date and math utility libraries, versioned at 1.0.0 or 1.0.1:
 
 ```text
 streak-metrics-math@1.0.0, 1.0.1    kit-map-vim@1.0.0
@@ -19,42 +19,38 @@ streak-math-metrics@1.0.0           streak-metricazbd@1.0.0
 streak-metricsazb@1.0.0             streak-kit-map@1.0.0
 ```
 
-The delivery mechanic is the sharpest part. The entry file `dist/index.mjs` re-exports the real date helpers and launches the bundled implant the moment the module loads. No install hook, no exported function to call, no postinstall script for the registry to flag. From Trend's report: "a single import anywhere in the dependency graph, even a transitive one, is enough to execute the payload."
+The delivery mechanism avoids lifecycle install scripts. Instead, the entry module `dist/index.mjs` re-exports valid date functions while spawning the bundled implant as soon as the module is imported. Any application or transitive dependency importing the package triggers execution immediately during Node initialization.
 
-Keep your dependency tree in mind here. Not *your* import. Anyone's.
+## The RedShell implant
 
-## The payload
+The binary payload is named to look like a native calculation module (`math-core.bin`, `math-calc.bin`, or `calc-math.dat`) inside `dist/` or `dist/internal/`. This binary is the RedShell Linux beacon introduced in RedC2 4.0, which provides:
 
-The implant hides as a native math accelerator named `math-core.bin` or `math-calc.bin` or `calc-math.dat`, living in `dist/` or `dist/internal/`. It's the RedShell Linux beacon, introduced in RedC2 4.0. Once running:
+- An interactive shell via `/bin/sh`.
+- Harvesting of SSH keys and local browser credentials.
+- In-memory ELF execution for persistence.
+- SOCKS5 proxying and internal network pivoting.
+- Periodic check-in polling to receive operator tasks.
 
-```text
-- interactive shell via /bin/sh
-- SSH key + browser credential harvesting
-- persistence, in-memory ELF execution
-- SOCKS5 proxying, network pivoting
-- check-in message → command loop via /bin/sh
-```
+Windows builds of the framework include UAC bypass and driver-assisted defense evasion modules, while macOS builds share the core credential-gathering capabilities.
 
-The Windows beacon adds UAC bypass, AV/EDR tampering, and lateral movement. The macOS one does without those.
+## Commercial tooling background
 
-## The commercial context
+RedC2 follows the commercial tooling model seen with other post-exploitation frameworks. The developer ("MarlboroMan") advertised version 4.0 on underground forums in June 2026 with features for staged execution, network mapping, and in-memory execution of BOFs and .NET assemblies. It also includes "Red Agent," an LLM-assisted module designed to translate natural-language instructions into reconnaissance and credential-dumping commands.
 
-This is the part of the story the technical writeups undersell. RedC2 is a product with a release cadence: version 2.0 in August 2025, 3.0 in January 2026, 4.0 advertised on Hack Forums by a seller calling himself MarlboroMan in early June 2026, "built for evasion." Feature list: terminal access, file transfer, staged delivery, multi-beacon operation, network visualization, host-to-host tunneling, in-memory execution of BOFs, .NET assemblies, and shellcode. There's also "Red Agent," an LLM-driven component that takes natural-language commands for recon and credential dumping.
+## Threat hunting and detection
 
-The Red Offsec website describes it as "a multi-language, multi-OS command and control framework... built with evasion as a core principle," and the ToS prohibits "hacking without explicit permission." Cobalt Strike went down this exact road: legitimate red team tool, commercialized, then a decade of campaigns behind its beacon. Every one of those campaigns started with someone paying ninety-nine dollars, or not paying, because it leaked the way everything leaks.
-
-## What to look for
+Organizations can inspect dependency trees and process telemetry for signs of compromise:
 
 ```bash
-# any of these in your node_modules is a bad Tuesday
-ls -la node_modules/*/dist/*.bin
-ls -la node_modules/*/dist/internal/
-# entry files that spawn processes on import:
-grep -l "spawn\|exec\|fork" node_modules/*/dist/index.mjs
-# and the honest version: read the entry file of every
-# package you can't justify by name alone
+# locate unexpected ELF binaries within node_modules
+find node_modules/ -path "*/dist/*.bin" -o -path "*/dist/internal/*" 2>/dev/null
+
+# identify packages spawning subshells directly in entry scripts
+grep -lE "child_process|spawn|execFile" node_modules/*/dist/*.mjs
 ```
 
-For detection teams: unexpected Linux binaries launching from package directories, `/bin/sh` children of Node processes, and hosts beaconing after a routine dependency bump are the behavioral anchors. The package names rotate faster than blocklists update.
+Key behavioral indicators include:
 
-The number that sticks with me is the price. A capable cross-platform C2 with an AI assistant costs less than a month of a streaming subscription. The commercialization of the offense stack isn't coming, it's fully shipped, versioned, and self-updating. The economics only work, though, if the delivery keeps working. Fourteen typosquatted date libraries is the same old delivery problem wearing a newer price tag. The defense is still reading your dependency tree like someone hostile might have written part of it.
+- Node.js processes spawning `/bin/sh` or unexpected ELF binaries from package directories.
+- Hosts establishing new outbound network connections shortly after automated dependency installations or build jobs.
+- Sudden network beaconing from developer workstations or CI runners.

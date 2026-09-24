@@ -3,13 +3,15 @@ title = "Clicking 'Trust This Folder' Is Running Code"
 date = "2026-08-03"
 +++
 
-Here's the scenario: a fake recruiter sends you a take-home assignment, or a vendor hands you a sample app, and you clone the repo and hit "trust this folder" so your coding agent can actually work with it. That's the whole attack. Code runs at that moment — before you've typed a single prompt, before any shell command needs your approval.
+When a developer clones an unfamiliar repository and clicks "trust this folder" in an AI coding assistant, code can execute immediately, before entering any prompt or approving any command.
 
-## Two ways in that skip the guardrails
+## Automatic execution vectors
 
-Codex treats project trust and command-hook trust as separate things, and it's tightened up considerably on the hook side — those now require explicit review and approval before anything runs. So the natural question researchers at Datadog asked was: what still runs without ever having to declare itself as a hook?
+AI assistants often separate command execution prompts from workspace configuration. While explicit lifecycle hooks now prompt for user approval in newer releases, several configuration mechanisms still trigger execution during workspace initialization.
 
-**On Codex: project-scoped MCP servers.** A local MCP server is just a process the agent spins up on your machine, and Codex lets you define these at the project level in `.codex/config.toml` — executable, arguments, working directory, environment, all of it.
+### Project-scoped MCP servers in Codex
+
+Codex allows project repositories to define local Model Context Protocol (MCP) servers in `.codex/config.toml`:
 
 ```toml
 [mcp_servers.poc_python]
@@ -17,9 +19,11 @@ command = "python3"
 args = [".codex/poc/server.py"]
 ```
 
-Open the project, and that process starts. No prompt, no click, no confirmation dialog.
+Opening a workspace that contains this configuration causes the agent to spawn the configured command automatically, with no additional confirmation prompt.
 
-**On Claude Code: hijacking PATH.** Claude Code's project settings file, `.claude/settings.json`, can set environment variables that apply to the whole session and everything it spawns. During startup, Claude gathers context about the repo, and part of that involves calling Git directly — before the model has said a word. Command resolution walks through `PATH` in order, so if a project defines its own `PATH`, it can quietly point "git" at a wrapper script sitting inside the repo itself.
+### PATH hijacking in Claude Code
+
+Claude Code supports session-wide environment variables defined in `.claude/settings.json`. During startup, the agent inspects the repository context by running `git`. Because command resolution follows `PATH` in order, setting a custom `PATH` in the project settings allows a repo-local binary or script to intercept the call:
 
 ```json
 {
@@ -35,40 +39,28 @@ printf 'git wrapper pid=%s cwd=%s\n' "$$" "$PWD" >> .agent-env-poc.log
 exec /usr/bin/git "$@"
 ```
 
-The wrapper still calls the real Git underneath, so nothing looks broken and the agent carries on as if nothing happened. The only evidence is a single log line nobody's watching for.
+The wrapper script logs or executes arbitrary commands before forwarding arguments to the real `git` binary, keeping the workflow functional while executing untrusted code.
 
-And this is far from the only lever available. `BASH_ENV` triggers the moment a Bash process starts, `NODE_OPTIONS` and `PYTHONPATH` do the same for their respective runtimes. Basically any program can decide its own environment variables carry executable meaning, which means a denylist built around the "usual suspects" will always miss something.
+Other environment variables introduce similar risks. Runtimes automatically evaluate variables like `BASH_ENV`, `PYTHONPATH`, and `NODE_OPTIONS` whenever subshells or scripts start up, making environment sanitization difficult to maintain with simple blocklists.
 
-## This isn't hypothetical — it's already happening
+## Real-world campaigns
 
-The social engineering side of this is well documented at this point. Microsoft's tracked "Contagious Interview" campaign, where fake recruiters talked developers into cloning and trusting malicious projects, after which VS Code quietly ran a project task on their behalf. Separately, three malicious npm packages were caught installing `SessionStart` hooks in Claude Code that fired automatically every time a compromised project got reopened (MAL-2026-3648).
+This vector is already actively targeted. In campaigns like "Contagious Interview," threat actors pose as recruiters and send developers coding assignments designed to abuse editor workspace tasks upon cloning. In another case, malicious npm packages registered `SessionStart` hooks in Claude Code to execute payloads whenever a developer opened the directory (MAL-2026-3648).
 
-The hook-based approach drew enough attention that review gates went up around it. The MCP and PATH tricks never needed a model response or a user's approval in the first place — which is precisely why they're still open.
+Because review dialogs now intercept standard lifecycle hooks, attackers have shifted focus to startup configurations like MCP servers and environment overrides that load without explicit prompts.
 
-## What actually helps
+## Defensive steps
 
-The uncomfortable truth is that no amount of careful reviewing wins this fight outright. A project can steer execution through hooks, skills, MCP servers, editor tasks, dev-container configs, environment variables, runtime startup files, or plain old executables sitting in the repo. The attacker only needs one of those to work. The defender has to check all of them, every time.
+Auditing an entire repository before opening it is difficult when execution triggers can hide in editor tasks, container settings, environment files, or package scripts. The most effective approach treats opening a workspace as equivalent to executing its contents:
 
-Which means the mental model has to shift from "review the repo" to "trusting a project is the same as running its code":
+1. Open untrusted repositories inside ephemeral containers or isolated VMs without access to host credentials, cloud tokens, or active SSH agents.
+2. Inspect workspace configuration files before opening folders in primary development environments:
+   - `.codex/config.toml` (MCP servers)
+   - `.claude/settings.json` (environment variables and hooks)
+   - `.mcp.json` (MCP server definitions)
+   - `.vscode/tasks.json` (editor tasks)
+   - `.devcontainer/` (container initialization scripts)
+   - `package.json` (scripts and lifecycle hooks)
+3. Monitor process trees on workspace open for unexpected child processes like `sh`, `bash`, or `python3` launching prior to user interaction.
 
-```text
-1. Open unfamiliar repos in disposable environments.
-   No sensitive credentials, no SSH agent, no cloud tokens.
-2. If you must open on your main machine, review these
-   specific files first:
-     .codex/config.toml        (MCP servers)
-     .claude/settings.json     (env, PATH, hooks)
-     .mcp.json                 (MCP config)
-     .vscode/tasks.json        (editor tasks)
-     .devcontainer/            (dev container settings)
-     package.json scripts      (install hooks)
-3. Watch for processes spawned at open time.
-   A python3 or sh process with nothing behind it —
-   no prompt, no user action — is the tell.
-```
-
-And if you're on the receiving end of the Contagious Interview pattern specifically: a take-home assignment that requires cloning a repo and trusting it inside your coding agent should already feel wrong. A legitimate interview process has no reason to need your agent running code it hasn't seen yet.
-
-## The bigger pattern
-
-What's genuinely interesting here is watching the defense evolve in real time. Codex locked down hooks, so the pressure just moved sideways onto MCP servers instead. That's the shape of this entire problem space: every control you add creates a new hiding spot, because the hiding spots are all "features" — each one just a different way of letting project content carry executable meaning. Inspection alone was never going to be a durable defense here; isolation is. Treat every unfamiliar repo as hostile until it proves otherwise, because that "trust this folder" prompt was never a real security boundary. It's a UX convenience wearing a security boundary's clothes.
+Treating workspace trust as an execution boundary requires relying on operating system sandboxing and container isolation rather than UI trust prompts.

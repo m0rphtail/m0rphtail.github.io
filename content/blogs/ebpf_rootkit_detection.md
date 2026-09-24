@@ -1,55 +1,49 @@
 +++
-title = "eBPF Rootkits Don't Fool the Kernel, They Fool the Tools You Trust to Read It"
+title = "How eBPF Rootkits Manipulate System Inspection Tools"
 date = "2026-07-27"
 +++
 
-Rootkits aren't hiding from the kernel at all. They're hiding from the tools that ask the kernel questions on your behalf. One of them, VoidLink, pulls this off by editing the memory of `ss` while `ss` is running.
+eBPF rootkits generally evade detection by modifying the data that user-space auditing tools retrieve from the kernel. VoidLink, for example, conceals active network connections by altering the memory buffers of `ss` during runtime.
 
-## The trick that surprised me
+## Hiding sockets in ss
 
-`ss -tn` is how most of us check active TCP connections. Under the hood, it opens a Netlink socket, fires off a `SOCK_DIAG_BY_FAMILY` request, and reads back a chain of `inet_diag_msg` records — one per socket. Each record carries a length field, and the parser uses that length to walk from one record to the next.
+Running `ss -tn` opens a Netlink socket, issues a `SOCK_DIAG_BY_FAMILY` request, and parses a series of `inet_diag_msg` records returned by the kernel. The user-space parser relies on the length header of each record to advance through the buffer.
 
-VoidLink drops a kprobe on the entry to `__sys_recvmsg` to grab the pointer to the user-space buffer. Then a kretprobe fires right after the kernel has filled that buffer, but before user space actually gets to read it. In that narrow window, it calls `bpf_probe_write_user()` and quietly inflates the length field on the record sitting just before the one it wants hidden. When the parser's cursor moves next, it jumps clean over the hidden connection. As far as `ss` can tell, one earlier message was just a bit longer than usual — nothing to see here.
+VoidLink places a kprobe on `__sys_recvmsg` to record the user-space buffer destination. A corresponding kretprobe fires after the kernel writes the socket data into the buffer, but before user space reads the result. In that window, it invokes `bpf_probe_write_user()` to increase the length field of the record preceding the target socket. When `ss` parses the response, it skips over the hidden socket entirely:
 
 ```c
-// the shape of it, from Datadog's analysis
-// kprobe on __sys_recvmsg: capture the user buffer pointer
-// kretprobe: after kernel fills buffer, before user space reads
+// based on Datadog's analysis of VoidLink
+// kprobe on __sys_recvmsg: capture user buffer pointer
+// kretprobe: after kernel writes buffer, before user space reads
 bpf_probe_write_user(buf + offset_of_A.nlmsg_len,
                      &inflated_len, sizeof(inflated_len));
 // A.nlmsg_len += NLMSG_ALIGN(B.nlmsg_len)
-// NLMSG_NEXT jumps A -> C, B never seen
+// NLMSG_NEXT advances A -> C, skipping B
 ```
 
-What makes this actually work, and not just crash the parser, is that `NLMSG_OK` only ever checks whether `nlmsg_len` is less than or equal to the remaining bytes in the buffer. VoidLink inflates record A's length by exactly the size of record B — and B's bytes are still physically sitting there in the buffer, just skipped over. So the bounds check passes every time. No out-of-bounds read, no inconsistency, nothing that would ever make the parser suspicious. It genuinely never knows.
+The record parser uses `NLMSG_OK` to confirm that `nlmsg_len` does not exceed the remaining bytes in the buffer. Because record B remains inside the allocated buffer, the bounds check passes without throwing a parsing error.
 
-## LinkPro: getting bpftool to lie about what's loaded
+## Evading bpftool with LinkPro
 
-LinkPro takes a different approach — it hides its own eBPF programs from anyone trying to enumerate what's running. It sets a tracepoint on `sys_enter_bpf`, watching specifically for `BPF_PROG_GET_NEXT_ID` (11), `BPF_MAP_GET_NEXT_ID` (12), and `BPF_LINK_GET_NEXT_ID` (31). It stashes the call context in a map keyed by `pid_tgid`, then a kretprobe on `__x64_sys_bpf` checks whatever `next_id` the kernel is about to hand back against its own private allowlist of program IDs. Match found, and it calls `bpf_override_return(ctx, -ENOENT)`.
+LinkPro focuses on hiding loaded eBPF programs from administrative inspection. It attaches a tracepoint to `sys_enter_bpf`, targeting `BPF_PROG_GET_NEXT_ID` (11), `BPF_MAP_GET_NEXT_ID` (12), and `BPF_LINK_GET_NEXT_ID` (31). It stores the process context in a map keyed by `pid_tgid`, and a kretprobe on `__x64_sys_bpf` checks the returned `next_id` against an internal list of program IDs to conceal. On a match, it invokes `bpf_override_return(ctx, -ENOENT)`.
 
-`-ENOENT` happens to be exactly what a `GET_NEXT_ID` walk returns naturally once it's run out of things to enumerate. Forcing it early just stops the whole walk dead, which means `bpftool prog list` silently truncates right at the hidden program. Datadog actually tested this on a live kernel and found something the authors probably didn't intend: every program with a higher ID than the hidden one vanished too, allowlisted or not. The trick is, if anything, more effective than it was designed to be.
+Returning `-ENOENT` mimics the standard end of the program list. This halts enumeration prematurely, causing `bpftool prog list` to stop reporting at the hidden ID. In tests conducted by Datadog, this also caused all programs loaded with higher IDs to disappear from enumeration results.
 
-The tell is in the mismatch it leaves behind: `bpftool prog show id N` goes through `BPF_PROG_GET_FD_BY_ID` instead, a path this hook never touches. Compare what enumeration reports against a direct ID lookup, and the gap gives it away immediately.
+Defenders can detect this suppression by checking for discrepancies: direct lookups using `bpftool prog show id N` rely on `BPF_PROG_GET_FD_BY_ID`, an interface that LinkPro does not intercept. Discrepancies between list output and direct ID lookups indicate interception.
 
-## What defenders can actually work with
+## Detection via program loading
 
-VoidLink, LinkPro, and a third family called Atomic Arch each lean on different helper functions to pull off different effects, but they all share one property worth exploiting: whatever a program is capable of doing is fully knowable the moment it loads — before it ever attaches and starts reshaping what the host reports back.
-
-That makes `BPF_PROG_LOAD` the highest-trust moment to instrument. Capture a full fingerprint right there. A handful of helpers are rare enough in legitimate code that seeing them at all is worth attention, especially in combination or coming from an unfamiliar loader: `bpf_probe_write_user()`, `bpf_override_return()`, `bpf_send_signal()`.
+eBPF rootkit families like VoidLink, LinkPro, and Atomic Arch rely on distinct helper functions that can be audited during program initialization, before programs attach to probe points:
 
 ```bash
-# helper IDs used, program type, attach target, loader identity
-# then alert on:
-#   bpf_probe_write_user (helper 36)  - user memory writes
-#   bpf_override_return (helper 58)   - function return forgery
+# capture program properties at BPF_PROG_LOAD:
+# monitor use of sensitive helper functions:
+#   bpf_probe_write_user (helper 36)  - writes to user memory
+#   bpf_override_return (helper 58)   - overrides kernel return values
 #   bpf_send_signal    (helper 44)    - signal injection
-#   bpf_get_stackid     (helper 27)   - stack spoofing
+#   bpf_get_stackid     (helper 27)   - stack modification
 ```
 
-LinkPro also gives itself away in a much dumber way: both of its handlers log plaintext debug strings — "BPF cmd: %d, start_id: %u" and "HIDING NEXT_ID: %u" — straight to `/sys/kernel/debug/tracing/trace_pipe` on every intercepted syscall. Datadog chalks it up to sloppy development left in by accident and warns against leaning on it as your primary detection method. Fair enough — but I'd still wire up a tripwire for it anyway. It's one grep, and free signal is free signal.
+Monitoring the `BPF_PROG_LOAD` syscall provides reliable visibility because the program bytecode and requested helpers must be verified by the kernel before execution. Specific helpers like `bpf_probe_write_user()` and `bpf_override_return()` are rare in standard monitoring agents, making their presence an effective indicator of compromise.
 
-## Where this leaves us
-
-The uncomfortable reality here is that eBPF rootkits are hiding in exactly the same territory your EDR agent lives in. The kernel trusts eBPF programs because it trusts the loader, and the loader is, definitionally, a root process. Once an attacker has root, the kernel's own introspection tools become just another thing they can lie to.
-
-The one angle that actually holds up is catching things at load time. You can't reliably spot a rootkit that's already reshaping every read on the system — by the time it's running, it's already ahead of you. But you can catch it before it gets that far. That means `BPF_PROG_LOAD` telemetry needs to be treated as a genuine first-class detection source, not some debugging afterthought. The window to catch it is small, but the signal inside that window is real — and it's the one place these rootkits haven't yet figured out how to lie.
+LinkPro also leaves residual debug logging, printing messages such as "BPF cmd: %d, start_id: %u" and "HIDING NEXT_ID: %u" to `/sys/kernel/debug/tracing/trace_pipe` on intercepted calls. Checking trace pipes for these string patterns provides an immediate, low-overhead detection method.
