@@ -3,9 +3,7 @@ title = "FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop"
 date = "2026-09-14"
 +++
 
-This started with a repo that looked legitimate. A collection of MCP servers for pentesters: SQLMap, FFUF, NMAP, Masscan, all wrapped so an AI agent could drive them. It even had a promotional blog post written about it.
-
-Then came the tell. Every link in the README pointed to the same ZIP file. Not the releases page, not the docs. The install commands, the badge images, the download button, even the contact email. All thirteen of them, one file.
+A GitHub repository named `StanLeyJ03/mcp-for-security` advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents. While the repository mirrored the structure and documentation of a legitimate project, all 13 links in the README (including badges, installation commands, documentation references, and contact addresses) pointed to the same download target: `for-security-mcp-3.3.zip`.
 
 ## TL;DR
 
@@ -43,7 +41,7 @@ uix.txt           309,352 B
 
 `luajit.exe` contains no malicious code. Static analysis found KERNEL32-only imports, no resources, no overlay, no TLS callbacks, no delay imports, no embedded C2, and exactly one URL string (`http://luajit.org/`). It is abused the same way `mshta` or `rundll32` is: a legitimate interpreter that will happily run someone else's script.
 
-Do not call it "stock", though. The LuaJIT project ships source only and distributes no Windows binaries, so every `luajit.exe` in the wild is somebody's build. This one carries a compile timestamp of 2026-02-18 22:40 UTC and was linked as a GUI-subsystem executable. A console build flashes a window on launch. This one never does. Some public reporting labels the binary "trojanized"; the static evidence disagrees. It is a clean rebuild, configured so a victim never sees it run. Roughly ten hours after that compile timestamp, the repository received its ZIP.
+The LuaJIT project distributes source code rather than official Windows binaries, meaning pre-compiled executables vary by build environment. This binary carries a compilation timestamp of 2026-02-18 22:40 UTC and was linked as a GUI subsystem executable rather than a console application, preventing a terminal window from flashing when launched. While some vendor reporting describes the executable as trojanized, static analysis indicates an unmodified interpreter compiled specifically for headless execution. The repository received the ZIP archive roughly ten hours after this compile timestamp.
 
 ## How the lure worked
 
@@ -65,19 +63,19 @@ Thirteen occurrences of the same ZIP URL in a 4,991-byte README.
 
 *The README on GitHub. Both badges are broken images, since they point at the ZIP.*
 
-The commit history is where the story gets clean. The repo is a history-preserving clone of `cyproxio/mcp-for-security`, Serhat Çiçek's project (630 stars, since deprecated by its author). Ten commit hashes in the clone are byte-identical to the original's history. The copy appeared two days after the original and then sat idle, apart from a README rewrite in August 2025.
+The repository is a clone of `cyproxio/mcp-for-security`, originally created by Serhat Çiçek. Ten commit hashes in the clone match the original repository byte-for-byte. The copy was created two days after the upstream project and remained largely inactive until a README edit in August 2025.
 
 ![](/shot-20260914173405.png)
 
 *Contributors. Serhatcck built the project: 10 commits, 8,099 lines added. StanLeyJ03 made 3 commits and removed more than it added.*
 
-On February 19, 2026, two commits hours apart finished the job. At 09:01 UTC one dropped the ZIP into the tree. At 12:41 UTC another rewrote every link to point at it. The repository still stands today.
+On February 19, 2026, two commits completed the lure: at 09:01 UTC the archive was added to the repository tree, and at 12:41 UTC a second commit updated the README to point all links at the ZIP.
 
 ![](/shot-20260914173718.png)
 
 *The weaponizing commit. Every real link replaced with the ZIP path, +12/-12. The diff shows the working `git clone` line swapped for a download.*
 
-The file itself sits where nobody looks. In the `nmap-mcp/src/` directory it appears alongside `package.json`, `index.ts`, and `readme.md`, named like a release artifact, three directories deep in a project that has no releases:
+The archive is located at `nmap-mcp/src/for-security-mcp-3.3.zip`, stored alongside ordinary source files:
 
 ![](/fakegit-02-zip-in-tree.png)
 
@@ -104,11 +102,11 @@ flowchart TD
     N --> O
 {% </mermaid> %}
 
-The launcher is 28 bytes and does one thing: `start luajit.exe uix.txt`. `start` detaches the process, and the script hides its console window immediately after. From the victim's side, nothing visibly happens.
+`Launcher.cmd` is a 28-byte batch script containing `start luajit.exe uix.txt`. Using `start` spawns the interpreter in a detached process, and the Lua script hides its console window immediately upon execution.
 
 ## The obfuscator behind it
 
-`uix.txt` is not a script with strings scattered through it. It is a virtual machine that interprets a second, encrypted program, produced by Prometheus, an open-source Lua obfuscator on GitHub, run with its heaviest settings.
+`uix.txt` is an obfuscated virtual machine that executes a second, encrypted program. The obfuscation is generated by Prometheus, an open-source Lua obfuscator, with heavy virtualization and anti-tamper configurations enabled.
 
 Prometheus's source lists its transformation steps, and the sample matches them one for one:
 
@@ -126,9 +124,9 @@ The VM mechanics, for anyone who wants the details:
 * Everything is wrapped in `return (function(...) return (function(z,E,A,j,r,l,Q,F,V,L,N,G,q,s,g,d,k,O,K,c,u,y,U,t) ... end)(...))( ... )(E(Q))`.
 * `BIGFUNC(y, A, j, r)` interprets a numeric program counter. `while y do if y<N then ...` is a binary-search dispatch over 553 basic blocks. `F` is a slot-indexed heap, `c` a refcount array, `t()` an allocator.
 * Nine closure factories with fixed arities (`G` = 0, `d` = 1, `g` = 2, `u` = 3, `O` = 4, `V` = 5, `q` = 6, `s` = 8, `U` = varargs) produce 64 closures.
-* Eighty-eight sentinel globals are read as `z["..."]`. The VM never writes any global, so they are always `nil`. Their only job is to terminate the interpreter loop.
-* Decoy blocks raise Lua errors if they are ever reached (`"1xp" / c`), which never happens. They exist to waste an analyst's afternoon.
-* The anti-tamper check raises deliberate errors, catches its own traceback, parses `file:LINE:` and compares line numbers against expected constants. Edit the file and it dies with `Tamper Detected!`.
+* Eighty-eight sentinel globals are read as `z["..."]`. The VM never writes to globals, so these expressions evaluate to `nil` to terminate specific interpreter loops.
+* Dead-code basic blocks contain deliberately invalid expressions (such as `"1xp" / c`) to confuse static analysis tools.
+* The anti-tamper check triggers intentional exceptions, inspects the resulting traceback string (`file:LINE:`), and compares line offsets against expected values. Modifying the file triggers `Tamper Detected!` and halts execution.
 
 Public deobfuscators exist for Prometheus (0x251's `Prometheus-Deobfuscator` and its V2). This analysis did not use them. Their strongest step executes the script under stubbed natives to observe behavior, and this payload is architecture-independent, so running it here would mean a live sample on a machine that already has `luajit` installed. A Python emulator that models the VM instead, with natives stubbed to symbolic values and no Lua runtime involved, does the same job without the risk.
 
@@ -169,21 +167,21 @@ All 996 strings came out clean, and the separate 8,514-byte blob decrypts to coh
 
 ## What it does once running
 
-Everything below is reconstructed from the decrypted strings and the decrypted `ffi.cdef` header. Grouped by what the loader is actually trying to achieve.
+Everything below is reconstructed from the decrypted strings and the decrypted `ffi.cdef` header.
 
-**Reach Windows without imports.** The `ffi.cdef` header declares the full Win32 surface: PE structures (`IMAGE_DOS_HEADER`, `IMAGE_NT_HEADERS32/64`, `IMAGE_EXPORT_DIRECTORY`), loader walking structures (`PEB`, `PEB_LDR_DATA`, `LDR_DATA_TABLE_ENTRY`, `UNICODE_STRING`), `RtlInitUnicodeString`, and `LdrLoadDll`. APIs get resolved by walking the loader list at runtime, so the import table shows nothing suspicious.
+- Windows API resolution: The `ffi.cdef` header declares the full Win32 surface: PE structures (`IMAGE_DOS_HEADER`, `IMAGE_NT_HEADERS32/64`, `IMAGE_EXPORT_DIRECTORY`), loader walking structures (`PEB`, `PEB_LDR_DATA`, `LDR_DATA_TABLE_ENTRY`, `UNICODE_STRING`), `RtlInitUnicodeString`, and `LdrLoadDll`. APIs get resolved by walking the loader list at runtime, keeping the Import Address Table clean.
 
-**Profile the host.** Computer name, user name, `GetSystemMetrics`, `VerifyVersionInfoW` (OS build), `IsWow64Process`, `GetTokenInformation` with `TOKEN_ELEVATION` (is the process admin?), the `MachineGuid` registry value as a unique host ID, and `ip-api[.]com` for geolocation. The C2 parameters confirm it: `guid= os= arch= user= computer= country= city= timezone= loaderId= taskId= brand= location= query=`.
+- Host profiling: Gathers computer name, username, `GetSystemMetrics`, `VerifyVersionInfoW` (OS build), `IsWow64Process`, `GetTokenInformation` with `TOKEN_ELEVATION` (checking administrator privileges), the `MachineGuid` registry value as a unique host ID, and queries `ip-api[.]com` for geolocation. The C2 parameters confirm it: `guid= os= arch= user= computer= country= city= timezone= loaderId= taskId= brand= location= query=`.
 
-**Survive reboots, three ways.** A Run key plus the matching `Explorer\StartupApproved\Run` entry, a scheduled task created both ways (`schtasks` and PowerShell `Register-ScheduledTask`), and file drops including `C:/Windows/System32/oobe/Setup.exe` registered with `/rl highest`.
+- Persistence mechanisms: A Run key plus the matching `Explorer\StartupApproved\Run` entry, a scheduled task created both ways (`schtasks` and PowerShell `Register-ScheduledTask`), and file drops including `C:/Windows/System32/oobe/Setup.exe` registered with `/rl highest`.
 
-**Blind the defences.** `Add-MpPreference -ExclusionPath $env:SystemDrive -ExclusionExtension .exe, .dll -Force` through hidden PowerShell. One command, and every `.exe` and `.dll` on the system drive is exempt from Defender.
+- Defender evasion: Runs `Add-MpPreference -ExclusionPath $env:SystemDrive -ExclusionExtension .exe, .dll -Force` through hidden PowerShell. One command exempts `.exe` and `.dll` files on the system drive from Microsoft Defender scans.
 
-**Run code it retrieves.** `VirtualAlloc` + `VirtualProtect` + `CreateThread` with the `LPTHREAD_START_ROUTINE` signature, which means in-memory shellcode and PE execution. Files also get written to disk and launched through `rundll32`, `WinExec`, `cmd /c`, or PowerShell. Handled extensions: `.exe .dll .bin .luac .json .bat .cmd .ps1`.
+- Payload execution: Uses `VirtualAlloc`, `VirtualProtect`, and `CreateThread` with the `LPTHREAD_START_ROUTINE` signature for in-memory shellcode and PE execution. Dropped files can be launched through `rundll32`, `WinExec`, `cmd /c`, or PowerShell. Handled extensions: `.exe .dll .bin .luac .json .bat .cmd .ps1`.
 
-**Watch the screen.** `GetDC` into `CreateDIBSection` and `BitBlt`, with full bitmap headers. A screenshot pipeline writing `.bmp`.
+- Screen capture: Calls `GetDC`, `CreateDIBSection`, and `BitBlt` with full bitmap headers to capture screenshots saved in `.bmp` format.
 
-**Stay quiet.** `GetConsoleWindow` + `ShowWindow(SW_HIDE)` for the console, and a `CreateMutexW` single-instance guard. The mutex call is confirmed structurally: the resolver leaf decodes to `CreateMutexW` and invokes it as `CreateMutexW(NULL, FALSE, name)`, so the name comes from a runtime table lookup rather than a hardcoded literal.
+- Process stealth: Hides the console window using `GetConsoleWindow` and `ShowWindow(SW_HIDE)`, and enforces a single instance via `CreateMutexW`. The mutex name is derived from a runtime table lookup rather than a hardcoded literal.
 
 The DLLs it reaches for: `kernel32`, `ntdll`, `wininet`, `advapi32`, `shlwapi`, `shell32`, `winbrand`, and `user32`/`gdi32`. It leans on the LuaJIT `bit` library throughout, plus `ffi`, `cdef`, `cast`, `sizeof`, and casts like `ulong[1]` and `TOKEN_ELEVATION[1]`. None of this would survive a plain Lua interpreter, which is why the interpreter ships in the ZIP.
 
@@ -191,15 +189,15 @@ The DLLs it reaches for: `kernel32`, `ntdll`, `wininet`, `advapi32`, `shlwapi`, 
 
 Channel one is plain HTTP to a bare IPv4 address, defanged here as `hxxp://213[.]176[.]73[.]151`, with REST-ish paths `/api/`, `/json/`, and `/task/`. Check-ins carry the victim profile above. Exfiltration is a `POST` with `multipart/form-data`, boundary `a1u4xbodohy2cqdc2n0i336qy9tcap8w64yb424`, one part named `data` and one named `file`. `GET` polls for tasks. `hxxps://www[.]microsoft[.]com` appears to be a connectivity check. The User-Agent is a stock Chrome string (`Chrome/145.0.0.0`), and the frozen minor version is exactly what Chrome's User-Agent Reduction produces, so it dates the build rather than proving fakery.
 
-The check-in URL is not anonymous. Triage captured a live one from this exact sample:
+The check-in URL carries a specific identifier. Triage captured a live request from this sample:
 
 ```text
 POST /api/NTE3YjdjNWU1NjYzNjU2YTA1N2Y= HTTP/1.1
 ```
 
-Decode that base64 segment and you get `517b7c5e5663656a057f`, which started this analysis as an "unidentified constant" in the decoded strings. It is the loader ID, and every check-in carries it as a path segment. One of the quiet payoffs of putting static work and sandbox telemetry side by side.
+Decoding that base64 segment yields `517b7c5e5663656a057f`, corresponding to the unique loader ID in the decrypted strings. Every check-in carries it as a path segment.
 
-Channel two is the reason this family keeps surviving takedowns. A JSON-RPC template is embedded:
+The secondary C2 channel uses Polygon blockchain infrastructure as a dead drop. An embedded JSON-RPC template handles queries:
 
 ```json
 { "jsonrpc": "2.0", "method": "eth_call",
@@ -208,9 +206,9 @@ Channel two is the reason this family keeps surviving takedowns. A JSON-RPC temp
 
 The contract is hardcoded as `0x1823A9a0Ec8e0C25dD957D0841e3D41a4474bAdc` with the 4-byte selector `0x3bc5de30`. Five Polygon mainnet RPC providers sit behind it as fallbacks: `polygon-mainnet[.]gateway[.]tatum[.]io`, `polygon-public[.]nodies[.]app`, `polygon[.]drpc[.]org`, `polygon[.]publicnode[.]com`, `rpc-mainnet[.]matic[.]quiknode[.]pro`.
 
-> Do not misread this IOC. The contract is not a wallet and not a payment address. `eth_call` is a read-only invocation, and this is the EtherHiding pattern: the operator stores the current C2 address on chain and updates it there, so rotating infrastructure never requires touching a deployed sample. No wallet address and no ransom demand exists anywhere in this build.
+> The contract address is not a payment wallet or ransom endpoint. `eth_call` is a read-only query used for EtherHiding: the operators store the active C2 address in smart contract storage, allowing them to rotate backend IP addresses without modifying deployed files on disk.
 
-The dead drop doing its job is visible in public telemetry. Triage's June 2026 sandbox run shows the loader POSTing to a second address, `85[.]137[.]52[.]21`, which appears nowhere in the static strings and nowhere in the March C2 tables. It shows up after the check-in to the original C2 and after the `eth_call`, with nothing downloaded in between. Two explanations fit: the contract returned a rotated address, or the first C2 handed one over. Either way, the sample on disk never changed and the address did.
+Dynamic analysis confirms this rotation mechanism. In a June 2026 Triage sandbox run, the loader sent a POST request to `85[.]137[.]52[.]21`, an IP that does not appear in the static strings or earlier C2 lists. The request occurred immediately after the initial check-in and the `eth_call` query, demonstrating dynamic fallback to rotated infrastructure.
 
 ![](/fakegit-06-sandbox-telemetry.png)
 
