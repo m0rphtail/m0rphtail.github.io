@@ -7,6 +7,8 @@ tags:
   - reverse-engineering
 ---
 
+import ResponsiveTable from "@/components/ResponsiveTable.astro";
+
 A GitHub repository named `StanLeyJ03/mcp-for-security` advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents. While the repository mirrored the structure and documentation of a legitimate project, all 13 links in the README (including badges, installation commands, documentation references, and contact addresses) pointed to the same download target: `for-security-mcp-3.3.zip`.
 
 ## TL;DR
@@ -95,6 +97,8 @@ _One ZIP among ordinary source files._
 
 Prometheus's source lists its transformation steps, and the sample matches them one for one:
 
+<ResponsiveTable>
+
 | Prometheus step        | What it does                                  | Where it shows up in `uix.txt`                                           |
 | ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------ |
 | `Vmify`                | compiles the script into a randomized VM      | the 553-block dispatch, closure factories, heap and refcount machinery   |
@@ -103,6 +107,8 @@ Prometheus's source lists its transformation steps, and the sample matches them 
 | `NumbersToExpressions` | rewrites constants as junk arithmetic         | `-1273246-((228191+-839136)+340691)` and friends                         |
 | `SplitStrings`         | splits names into chunk tables                | the `mn` / `xn` reassembly helpers, 403 call sites                       |
 | `ConstantArray`        | hoists constants into a big table             | the literal tables the VM indexes at runtime                             |
+
+</ResponsiveTable>
 
 The VM mechanics, for anyone who wants the details:
 
@@ -133,6 +139,8 @@ prevVal = byte
 
 That makes the constants in the sample checkable against the generator's parameter ranges. Every one of them lands inside:
 
+<ResponsiveTable>
+
 | In the sample         | Prometheus parameter               | Checks out because                                   |
 | --------------------- | ---------------------------------- | ---------------------------------------------------- |
 | `% 2^45`              | `35184372088832`                   | same modulus                                         |
@@ -141,6 +149,8 @@ That makes the constants in the sample checkable against the generator's paramet
 | `22231257191003`      | `secret_key_44 * 2 + 1`            | back-computes to an integer inside the 0..2^44 range |
 | seed init `% 255 + 2` | `seed_53 % 255 + 2`                | identical                                            |
 | IV `238`              | `secret_key_8`                     | inside the 0..255 range                              |
+
+</ResponsiveTable>
 
 The string table is therefore recoverable by anyone with the public obfuscator source. It also explains the version sprawl: the "16 obfuscator generations" tracked under ESET's `Lua/Agent.Z` through `Lua/Agent.BT` are not 16 hand-written variants. Prometheus re-randomizes its keys on every build, so re-obfuscating the same code produces what looks like a new generation while nothing underneath has moved.
 
@@ -184,7 +194,7 @@ Decoding that base64 segment yields `517b7c5e5663656a057f`, corresponding to the
 
 The secondary C2 channel uses Polygon blockchain infrastructure as a dead drop. An embedded JSON-RPC template handles queries:
 
-<!-- prettier-ignore -->
+{/* prettier-ignore */}
 ```json
 { "jsonrpc": "2.0", "method": "eth_call",
   "params": [ { "to": "%s", "data": "%s" }, "latest" ], "id": 1 }
@@ -385,6 +395,8 @@ rule LuaJIT_FakeGit_Loader_decrypted
 
 ## MITRE ATT&CK mapping
 
+<ResponsiveTable>
+
 | ID                    | Technique                                 | Evidence                                                  |
 | --------------------- | ----------------------------------------- | --------------------------------------------------------- |
 | T1218                 | System binary proxy execution (LOLbin)    | LuaJIT runtime runs the attacker's script                 |
@@ -407,6 +419,8 @@ rule LuaJIT_FakeGit_Loader_decrypted
 | T1041 / T1567         | Exfiltration over C2 channel              | multipart upload, parts `data` and `file`                 |
 | T1105                 | Ingress tool transfer                     | `/task/` downloads, seven handled extensions              |
 | T1497                 | Virtualization/sandbox evasion (partial)  | anti-tamper traceback check; `VerifyVersionInfoW`         |
+
+</ResponsiveTable>
 
 ## Verdict
 
