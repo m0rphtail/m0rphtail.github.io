@@ -131,12 +131,67 @@ const rssHref = getRelativeLocaleUrl(
       })();
     </script>
 
+    <!--
+      Analytics — GoatCounter. The stock snippet only counts full page
+      loads; this block also counts client-side navigations by re-firing
+      on every astro:page-load. Settings merge into window.goatcounter so
+      a re-run can never clobber the loaded script.
+    -->
+    <script is:inline>
+      window.goatcounter = window.goatcounter || {};
+      window.goatcounter.endpoint = "https://kchitnis.goatcounter.com/count";
+      window.goatcounter.no_onload = true;
+      window.goatcounter.no_events = true;
+      // Register once, even if this script re-runs after a navigation.
+      if (!window.__gcSpaHooked) {
+        window.__gcSpaHooked = true;
+        document.addEventListener("astro:page-load", function () {
+          var fire = function () {
+            if (window.goatcounter && window.goatcounter.count) {
+              window.goatcounter.count();
+              return true;
+            }
+            return false;
+          };
+          if (!fire()) {
+            var n = 0;
+            var t = setInterval(function () {
+              if (fire() || ++n > 50) clearInterval(t);
+            }, 100);
+          }
+        });
+      }
+    </script>
+    <!-- Self-hosted copy of gc.zgo.at/count.js (see public/js/). Same-origin,
+         so no SRI is needed; update by re-copying the file. -->
+    <script
+      is:inline
+      async
+      data-goatcounter="https://kchitnis.goatcounter.com/count"
+      src={getAssetPath("js/count.js")}></script>
+
     <ClientRouter />
   </head>
   <body
     class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
   >
     <slot />
+    <!--
+      No-JS fallback pageview (1x1 pixel). The body placement is required:
+      the router parses fetched pages with scripting disabled, so a head
+      <noscript> with an <img> gets hoisted into the body as a live element
+      that its noscript cleanup cannot catch — firing a duplicate hit on
+      every client-side navigation. Inside the body the img stays wrapped
+      in the noscript, and the router strips the whole element on swaps.
+    -->
+    <noscript>
+      <img
+        src={`https://kchitnis.goatcounter.com/count?p=${encodeURIComponent(Astro.url.pathname)}&t=${encodeURIComponent(title)}`}
+        alt=""
+        width="1"
+        height="1"
+      />
+    </noscript>
     <script>
       import "@/scripts/theme";
     </script>

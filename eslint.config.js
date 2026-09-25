@@ -17,6 +17,9 @@ export default [
       parser: tsParser,
     },
   },
-  { rules: { "no-console": "error" } },
-  { ignores: ["dist/**", ".astro/**", "public/pagefind/**"] },
+  {
+    rules: { "no-console": "error" },
+  },
+  // vendored scripts are byte-exact copies; don't lint or reformat them
+  { ignores: ["dist/**", ".astro/**", "public/pagefind/**", "public/js/**"] },
 ];

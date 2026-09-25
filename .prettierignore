@@ -15,3 +15,6 @@
 
 # Ignore MDX files
 *.mdx
+
+# Vendored scripts (byte-exact copies; e.g. GoatCounter's count.js)
+public/js
