@@ -1,6 +1,6 @@
 # kchitnis.com
 
-Personal site for Kshitij Chitnis. Blog posts now, with resume/art/music pages to come. Built with [Astro](https://astro.build) on the [AstroPaper](https://github.com/satnaing/astro-paper) theme.
+Personal site for Kshitij Chitnis. Blog posts, resume, art, and music pages. Built with [Astro](https://astro.build) on the [AstroPaper](https://github.com/satnaing/astro-paper) theme.
 
 Status: migration in progress. This branch (`clean-astro-migration`) is not live yet. The old Zola site still serves from `main` until the migration is finished and merged.
 
@@ -120,9 +120,9 @@ Verbatim evidence (malware samples, obfuscated code): prettier reformats fenced 
 
 ## Colors, fonts, nav
 
-Colors are six CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Current setup is the theme's "Paper Light" for light mode and the older "Paper Dark" cyan scheme for dark mode. More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
+Colors are six CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Light mode is the theme's "Paper Light" (slightly darker `--muted` for visible striped table rows). Dark mode is a custom neutral: `#1a1a1a` background with the "Paper Dark" cyan accent `#4db8f0`. More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
 
-Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Posts / Art / Music / About). Add new entries there when new pages arrive.
+Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Posts / Resume / Art / Music / About). Add new entries there when new pages arrive.
 
 ## Tags
 
