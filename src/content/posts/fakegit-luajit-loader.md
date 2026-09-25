@@ -63,25 +63,25 @@ Email              -> .../raw/refs/heads/main/nmap-mcp/src/for-security-mcp-3.3.
 
 Thirteen occurrences of the same ZIP URL in a 4,991-byte README.
 
-![](/fakegit-01-readme-lure.png)
+![The cloned repository's README on GitHub, with both badges broken because every link points at the ZIP file.](@/assets/images/posts/fakegit-01-readme-lure.png)
 
 _The README on GitHub. Both badges are broken images, since they point at the ZIP._
 
 The repository is a clone of `cyproxio/mcp-for-security`, originally created by Serhat Çiçek. Ten commit hashes in the clone match the original repository byte-for-byte. The copy was created two days after the upstream project and remained largely inactive until a README edit in August 2025.
 
-![](/shot-20260914173405.png)
+![Contributors chart: Serhatcck built the project with 10 commits and 8,099 additions; StanLeyJ03 made 3 commits and removed more lines than it added.](@/assets/images/posts/shot-20260914173405.png)
 
 _Contributors. Serhatcck built the project: 10 commits, 8,099 lines added. StanLeyJ03 made 3 commits and removed more than it added._
 
 On February 19, 2026, two commits completed the lure: at 09:01 UTC the archive was added to the repository tree, and at 12:41 UTC a second commit updated the README to point all links at the ZIP.
 
-![](/shot-20260914173718.png)
+![The weaponizing commit's diff: every real link replaced with the ZIP path, +12/-12, with the working git clone line swapped for a download.](@/assets/images/posts/shot-20260914173718.png)
 
 _The weaponizing commit. Every real link replaced with the ZIP path, +12/-12. The diff shows the working `git clone` line swapped for a download._
 
 The archive is located at `nmap-mcp/src/for-security-mcp-3.3.zip`, stored alongside ordinary source files:
 
-![](/fakegit-02-zip-in-tree.png)
+![The for-security-mcp-3.3.zip archive sitting in the repository tree among ordinary source files.](@/assets/images/posts/fakegit-02-zip-in-tree.png)
 
 _One ZIP among ordinary source files._
 
@@ -146,7 +146,7 @@ The string table is therefore recoverable by anyone with the public obfuscator s
 
 All 996 strings came out clean, and the separate 8,514-byte blob decrypts to coherent C: a LuaJIT `ffi.cdef` header declaring the whole Win32 surface the loader uses. Hashes for both, encrypted and plaintext, are in the IOC list.
 
-![](/fakegit-05-prometheus-public.png)
+![Prometheus on GitHub: 506 stars, with a docs folder covering every transformation this loader uses.](@/assets/images/posts/fakegit-05-prometheus-public.png)
 
 _Prometheus on GitHub: 506 stars, and a docs folder covering every transformation this loader uses._
 
@@ -196,7 +196,7 @@ The contract is hardcoded as `0x1823A9a0Ec8e0C25dD957D0841e3D41a4474bAdc` with t
 
 Dynamic analysis confirms this rotation mechanism. In a June 2026 Triage sandbox run, the loader sent a POST request to `85[.]137[.]52[.]21`, an IP that does not appear in the static strings or earlier C2 lists. The request occurred immediately after the initial check-in and the `eth_call` query, demonstrating dynamic fallback to rotated infrastructure.
 
-![](/fakegit-06-sandbox-telemetry.png)
+![Sandbox telemetry: luajit.exe checking in to the original C2, calling the contract through polygon[.]drpc[.]org, then posting to a second address absent from all 996 static strings.](@/assets/images/posts/fakegit-06-sandbox-telemetry.png)
 
 _The sandbox run, live: `luajit.exe` checking in to the original C2, calling the contract through `polygon[.]drpc[.]org`, and then posting to a second address that exists in none of the 996 static strings._
 
@@ -379,7 +379,7 @@ rule LuaJIT_FakeGit_Loader_decrypted
 }
 ```
 
-![](/fakegit-08-yara-test.png)
+![YARA test run: the structural rule fires on uix.txt, the decrypted rule fires on the rebuilt string table, and the interpreter and launcher stay clean.](@/assets/images/posts/fakegit-08-yara-test.png)
 
 *Both rules compiled and run. The structural rule fires on `uix.txt` and nothing else. The decrypted rule fires on the rebuilt string table with all eight anchors. The interpreter and launcher stay clean, which is correct: neither one contains the malware.
 

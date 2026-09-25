@@ -60,6 +60,6 @@ But the binary must contain the flag.
 
 In ghidra checking `.rodata` we see the flag.
 
-![](/nostrings.png)
+![Ghidra showing the .rodata section, where the flag string is visible in the binary.](@/assets/images/posts/nostrings.png)
 
 flag: `DUCTF{stringent_strings_string}`
