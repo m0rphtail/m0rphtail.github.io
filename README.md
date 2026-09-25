@@ -83,6 +83,7 @@ Content folders starting with `_` (like `_releases/`) are for organization only:
 | Domain                         | `public/CNAME`                                 |
 | Footer text                    | `src/i18n/lang/en.ts` under `footer:`          |
 | About page                     | `src/content/pages/about.md`                   |
+| Resume page                    | `src/content/pages/resume.md`                  |
 | Art page (gallery)             | `src/content/pages/art.mdx`                    |
 | Music page (players)           | `src/content/pages/music.md`                   |
 | Homepage intro text            | `src/pages/index.astro`                        |
@@ -129,9 +130,11 @@ The site runs without a tag UI: no /tags pages, no tag chips on posts, no nav li
 
 If tags are ever wanted back: `~/backups/old-migration-2026-09-25/removed-tag-feature/` holds the removed files (tag pages, Tag component, getUniqueTags util) plus a README with exact restore steps.
 
-## Art and music pages
+## Resume, art, and music pages
 
-Both are content-collection pages served by `src/pages/[page].astro` — drop any new `.md`/`.mdx` file in `src/content/pages/` (except about, which has its own route) and it gets a route and breadcrumb automatically. Add a nav entry in `Header.astro` if it warrants one.
+All three are content-collection pages served by `src/pages/[page].astro` — drop any new `.md`/`.mdx` file in `src/content/pages/` (except about, which has its own route) and it gets a route and breadcrumb automatically. Add a nav entry in `Header.astro` if it warrants one.
+
+The resume (`src/content/pages/resume.md`) is plain markdown: `##` sections, `###` entries, `---` rules between sections. Note the frontmatter `title` renders as the page h1, so job/project entries sit at `###` — don't jump straight to `#`. Same content as the old Zola site's `/resume` page.
 
 The art gallery (`src/content/pages/art.mdx`) uses Astro's `<Image>` component, so images live in `src/assets/images/art/` and are served hashed. Each needs real alt text. To add a piece: drop the file in that folder, add an import and an `<Image>` line.
 
