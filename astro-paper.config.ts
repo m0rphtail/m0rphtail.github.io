@@ -3,7 +3,7 @@ import { defineAstroPaperConfig } from "./src/types/config";
 export default defineAstroPaperConfig({
   site: {
     url: "https://kchitnis.com/",
-    title: "kchitnis",
+    title: "KChitnis",
     description: "Malware teardowns, threat intel, and detection notes.",
     author: "Kshitij Chitnis",
     profile: "https://kchitnis.com",
