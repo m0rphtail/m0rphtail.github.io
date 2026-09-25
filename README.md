@@ -111,7 +111,11 @@ canonicalURL: "https://..." # optional, if originally published elsewhere
 ---
 ```
 
-Images: either drop files in `public/` and reference them as `/image.png`, or keep them next to the post and reference them relatively. Markdown image syntax works normally.
+Images: put post images in `src/assets/images/posts/` and reference them as `![alt text](@/assets/images/posts/my-image.png)`. Astro then optimizes them (hashed `.webp`, lazy loading, width/height set). Images in `public/` are served raw and unoptimized — avoid for content images. Every image needs real alt text (empty alt gets flagged). The theme's own guide is at `src/content/posts/adding-new-post.mdx`.
+
+Headings: the frontmatter `title` renders as the page h1, so start body headings at `##` and nest down. A stray `#` in the body breaks the outline.
+
+Verbatim evidence (malware samples, obfuscated code): prettier reformats fenced code when it recognizes the language. If a fence must stay byte-exact, put `<!-- prettier-ignore -->` on the line directly above the opening fence. Applied in the fakegit and js-obfuscation posts.
 
 ## Colors, fonts, nav
 
