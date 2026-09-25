@@ -119,6 +119,8 @@ Headings: the frontmatter `title` renders as the page h1, so start body headings
 
 Verbatim evidence (malware samples, obfuscated code): prettier reformats fenced code when it recognizes the language. If a fence must stay byte-exact, put `<!-- prettier-ignore -->` on the line directly above the opening fence. Applied in the fakegit and js-obfuscation posts.
 
+Table of contents: put `## Table of contents` right after the intro, before the first section. The theme's `remark-toc` (configured in `astro.config.ts`) fills the heading at build time with links to every `##` and `###` below it, and `remark-collapse` wraps the list in a collapsible "Open Table of contents" block. Nothing else is needed — no manual list to maintain. Every post in the tree has one (the tiny CTF writeups use bold text for the flag line, not a heading, so flags can't leak into their TOC).
+
 ## Colors, fonts, nav
 
 Colors are seven CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Both modes are blue-accented: light is warm paper `#f9f5ee` with `#006cac` links, dark is grey `#2f2f2f` with `#4db8f0` links and blue-grey borders. Code blocks follow the shiki themes set in `astro.config.ts`, except the dark panel background, which `theme.css` forces to grey `#262626` with a `--shiki-dark-bg` override (shiki sets that variable inline on every `<pre>`, so the override carries `!important`). More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
