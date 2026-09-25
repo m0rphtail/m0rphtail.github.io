@@ -35,22 +35,23 @@ public/                 Static files, copied as-is to the site root
 src/
   assets/
     icons/              UI icons and socials/*.svg used by the theme
-    images/             Images imported by pages (theme art lives here)
-  components/           Reusable UI pieces (Header, Footer, Card, Tag, ...)
+    images/             Images imported by pages (theme art + art/ gallery)
+  components/           Reusable UI pieces (Header, Footer, Card, ...)
   content/
-    pages/              Standalone pages (about.md)
+    pages/              Standalone pages (about.md, art.mdx, music.md)
     posts/              Blog posts (all your content lives here)
   i18n/                 UI strings, English text in lang/en.ts
   layouts/              Page shells (Layout.astro, PostLayout.astro)
-  pages/                Routes: home, /posts, /tags, /search, /about,
+  pages/                Routes: home, /posts, /art, /music, /about, /search,
                         /404, rss.xml, robots.txt, og.png
+                        ([page].astro serves art/music/any new content page)
   scripts/              Theme toggle logic
   styles/
     theme.css           COLORS live here
     global.css          Base styles
     typography.css      Prose styles for post content
   types/                Type definitions for the config
-  utils/                Helpers: sorting, slug rules, tags, etc.
+  utils/                Helpers: sorting, slug rules, etc.
 astro-paper.config.ts   MAIN SETTINGS: title, URL, socials, features
 astro.config.ts         Astro setup: integrations, markdown, fonts
 package.json            Scripts and dependencies
@@ -77,6 +78,8 @@ Content folders starting with `_` (like `_releases/`) are for organization only:
 | Domain                         | `public/CNAME`                                 |
 | Footer text                    | `src/i18n/lang/en.ts` under `footer:`          |
 | About page                     | `src/content/pages/about.md`                   |
+| Art page (gallery)             | `src/content/pages/art.mdx`                    |
+| Music page (players)           | `src/content/pages/music.md`                   |
 | Homepage intro text            | `src/pages/index.astro`                        |
 
 ## Writing posts
@@ -109,7 +112,33 @@ Images: either drop files in `public/` and reference them as `/image.png`, or ke
 
 Colors are six CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Current setup is the theme's "Paper Light" for light mode and the older "Paper Dark" cyan scheme for dark mode. More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
 
-Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded to Posts / Tags / About. Resume, art and music are not in it yet; those need both a route and a nav entry when they come back.
+Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Posts / Art / Music / About). Add new entries there when new pages arrive.
+
+## Tags
+
+The site runs without a tag UI: no /tags pages, no tag chips on posts, no nav link. Search covers finding posts. New posts can still carry `tags:` in the frontmatter — the field is optional and simply unused by the UI.
+
+If tags are ever wanted back: `~/backups/old-migration-2026-09-25/removed-tag-feature/` holds the removed files (tag pages, Tag component, getUniqueTags util) plus a README with exact restore steps.
+
+## Art and music pages
+
+Both are content-collection pages served by `src/pages/[page].astro` — drop any new `.md`/`.mdx` file in `src/content/pages/` (except about, which has its own route) and it gets a route and breadcrumb automatically. Add a nav entry in `Header.astro` if it warrants one.
+
+The art gallery (`src/content/pages/art.mdx`) uses Astro's `<Image>` component, so images live in `src/assets/images/art/` and are served hashed. Each needs real alt text. To add a piece: drop the file in that folder, add an import and an `<Image>` line.
+
+Loading convention (keeps the dev-toolbar Audit panel clean): images sit in a single column, so how many are above the fold depends on window height. The Astro audit flags any _lazy_ image whose top edge is above the fold. Current setup:
+
+- First image: `priority` — loads eager + `fetchpriority="high"` (it's the LCP candidate; only one image per page should have this).
+- Second image: `loading="eager"` — also starts above the fold at typical laptop sizes (its top sits ~656px down).
+- Everything after: default lazy.
+
+If you reorder the gallery or the audit flags a different image, match the loading mode to position: `priority` on the first, `loading="eager"` on any others starting above ~900px, lazy for the rest.
+
+The music page (`src/content/pages/music.md`) is plain markdown with SoundCloud iframe embeds. Each iframe needs a `title` attribute (accessibility requirement) — use the track name.
+
+## Posts list
+
+The /posts page shows all posts on one page, newest first. No pagination.
 
 ## Search
 

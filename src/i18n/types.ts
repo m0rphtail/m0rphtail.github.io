@@ -2,7 +2,8 @@ export interface UIStrings {
   nav: {
     home: string;
     posts: string;
-    tags: string;
+    art: string;
+    music: string;
     about: string;
     archives: string;
     search: string;
@@ -13,7 +14,6 @@ export interface UIStrings {
     sharePostIntro: string;
     sharePostOn: string;
     sharePostViaEmail: string;
-    tagLabel: string;
     backToTop: string;
     goBack: string;
     editPage: string;
@@ -36,12 +36,6 @@ export interface UIStrings {
     allRightsReserved: string;
   };
   pages: {
-    tagTitle: string;
-    tagDesc: string;
-
-    tagsTitle: string;
-    tagsDesc: string;
-
     postsTitle: string;
     postsDesc: string;
 

@@ -1,0 +1,36 @@
+---
+title: "Art"
+description: "Drawings and visual work."
+---
+
+import { Image } from "astro:assets";
+import man from "@/assets/images/art/man.webp";
+import desert1 from "@/assets/images/art/desert1.webp";
+import egyptian from "@/assets/images/art/egyptian.webp";
+import monster from "@/assets/images/art/monster.webp";
+import mood from "@/assets/images/art/mood.webp";
+import tunnel from "@/assets/images/art/tunnel.webp";
+import windows from "@/assets/images/art/windows.webp";
+
+<Image
+  src={man}
+  priority
+  alt="Artwork of a man in vivid blue and magenta tones."
+/>
+
+{/* Above the fold on typical laptop viewports — load eagerly, but don't compete with the LCP image. */}
+<Image
+  src={desert1}
+  loading="eager"
+  alt="Desert landscape artwork in warm orange and amber tones."
+/>
+
+<Image src={egyptian} alt="Egyptian-themed artwork in deep indigo and blue." />
+
+<Image src={monster} alt="Monster artwork in deep purple and magenta." />
+
+<Image src={mood} alt="Abstract artwork in dark blue-grey with a small central form." />
+
+<Image src={tunnel} alt="Artwork looking down a tunnel, in blue tones." />
+
+<Image src={windows} alt="Black and white geometric pattern artwork." />

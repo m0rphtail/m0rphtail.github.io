@@ -1,0 +1,39 @@
+---
+// Serves content-collection pages that have no dedicated route in the theme
+// (art, music, and any future page dropped into src/content/pages/).
+// The theme hardcodes a route for "about", so it is excluded here.
+import { getCollection, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import config from "@/config";
+
+export async function getStaticPaths() {
+  const pages = await getCollection("pages");
+  return pages
+    .filter(p => p.id !== "about")
+    .map(p => ({ params: { page: p.id }, props: { entry: p } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<Layout
+  title={`${entry.data.title} | ${config.site.title}`}
+  description={entry.data.description}
+  ogImage={entry.data.ogImage}
+  canonicalURL={entry.data.canonicalURL}
+>
+  <Header />
+
+  <Breadcrumb />
+
+  <Main pageTitle={entry.data.title} class="app-prose">
+    <Content />
+  </Main>
+
+  <Footer />
+</Layout>
