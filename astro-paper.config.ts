@@ -22,8 +22,7 @@ export default defineAstroPaperConfig({
     showArchives: false,
     showBackButton: true,
     editPost: {
-      enabled: true,
-      url: "https://github.com/m0rphtail/m0rphtail.github.io/edit/main/",
+      enabled: false,
     },
     search: "pagefind",
   },
