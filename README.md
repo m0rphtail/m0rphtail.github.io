@@ -164,6 +164,16 @@ Search uses [Pagefind](https://pagefind.app/), which indexes the built site. Run
 
 Pagefind is pinned to `1.5.0` on purpose. Newer versions crash on this Raspberry Pi with a jemalloc page-size error (the Pi uses 16K pages). Do not bump it without testing; older versions work fine on normal x86 CI runners too.
 
+## Analytics
+
+Pageviews are counted with [GoatCounter](https://www.goatcounter.com/) — dashboard at <https://kchitnis.goatcounter.com>. No cookies, no consent banner.
+
+The wiring is in `src/layouts/Layout.astro` and is SPA-aware: the theme navigates client-side (`ClientRouter`), and the stock snippet only counts full page loads, so an inline script sets `window.goatcounter` (endpoint, `no_onload`, `no_events`) and re-fires `goatcounter.count()` on every `astro:page-load` — initial load plus every navigation. Settings go on `window`, not just the script tag: the router's head swap removes the tag, and the script re-reads it at count time.
+
+The script is self-hosted: `public/js/count.js` is a byte-exact copy of `https://gc.zgo.at/count.js`, so nothing loads from a third-party origin and no SRI is needed. To update it, re-copy the file from the CDN. `public/js/` is excluded from prettier, eslint, and tsc — do not reformat the vendored file.
+
+The no-JS fallback is the 1x1 pixel `<noscript>` at the end of the body in `Layout.astro`. Keep it in the body, never the head: the router parses fetched pages with scripting disabled, where a head `<noscript>` containing an `<img>` gets hoisted into the body as a live element that fires a duplicate hit on every client-side navigation. In the body the img stays wrapped and the router strips the whole element before swapping.
+
 ## Favicon
 
 The tab icon is the blue mark uploaded Sep 2026 (flat `#4770c2` background). `public/` holds the full set, all rendered from one square source image:
