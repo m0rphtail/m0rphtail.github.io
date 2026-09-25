@@ -3,7 +3,7 @@ import type { UIStrings } from "../types";
 export default {
   nav: {
     home: "Home",
-    posts: "Posts",
+    posts: "Blogs",
     resume: "Resume",
     art: "Art",
     music: "Music",
@@ -31,15 +31,15 @@ export default {
   home: {
     socialLinks: "Social Links",
     featured: "Featured",
-    recentPosts: "Recent Posts",
-    allPosts: "All Posts",
+    recentPosts: "Recent Blogs",
+    allPosts: "All Blogs",
   },
   footer: {
     copyright: "Copyright",
     allRightsReserved: "All rights reserved.",
   },
   pages: {
-    postsTitle: "Posts",
+    postsTitle: "Blogs",
     postsDesc: "All the articles I've posted.",
 
     archivesTitle: "Archives",
@@ -53,7 +53,7 @@ export default {
     openMenu: "Open menu",
     closeMenu: "Close menu",
     toggleTheme: "Toggle theme",
-    searchPlaceholder: "Search posts...",
+    searchPlaceholder: "Search blogs...",
     noResults: "No results found",
     goToPreviousPage: "Go to previous page",
     goToNextPage: "Go to next page",
