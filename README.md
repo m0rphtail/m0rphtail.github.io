@@ -69,24 +69,25 @@ Content folders starting with `_` (like `_releases/`) are for organization only:
 
 ## Where to change things
 
-| I want to change...            | Edit this                                      |
-| ------------------------------ | ---------------------------------------------- |
-| Site title, URL, description   | `astro-paper.config.ts` under `site:`          |
-| Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`       |
-| Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`    |
-| Posts per page / on homepage   | `astro-paper.config.ts` under `posts:`         |
-| Search, back button, edit link | `astro-paper.config.ts` under `features:`      |
-| Site colors, light and dark    | `src/styles/theme.css`                         |
-| Font                           | `astro.config.ts` under `fonts:`               |
-| Nav menu items                 | `src/components/Header.astro` (hardcoded list) |
-| Favicon + icons                | `public/` (see "Favicon" below)                |
-| Domain                         | `public/CNAME`                                 |
-| Footer text                    | `src/i18n/lang/en.ts` under `footer:`          |
-| About page                     | `src/content/pages/about.md`                   |
-| Resume page                    | `src/content/pages/resume.md`                  |
-| Art page (gallery)             | `src/content/pages/art.mdx`                    |
-| Music page (players)           | `src/content/pages/music.md`                   |
-| Homepage intro text            | `src/pages/index.astro`                        |
+| I want to change...            | Edit this                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| Site title, URL, description   | `astro-paper.config.ts` under `site:`                                                   |
+| Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`                                                |
+| Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`                                             |
+| Posts per page / on homepage   | `astro-paper.config.ts` under `posts:`                                                  |
+| Search, back button, edit link | `astro-paper.config.ts` under `features:`                                               |
+| Site colors, light and dark    | `src/styles/theme.css`                                                                  |
+| Code-block colors              | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below |
+| Font                           | `astro.config.ts` under `fonts:`                                                        |
+| Nav menu items                 | `src/components/Header.astro` (hardcoded list)                                          |
+| Favicon + icons                | `public/` (see "Favicon" below)                                                         |
+| Domain                         | `public/CNAME`                                                                          |
+| Footer text                    | `src/i18n/lang/en.ts` under `footer:`                                                   |
+| About page                     | `src/content/pages/about.md`                                                            |
+| Resume page                    | `src/content/pages/resume.md`                                                           |
+| Art page (gallery)             | `src/content/pages/art.mdx`                                                             |
+| Music page (players)           | `src/content/pages/music.md`                                                            |
+| Homepage intro text            | `src/pages/index.astro`                                                                 |
 
 ## Writing posts
 
@@ -120,9 +121,13 @@ Verbatim evidence (malware samples, obfuscated code): prettier reformats fenced 
 
 ## Colors, fonts, nav
 
-Colors are six CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Light mode is the theme's "Paper Light" (slightly darker `--muted` for visible striped table rows). Dark mode is a custom neutral: `#1a1a1a` background with the "Paper Dark" cyan accent `#4db8f0`. More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
+Colors are seven CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Both modes are blue-accented: light is warm paper `#f9f5ee` with `#006cac` links, dark is grey `#2f2f2f` with `#4db8f0` links and blue-grey borders. Code blocks follow the shiki themes set in `astro.config.ts`, except the dark panel background, which `theme.css` forces to grey `#262626` with a `--shiki-dark-bg` override (shiki sets that variable inline on every `<pre>`, so the override carries `!important`). More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
 
 Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Posts / Resume / Art / Music / About). Add new entries there when new pages arrive.
+
+### Code blocks
+
+Syntax colors come from the shiki themes in `astro.config.ts` (`shikiConfig.themes`). The dark-mode panel background is the exception: shiki writes `--shiki-dark-bg` inline on every `<pre>`, so `theme.css` overrides it with `!important` to keep the panel grey `#262626` (matching the grey page). To change the dark panel, edit that one rule in `theme.css`; to change token colors in both modes, edit the shiki themes.
 
 ## Tags
 
