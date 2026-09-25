@@ -125,7 +125,7 @@ Table of contents: put `## Table of contents` right after the intro, before the 
 
 Colors are seven CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Both modes are blue-accented: light is warm paper `#f9f5ee` with `#006cac` links, dark is grey `#2f2f2f` with `#4db8f0` links and blue-grey borders. Code blocks follow the shiki themes set in `astro.config.ts`, except the dark panel background, which `theme.css` forces to grey `#262626` with a `--shiki-dark-bg` override (shiki sets that variable inline on every `<pre>`, so the override carries `!important`). More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
 
-Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Posts / Resume / Art / Music / About). Add new entries there when new pages arrive.
+Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Blogs / Resume / Art / Music / About). Add new entries there when new pages arrive.
 
 ### Code blocks
 
