@@ -7,21 +7,19 @@ tags:
   - security
 ---
 
-
 > This program I developed will greet you, but my friend said it is leaking data like a sieve, what did I forget to add?
 >
 > Author: xXl33t_h@x0rXx
->
 
 ## Analysis
 
 # checksec
 
 ```
-Canary                        : ✘ 
-NX                            : ✓ 
-PIE                           : ✓ 
-Fortify                       : ✘ 
+Canary                        : ✘
+NX                            : ✓
+PIE                           : ✓
+Fortify                       : ✘
 RelRO                         : Partial
 ```
 
@@ -36,7 +34,7 @@ void main(void){
     char *format;
     char *s;
     int64_t var_8h;
-    
+
     var_8h = *(int64_t *)(in_FS_OFFSET + 0x28);
     sym.buffer_init();
     iVar1 = sym.imp.fopen("./flag.txt", 0x2008);
@@ -106,7 +104,7 @@ $ python hello_x.py
 
 2
     (null)
-    
+
 3
     H=
 
@@ -116,7 +114,7 @@ $ python hello_x.py
 5
     (null)
 
-6  
+6
     DUCTF {test_flag}
 
 7

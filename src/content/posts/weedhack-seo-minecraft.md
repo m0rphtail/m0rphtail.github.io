@@ -1,11 +1,10 @@
 ---
 title: "Weedhack: SEO Poisoning the Minecraft Client Scene"
 pubDatetime: 2026-08-24
-description: "A campaign documented by McAfee shows how attackers use search engine optimization (SEO) poisoning to outrank legitimate open-source utility websites across Google, Bing, Brave, an…"
+description: "A campaign documented by McAfee shows how attackers use search engine optimization (SEO) poisoning to outrank legitimate open-source utility websites across Google, Bing, Brave, and DuckDuckGo."
 tags:
   - security
 ---
-
 
 A campaign documented by McAfee shows how attackers use search engine optimization (SEO) poisoning to outrank legitimate open-source utility websites across Google, Bing, Brave, and DuckDuckGo. In this campaign, fraudulent download portals for Minecraft clients like Xenon and Nova ranked above the official repositories hosted on GitHub and Modrinth.
 
@@ -39,7 +38,7 @@ Infected user accounts often distribute download links automatically to shared D
 
 ## Payload capabilities
 
-Weedhack distributes multi-stage Java payloads designed to gather host information, establish Microsoft Defender exclusions, and exfiltrate browser credentials and system data. 
+Weedhack distributes multi-stage Java payloads designed to gather host information, establish Microsoft Defender exclusions, and exfiltrate browser credentials and system data.
 
 Legitimate software mods do not require users to disable endpoint protections or add global Defender exclusions. When an installer requests turning off antivirus protections, that prompt serves as a primary indicator of compromise.
 

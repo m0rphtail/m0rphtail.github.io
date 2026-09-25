@@ -1,11 +1,10 @@
 ---
 title: "Tenda, Temu, and the Root Password Printed on the Serial Console"
 pubDatetime: 2026-08-03
-description: "A recent security review of the Tenda AC10 V6 highlights common hardware security oversights in consumer routers: an unauthenticated endpoint enables a Telnet daemon, and the dynam…"
+description: "A recent security review of the Tenda AC10 V6 highlights common hardware security oversights in consumer routers: an unauthenticated endpoint enables a Telnet daemon, and the dynamically generated root password is printed directly to the serial console during factory resets."
 tags:
   - security
 ---
-
 
 A recent security review of the Tenda AC10 V6 highlights common hardware security oversights in consumer routers: an unauthenticated endpoint enables a Telnet daemon, and the dynamically generated root password is printed directly to the serial console during factory resets.
 
@@ -30,7 +29,7 @@ On the AC10 V6, the magic string changed, and the encrypted firmware prevented e
 
 ## Capturing credentials over UART
 
-During reboot or factory reset, the router's system-on-chip outputs kernel and boot messages over UART pads exposed on the PCB. 
+During reboot or factory reset, the router's system-on-chip outputs kernel and boot messages over UART pads exposed on the PCB.
 
 Connecting a USB-to-UART serial adapter and holding the factory reset button captures the re-provisioning log. During this routine, the firmware prints the pre-encoded password components followed by the base64-encoded root password directly to the serial output. Logging in via Telnet with that password yields a root BusyBox shell.
 

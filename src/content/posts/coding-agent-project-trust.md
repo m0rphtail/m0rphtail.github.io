@@ -1,11 +1,10 @@
 ---
 title: "Clicking 'Trust This Folder' Is Running Code"
 pubDatetime: 2026-08-03
-description: "When a developer clones an unfamiliar repository and clicks \"trust this folder\" in an AI coding assistant, code can execute immediately, before entering any prompt or approving any…"
+description: 'When a developer clones an unfamiliar repository and clicks "trust this folder" in an AI coding assistant, code can execute immediately, before entering any prompt or approving any command.'
 tags:
   - ai
 ---
-
 
 When a developer clones an unfamiliar repository and clicks "trust this folder" in an AI coding assistant, code can execute immediately, before entering any prompt or approving any command.
 

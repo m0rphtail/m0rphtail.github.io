@@ -7,7 +7,6 @@ tags:
   - security
 ---
 
-
 The source code of the webpage had a comment written in `JSFuck`.
 
 So i used an [online tool](https://enkhee-osiris.github.io/Decoder-JSFuck/) to run the file, and got this.
@@ -18,7 +17,7 @@ console.log(atob("aWN0ZnsxbnNwM2N0MHJfcjAwX2cwZXNfdGgwbmt9"));
 
 Decoding from base64 I get the flag.
 
-``` bash
+```bash
 echo "aWN0ZnsxbnNwM2N0MHJfcjAwX2cwZXNfdGgwbmt9" | base64 -d
 ```
 

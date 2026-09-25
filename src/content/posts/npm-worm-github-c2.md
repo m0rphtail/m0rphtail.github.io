@@ -6,7 +6,6 @@ tags:
   - supply-chain
 ---
 
-
 The shhallucinate npm worm stands out mainly for its C2 design: it ran its command channel directly through GitHub Actions discussions. Because the malicious infrastructure was just a public GitHub repository, standard domain reputation feeds and IP blocklists were useless against it.
 
 ## How the worm operated

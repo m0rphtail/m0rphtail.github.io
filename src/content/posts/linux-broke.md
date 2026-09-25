@@ -6,7 +6,6 @@ tags:
   - security
 ---
 
-
 A compact 732-byte Python script surfaced recently that achieves reliable root privilege escalation across almost every mainstream Linux distribution released since 2017. The exploit does not require defeating KASLR or winning tight race conditions. Instead, it abuses an architectural optimization inside the kernel's cryptographic subsystem to overwrite read-only page-cache memory.
 
 ## The AF_ALG interface and scatterlists

@@ -6,7 +6,6 @@ tags:
   - vulnerability
 ---
 
-
 On August 27, PaperCut issued an advisory warning of in-the-wild exploitation against PaperCut NG and MF servers. Security researchers at Huntress reproduced the full attack chain against a stock PaperCut NG 25.0.11.75758 instance and published an analysis of the exploit payload. The chain links two vulnerabilities: CVE-2026-81578 (an authorization bypass in the web management interface) and CVE-2026-82078 (unsafe dynamic class loading in database connection routines). Chained together, they yield unauthenticated remote code execution.
 
 ## Vulnerability mechanics

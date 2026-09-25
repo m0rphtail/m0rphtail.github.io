@@ -7,7 +7,6 @@ tags:
   - security
 ---
 
-
 The challenge is to bypass the checks to get the flag. The description gave the basic idea that it uses sed. This is a pretty straightforward challenge if you are familiar with bash. After reading the blacklist I used to wildcard operator to bypass the checks. You input this:
 
 ```

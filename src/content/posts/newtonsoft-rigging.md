@@ -1,11 +1,10 @@
 ---
 title: "The Newtonsoft.Json Fork That Rigged a Betting Platform"
 pubDatetime: 2026-07-22
-description: "A typosquatted package on NuGet demonstrates how targeted supply-chain malware can operate: rather than harvesting generic credentials or deploying standard backdoors, it behaved a…"
+description: "A typosquatted package on NuGet demonstrates how targeted supply-chain malware can operate: rather than harvesting generic credentials or deploying standard backdoors, it behaved as a fully functional JSON serializer while manipulating the outcome of a specific online betting game."
 tags:
   - supply-chain
 ---
-
 
 A typosquatted package on NuGet demonstrates how targeted supply-chain malware can operate: rather than harvesting generic credentials or deploying standard backdoors, it behaved as a fully functional JSON serializer while manipulating the outcome of a specific online betting game.
 

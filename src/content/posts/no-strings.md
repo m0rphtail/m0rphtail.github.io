@@ -7,11 +7,9 @@ tags:
   - security
 ---
 
-
 > This binary contains a free flag. No strings attached, seriously!
-> 
+>
 > Author: joseph#8210
-> 
 
 ## Analysis
 
@@ -27,7 +25,7 @@ undefined8 main(void)
   int local_6c;
   char local_68 [72];
   long local_20;
-  
+
   local_20 = *(long *)(in_FS_OFFSET + 0x28);
   printf("flag? ");
   fgets(local_68,0x46,stdin);

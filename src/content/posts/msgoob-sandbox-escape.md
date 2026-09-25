@@ -6,7 +6,6 @@ tags:
   - vulnerability
 ---
 
-
 In August 2025, Project Zero published a writeup detailing CVE-2025-38236, a use-after-free in Linux's `MSG_OOB` support for UNIX domain sockets. The full exploit chain turns code execution in a Chrome renderer process into arbitrary kernel code execution, using a feature that almost no modern software relies on.
 
 ## An obscure socket feature
@@ -32,7 +31,7 @@ recv(socks[0], &dummy, 1, 0);        // normal recv
 recv(socks[0], &dummy, 1, MSG_OOB);  // UAF
 ```
 
-Under the hood, an OOB message sits in the receive queue as a standard socket buffer (SKB), referenced by an `oob_skb` pointer. Reading it with `MSG_OOB` increments its `consumed` counter, leaving a zero-length SKB in the queue. The regular receive routine calls `manage_oob()` to clean up. 
+Under the hood, an OOB message sits in the receive queue as a standard socket buffer (SKB), referenced by an `oob_skb` pointer. Reading it with `MSG_OOB` increments its `consumed` counter, leaving a zero-length SKB in the queue. The regular receive routine calls `manage_oob()` to clean up.
 
 A 2024 patch intended to fix an unrelated spurious EOF bug introduced the flaw in `manage_oob()`. When the receive queue holds a zero-length SKB directly followed by another OOB SKB, the cleanup code unlinks the zero-length buffer and advances the queue, but fails to clear the dangling `oob_skb` pointer. Calling `recv(..., MSG_OOB)` again dereferences that freed memory.
 

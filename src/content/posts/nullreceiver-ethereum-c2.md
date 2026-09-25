@@ -7,7 +7,6 @@ tags:
   - c2
 ---
 
-
 Earlier blockchain C2 techniques, commonly grouped under EtherHiding, stored payload strings inside smart contracts on public ledgers. While this prevented defenders from seizing or taking down the hosting infrastructure, monitoring teams could still track the fixed contract address. A newer variant codenamed NullReceiver avoids fixed contract endpoints by embedding the C2 IP directly inside the recipient address bytes of standard Ethereum transfers.
 
 ## Address decoding mechanism

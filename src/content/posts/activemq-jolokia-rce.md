@@ -6,7 +6,6 @@ tags:
   - security
 ---
 
-
 CVE-2026-34197 is a remote code execution vulnerability in Apache ActiveMQ Classic that went unnoticed for 13 years. The researcher who published the flaw used Claude to review the project source, where the model flagged an overly broad MBean permission block. The researcher then confirmed the behavior, chained it into a working exploit, and reported it.
 
 ## The configuration exception
@@ -48,7 +47,7 @@ When the `vm://` transport sees that the target broker is missing, it calls `Bro
 
 ## Exposure and impact
 
-The exploit requires authentication, but many ActiveMQ deployments still run with default `admin:admin` credentials. On ActiveMQ versions 6.0.0 through 6.1.1, the situation was worse: CVE-2024-32114 omitted `/api/*` from web console security constraints, exposing Jolokia without authentication. On those releases, CVE-2026-34197 can be triggered unauthenticated over the network. 
+The exploit requires authentication, but many ActiveMQ deployments still run with default `admin:admin` credentials. On ActiveMQ versions 6.0.0 through 6.1.1, the situation was worse: CVE-2024-32114 omitted `/api/*` from web console security constraints, exposing Jolokia without authentication. On those releases, CVE-2026-34197 can be triggered unauthenticated over the network.
 
 The vendor addressed the issue in releases 5.19.6 and 6.2.5 by preventing `addNetworkConnector` from using `vm://` transports.
 

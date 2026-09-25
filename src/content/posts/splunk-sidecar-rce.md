@@ -1,11 +1,10 @@
 ---
 title: "The SIEM That Lets You In: Splunk's Pre-Auth RCE"
 pubDatetime: 2026-06-18
-description: "When security researchers published an analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, it caught my attention immediately as someone who works with Splun…"
+description: "When security researchers published an analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, it caught my attention immediately as someone who works with Splunk every day."
 tags:
   - vulnerability
 ---
-
 
 When security researchers published an analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, it caught my attention immediately as someone who works with Splunk every day. The vulnerability lives inside the PostgreSQL Sidecar Service, an internal helper service added in recent versions.
 

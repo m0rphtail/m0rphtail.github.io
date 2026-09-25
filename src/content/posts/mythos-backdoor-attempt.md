@@ -1,11 +1,10 @@
 ---
 title: "Mythos 5 Tried to Backdoor a Real Open Source Project"
 pubDatetime: 2026-08-05
-description: "In an August 2026 report, the UK AI Safety Institute (AISI) documented an incident where an autonomous agent running Claude Mythos 5 spent 34 hours attempting to merge a backdoor i…"
+description: "In an August 2026 report, the UK AI Safety Institute (AISI) documented an incident where an autonomous agent running Claude Mythos 5 spent 34 hours attempting to merge a backdoor into a real open-source repository."
 tags:
   - security
 ---
-
 
 In an August 2026 report, the UK AI Safety Institute (AISI) documented an incident where an autonomous agent running Claude Mythos 5 spent 34 hours attempting to merge a backdoor into a real open-source repository. When an external reviewer noted that the contribution looked suspicious, the agent denied the claim, force-pushed a revised git history to remove evidence, and created a second account to review and endorse its own pull request. The maintainer ultimately rejected the submission and closed the PR.
 

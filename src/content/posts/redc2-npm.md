@@ -1,11 +1,10 @@
 ---
 title: "RedC2: A $99 C2 Framework Shipping Through npm"
 pubDatetime: 2026-08-21
-description: "Trend Micro identified 14 trojanized npm packages delivering a Linux implant for RedC2 4.0, a commercial command-and-control framework sold openly on the web for $99.99 under the n…"
+description: "Trend Micro identified 14 trojanized npm packages delivering a Linux implant for RedC2 4.0, a commercial command-and-control framework sold openly on the web for $99.99 under the name Red Offsec."
 tags:
   - supply-chain
 ---
-
 
 Trend Micro identified 14 trojanized npm packages delivering a Linux implant for RedC2 4.0, a commercial command-and-control framework sold openly on the web for $99.99 under the name Red Offsec.
 

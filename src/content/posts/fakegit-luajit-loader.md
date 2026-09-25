@@ -1,23 +1,22 @@
 ---
 title: "FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop"
 pubDatetime: 2026-09-14
-description: "A GitHub repository named StanLeyJ03/mcp-for-security advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan f…"
+description: "A GitHub repository named StanLeyJ03/mcp-for-security advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents."
 tags:
   - malware
   - reverse-engineering
 ---
 
-
 A GitHub repository named `StanLeyJ03/mcp-for-security` advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents. While the repository mirrored the structure and documentation of a legitimate project, all 13 links in the README (including badges, installation commands, documentation references, and contact addresses) pointed to the same download target: `for-security-mcp-3.3.zip`.
 
 ## TL;DR
 
-* `StanLeyJ03/mcp-for-security` is a history-preserving clone of a real security MCP project. Two commits on 2026-02-19 turned its README into a funnel aimed at `for-security-mcp-3.3.zip`.
-* Inside the ZIP: a 28-byte launcher, a freshly built LuaJIT interpreter, and 309KB of single-line Lua that decrypts itself as it runs.
-* The obfuscation is Prometheus, the open-source Lua obfuscator, run with its heaviest settings and randomized build keys.
-* All 996 encrypted strings are decrypted here, including the C2, the Polygon dead drop, the persistence commands, and the PowerShell one-liner that exempts `.exe` and `.dll` across the entire system drive from Defender.
-* The campaign is publicly tracked as FakeGit and attributed by Trend Micro to Water Kurita, also tracked as Storm-2477.
-* The loader sits upstream of the SmartLoader chain that ends in StealC. Nothing was executed to produce this report, and no IOC was ever contacted.
+- `StanLeyJ03/mcp-for-security` is a history-preserving clone of a real security MCP project. Two commits on 2026-02-19 turned its README into a funnel aimed at `for-security-mcp-3.3.zip`.
+- Inside the ZIP: a 28-byte launcher, a freshly built LuaJIT interpreter, and 309KB of single-line Lua that decrypts itself as it runs.
+- The obfuscation is Prometheus, the open-source Lua obfuscator, run with its heaviest settings and randomized build keys.
+- All 996 encrypted strings are decrypted here, including the C2, the Polygon dead drop, the persistence commands, and the PowerShell one-liner that exempts `.exe` and `.dll` across the entire system drive from Defender.
+- The campaign is publicly tracked as FakeGit and attributed by Trend Micro to Water Kurita, also tracked as Storm-2477.
+- The loader sits upstream of the SmartLoader chain that ends in StealC. Nothing was executed to produce this report, and no IOC was ever contacted.
 
 ## What was in the zip
 
@@ -66,46 +65,27 @@ Thirteen occurrences of the same ZIP URL in a 4,991-byte README.
 
 ![](/fakegit-01-readme-lure.png)
 
-*The README on GitHub. Both badges are broken images, since they point at the ZIP.*
+_The README on GitHub. Both badges are broken images, since they point at the ZIP._
 
 The repository is a clone of `cyproxio/mcp-for-security`, originally created by Serhat Çiçek. Ten commit hashes in the clone match the original repository byte-for-byte. The copy was created two days after the upstream project and remained largely inactive until a README edit in August 2025.
 
 ![](/shot-20260914173405.png)
 
-*Contributors. Serhatcck built the project: 10 commits, 8,099 lines added. StanLeyJ03 made 3 commits and removed more than it added.*
+_Contributors. Serhatcck built the project: 10 commits, 8,099 lines added. StanLeyJ03 made 3 commits and removed more than it added._
 
 On February 19, 2026, two commits completed the lure: at 09:01 UTC the archive was added to the repository tree, and at 12:41 UTC a second commit updated the README to point all links at the ZIP.
 
 ![](/shot-20260914173718.png)
 
-*The weaponizing commit. Every real link replaced with the ZIP path, +12/-12. The diff shows the working `git clone` line swapped for a download.*
+_The weaponizing commit. Every real link replaced with the ZIP path, +12/-12. The diff shows the working `git clone` line swapped for a download._
 
 The archive is located at `nmap-mcp/src/for-security-mcp-3.3.zip`, stored alongside ordinary source files:
 
 ![](/fakegit-02-zip-in-tree.png)
 
-*One ZIP among ordinary source files.*
+_One ZIP among ordinary source files._
 
 ## Execution chain
-
-```mermaid
-flowchart TD
-    A["Launcher.cmd<br/>start luajit.exe uix.txt"] --> B["luajit.exe loads uix.txt"]
-    B --> C["VM boot<br/>anti-tamper line-number check"]
-    C --> D["Hide console<br/>GetConsoleWindow + ShowWindow(SW_HIDE)"]
-    D --> E["Decrypt string table<br/>996 strings + 8,514 B ffi.cdef"]
-    E --> F["ffi.cdef declares the Win32 surface"]
-    F --> G["Resolve APIs by PEB walk<br/>RtlInitUnicodeString + LdrLoadDll"]
-    G --> H["Profile victim<br/>OS, user, admin token, MachineGuid"]
-    H --> I["Check in over HTTP"]
-    I --> J["Persistence<br/>Run key + scheduled task + file drops"]
-    J --> K["Defender exclusion<br/>Add-MpPreference"]
-    K --> L{"Task loop"}
-    L -->|"HTTP reachable"| M["Poll /task/"]
-    L -->|"HTTP blocked"| N["Polygon eth_call<br/>dead-drop fallback"]
-    M --> O["Execute payload<br/>VirtualAlloc + CreateThread, or rundll32 / PowerShell"]
-    N --> O
-```
 
 `Launcher.cmd` is a 28-byte batch script containing `start luajit.exe uix.txt`. Using `start` spawns the interpreter in a detached process, and the Lua script hides its console window immediately upon execution.
 
@@ -115,23 +95,23 @@ flowchart TD
 
 Prometheus's source lists its transformation steps, and the sample matches them one for one:
 
-| Prometheus step | What it does | Where it shows up in `uix.txt` |
-| --- | --- | --- |
-| `Vmify` | compiles the script into a randomized VM | the 553-block dispatch, closure factories, heap and refcount machinery |
-| `EncryptStrings` | per-site string encryption with a random seed | all 996 encrypted literals |
-| `AntiTamper` | breaks the script when it is edited | the traceback line-number check that ends in `error("Tamper Detected!")` |
-| `NumbersToExpressions` | rewrites constants as junk arithmetic | `-1273246-((228191+-839136)+340691)` and friends |
-| `SplitStrings` | splits names into chunk tables | the `mn` / `xn` reassembly helpers, 403 call sites |
-| `ConstantArray` | hoists constants into a big table | the literal tables the VM indexes at runtime |
+| Prometheus step        | What it does                                  | Where it shows up in `uix.txt`                                           |
+| ---------------------- | --------------------------------------------- | ------------------------------------------------------------------------ |
+| `Vmify`                | compiles the script into a randomized VM      | the 553-block dispatch, closure factories, heap and refcount machinery   |
+| `EncryptStrings`       | per-site string encryption with a random seed | all 996 encrypted literals                                               |
+| `AntiTamper`           | breaks the script when it is edited           | the traceback line-number check that ends in `error("Tamper Detected!")` |
+| `NumbersToExpressions` | rewrites constants as junk arithmetic         | `-1273246-((228191+-839136)+340691)` and friends                         |
+| `SplitStrings`         | splits names into chunk tables                | the `mn` / `xn` reassembly helpers, 403 call sites                       |
+| `ConstantArray`        | hoists constants into a big table             | the literal tables the VM indexes at runtime                             |
 
 The VM mechanics, for anyone who wants the details:
 
-* Everything is wrapped in `return (function(...) return (function(z,E,A,j,r,l,Q,F,V,L,N,G,q,s,g,d,k,O,K,c,u,y,U,t) ... end)(...))( ... )(E(Q))`.
-* `BIGFUNC(y, A, j, r)` interprets a numeric program counter. `while y do if y<N then ...` is a binary-search dispatch over 553 basic blocks. `F` is a slot-indexed heap, `c` a refcount array, `t()` an allocator.
-* Nine closure factories with fixed arities (`G` = 0, `d` = 1, `g` = 2, `u` = 3, `O` = 4, `V` = 5, `q` = 6, `s` = 8, `U` = varargs) produce 64 closures.
-* Eighty-eight sentinel globals are read as `z["..."]`. The VM never writes to globals, so these expressions evaluate to `nil` to terminate specific interpreter loops.
-* Dead-code basic blocks contain deliberately invalid expressions (such as `"1xp" / c`) to confuse static analysis tools.
-* The anti-tamper check triggers intentional exceptions, inspects the resulting traceback string (`file:LINE:`), and compares line offsets against expected values. Modifying the file triggers `Tamper Detected!` and halts execution.
+- Everything is wrapped in `return (function(...) return (function(z,E,A,j,r,l,Q,F,V,L,N,G,q,s,g,d,k,O,K,c,u,y,U,t) ... end)(...))( ... )(E(Q))`.
+- `BIGFUNC(y, A, j, r)` interprets a numeric program counter. `while y do if y<N then ...` is a binary-search dispatch over 553 basic blocks. `F` is a slot-indexed heap, `c` a refcount array, `t()` an allocator.
+- Nine closure factories with fixed arities (`G` = 0, `d` = 1, `g` = 2, `u` = 3, `O` = 4, `V` = 5, `q` = 6, `s` = 8, `U` = varargs) produce 64 closures.
+- Eighty-eight sentinel globals are read as `z["..."]`. The VM never writes to globals, so these expressions evaluate to `nil` to terminate specific interpreter loops.
+- Dead-code basic blocks contain deliberately invalid expressions (such as `"1xp" / c`) to confuse static analysis tools.
+- The anti-tamper check triggers intentional exceptions, inspects the resulting traceback string (`file:LINE:`), and compares line offsets against expected values. Modifying the file triggers `Tamper Detected!` and halts execution.
 
 Public deobfuscators exist for Prometheus (0x251's `Prometheus-Deobfuscator` and its V2). This analysis did not use them. Their strongest step executes the script under stubbed natives to observe behavior, and this payload is architecture-independent, so running it here would mean a live sample on a machine that already has `luajit` installed. A Python emulator that models the VM instead, with natives stubbed to symbolic values and no Lua runtime involved, does the same job without the risk.
 
@@ -153,14 +133,14 @@ prevVal = byte
 
 That makes the constants in the sample checkable against the generator's parameter ranges. Every one of them lands inside:
 
-| In the sample | Prometheus parameter | Checks out because |
-| --- | --- | --- |
-| `% 2^45` | `35184372088832` | same modulus |
-| `172` | `primitive_root_257(secret_key_7)` | 172 is a primitive root modulo 257 |
-| `181` | `secret_key_6 * 4 + 1` | back-computes to 45, inside the 0..63 range |
-| `22231257191003` | `secret_key_44 * 2 + 1` | back-computes to an integer inside the 0..2^44 range |
-| seed init `% 255 + 2` | `seed_53 % 255 + 2` | identical |
-| IV `238` | `secret_key_8` | inside the 0..255 range |
+| In the sample         | Prometheus parameter               | Checks out because                                   |
+| --------------------- | ---------------------------------- | ---------------------------------------------------- |
+| `% 2^45`              | `35184372088832`                   | same modulus                                         |
+| `172`                 | `primitive_root_257(secret_key_7)` | 172 is a primitive root modulo 257                   |
+| `181`                 | `secret_key_6 * 4 + 1`             | back-computes to 45, inside the 0..63 range          |
+| `22231257191003`      | `secret_key_44 * 2 + 1`            | back-computes to an integer inside the 0..2^44 range |
+| seed init `% 255 + 2` | `seed_53 % 255 + 2`                | identical                                            |
+| IV `238`              | `secret_key_8`                     | inside the 0..255 range                              |
 
 The string table is therefore recoverable by anyone with the public obfuscator source. It also explains the version sprawl: the "16 obfuscator generations" tracked under ESET's `Lua/Agent.Z` through `Lua/Agent.BT` are not 16 hand-written variants. Prometheus re-randomizes its keys on every build, so re-obfuscating the same code produces what looks like a new generation while nothing underneath has moved.
 
@@ -168,7 +148,7 @@ All 996 strings came out clean, and the separate 8,514-byte blob decrypts to coh
 
 ![](/fakegit-05-prometheus-public.png)
 
-*Prometheus on GitHub: 506 stars, and a docs folder covering every transformation this loader uses.*
+_Prometheus on GitHub: 506 stars, and a docs folder covering every transformation this loader uses._
 
 ## What it does once running
 
@@ -204,6 +184,7 @@ Decoding that base64 segment yields `517b7c5e5663656a057f`, corresponding to the
 
 The secondary C2 channel uses Polygon blockchain infrastructure as a dead drop. An embedded JSON-RPC template handles queries:
 
+<!-- prettier-ignore -->
 ```json
 { "jsonrpc": "2.0", "method": "eth_call",
   "params": [ { "to": "%s", "data": "%s" }, "latest" ], "id": 1 }
@@ -217,7 +198,7 @@ Dynamic analysis confirms this rotation mechanism. In a June 2026 Triage sandbox
 
 ![](/fakegit-06-sandbox-telemetry.png)
 
-*The sandbox run, live: `luajit.exe` checking in to the original C2, calling the contract through `polygon[.]drpc[.]org`, and then posting to a second address that exists in none of the 996 static strings.*
+_The sandbox run, live: `luajit.exe` checking in to the original C2, calling the contract through `polygon[.]drpc[.]org`, and then posting to a second address that exists in none of the 996 static strings._
 
 **Attribution.** Trend Micro tracks this operation as Water Kurita, also tracked as Storm-2477, and assesses FakeGit as a continuation of an earlier Lumma Stealer campaign. derp.ca independently ties the distribution tooling to a single Vietnamese-speaking operator. This analysis corroborates the toolchain.
 
@@ -331,13 +312,13 @@ ECe6VGLRJum2qYtl79OiOU7aHot7Zhbn               32 chars; XOR key for the GitHub 
 
 What to hunt for:
 
-* `luajit.exe` (or `lua51.dll`) making outbound HTTP to a bare IP, especially to `/api/`, `/json/`, or `/task/`, or posting `multipart/form-data` to an IP literal.
-* `luajit.exe` resolving Polygon RPC hosts. Legitimate software has little reason to combine a Lua interpreter with `drpc[.]org` or `publicnode[.]com`.
-* Parent and child processes: `cmd.exe` launching `luajit.exe` with a `.txt` or `.luac` argument.
-* A new `Run` value plus a matching `StartupApproved\Run` entry created in the same window. The pairing is the tell; either one alone happens legitimately.
-* `Add-MpPreference -ExclusionPath` from anything that is not admin tooling.
-* A fresh scheduled task whose action points under `System32\oobe\` or `Windows\Setup\Scripts\`.
-* The two file paths above, plus `GetDC`/`BitBlt` activity from a process with no UI.
+- `luajit.exe` (or `lua51.dll`) making outbound HTTP to a bare IP, especially to `/api/`, `/json/`, or `/task/`, or posting `multipart/form-data` to an IP literal.
+- `luajit.exe` resolving Polygon RPC hosts. Legitimate software has little reason to combine a Lua interpreter with `drpc[.]org` or `publicnode[.]com`.
+- Parent and child processes: `cmd.exe` launching `luajit.exe` with a `.txt` or `.luac` argument.
+- A new `Run` value plus a matching `StartupApproved\Run` entry created in the same window. The pairing is the tell; either one alone happens legitimately.
+- `Add-MpPreference -ExclusionPath` from anything that is not admin tooling.
+- A fresh scheduled task whose action points under `System32\oobe\` or `Windows\Setup\Scripts\`.
+- The two file paths above, plus `GetDC`/`BitBlt` activity from a process with no UI.
 
 Response order that matters:
 
@@ -404,28 +385,28 @@ rule LuaJIT_FakeGit_Loader_decrypted
 
 ## MITRE ATT&CK mapping
 
-| ID | Technique | Evidence |
-| --- | --- | --- |
-| T1218 | System binary proxy execution (LOLbin) | LuaJIT runtime runs the attacker's script |
-| T1059.011 | Command and scripting interpreter: Lua | the entire loader runs as Lua |
-| T1027 / .002 / .013 | Obfuscated files, packing, encrypted file | Prometheus `Vmify` + `EncryptStrings` |
-| T1140 | Deobfuscate/decode files or information | 996 strings + 8,514-byte blob decrypted at runtime |
-| T1129 / T1106 | Execution via native API | FFI-declared APIs, `CreateThread`, `WinExec` |
-| T1055 | Process injection | `VirtualAlloc` + `VirtualProtect` + `CreateThread` |
-| T1620 | Reflective code loading | API resolution by PEB walk + `LdrLoadDll` |
-| T1547.001 | Registry Run keys / Startup folder | `CurrentVersion\Run` + `StartupApproved\Run` |
-| T1053.005 | Scheduled task | `schtasks`, `Register-ScheduledTask` |
-| T1562.001 | Impair defences | `Add-MpPreference -ExclusionPath $env:SystemDrive` |
-| T1070.004 / T1036.005 | Indicator removal, masquerading | `oobe\Setup.exe`, `ErrorHandler.cmd` |
-| T1012 / T1082 | System discovery | OS version, arch, `MachineGuid` |
-| T1033 | User discovery | user, computer name, admin token |
-| T1614 / .001 | Location discovery | `ip-api[.]com`, `country=` / `city=` / `timezone=` params |
-| T1113 | Screen capture | `BitBlt` + `CreateDIBSection` + bitmap headers |
-| T1071.001 | Application-layer C2 over web protocols | WinINet HTTP GET/POST |
-| T1102 / .001 | Web service / dead-drop resolver | Polygon `eth_call` contract read |
-| T1041 / T1567 | Exfiltration over C2 channel | multipart upload, parts `data` and `file` |
-| T1105 | Ingress tool transfer | `/task/` downloads, seven handled extensions |
-| T1497 | Virtualization/sandbox evasion (partial) | anti-tamper traceback check; `VerifyVersionInfoW` |
+| ID                    | Technique                                 | Evidence                                                  |
+| --------------------- | ----------------------------------------- | --------------------------------------------------------- |
+| T1218                 | System binary proxy execution (LOLbin)    | LuaJIT runtime runs the attacker's script                 |
+| T1059.011             | Command and scripting interpreter: Lua    | the entire loader runs as Lua                             |
+| T1027 / .002 / .013   | Obfuscated files, packing, encrypted file | Prometheus `Vmify` + `EncryptStrings`                     |
+| T1140                 | Deobfuscate/decode files or information   | 996 strings + 8,514-byte blob decrypted at runtime        |
+| T1129 / T1106         | Execution via native API                  | FFI-declared APIs, `CreateThread`, `WinExec`              |
+| T1055                 | Process injection                         | `VirtualAlloc` + `VirtualProtect` + `CreateThread`        |
+| T1620                 | Reflective code loading                   | API resolution by PEB walk + `LdrLoadDll`                 |
+| T1547.001             | Registry Run keys / Startup folder        | `CurrentVersion\Run` + `StartupApproved\Run`              |
+| T1053.005             | Scheduled task                            | `schtasks`, `Register-ScheduledTask`                      |
+| T1562.001             | Impair defences                           | `Add-MpPreference -ExclusionPath $env:SystemDrive`        |
+| T1070.004 / T1036.005 | Indicator removal, masquerading           | `oobe\Setup.exe`, `ErrorHandler.cmd`                      |
+| T1012 / T1082         | System discovery                          | OS version, arch, `MachineGuid`                           |
+| T1033                 | User discovery                            | user, computer name, admin token                          |
+| T1614 / .001          | Location discovery                        | `ip-api[.]com`, `country=` / `city=` / `timezone=` params |
+| T1113                 | Screen capture                            | `BitBlt` + `CreateDIBSection` + bitmap headers            |
+| T1071.001             | Application-layer C2 over web protocols   | WinINet HTTP GET/POST                                     |
+| T1102 / .001          | Web service / dead-drop resolver          | Polygon `eth_call` contract read                          |
+| T1041 / T1567         | Exfiltration over C2 channel              | multipart upload, parts `data` and `file`                 |
+| T1105                 | Ingress tool transfer                     | `/task/` downloads, seven handled extensions              |
+| T1497                 | Virtualization/sandbox evasion (partial)  | anti-tamper traceback check; `VerifyVersionInfoW`         |
 
 ## Verdict
 
@@ -445,9 +426,9 @@ Artifacts from the analysis: `decoder.py` (cipher plus CLI), `decoder_notes.md`,
 
 Nothing was executed at any point. Every result comes from parsing bytes, constant folding, and re-implementing the recovered cipher in Python.
 
-* Island: AgentBaiting, how 800+ fake AI skills and MCP servers delivered malware (July 2026). https://www.island.io/blog/agentbaiting-how-800-fake-ai-skills-and-mcp-servers-delivered-malware
-* derp.ca: FakeGit, LuaJIT malware distributed via GitHub at scale (March 2026). https://www.derp.ca/research/fakegit-luajit-github-campaign/
-* Hexastrike: Cloned, Loaded, and Stolen (April 2026). https://hexastrike.com/resources/blog/threat-intelligence/cloned-loaded-and-stolen-how-109-fake-github-repositories-delivered-smartloader-and-stealc/
-* Hive Pro advisory TA2026209, and the Cyber Security News writeup with the IOC table. https://www.hivepro.com/threat-advisory/when-your-ai-agent-hands-you-the-malware-inside-fakegits-agentbaiting-campaign
-* Triage sandbox runs of these hashes: https://tria.ge/260615-xedvlaes8y and https://tria.ge/260320-javqnabw3w
-* Prometheus, the open-source Lua obfuscator: https://github.com/prometheus-lua/Prometheus
+- Island: AgentBaiting, how 800+ fake AI skills and MCP servers delivered malware (July 2026). https://www.island.io/blog/agentbaiting-how-800-fake-ai-skills-and-mcp-servers-delivered-malware
+- derp.ca: FakeGit, LuaJIT malware distributed via GitHub at scale (March 2026). https://www.derp.ca/research/fakegit-luajit-github-campaign/
+- Hexastrike: Cloned, Loaded, and Stolen (April 2026). https://hexastrike.com/resources/blog/threat-intelligence/cloned-loaded-and-stolen-how-109-fake-github-repositories-delivered-smartloader-and-stealc/
+- Hive Pro advisory TA2026209, and the Cyber Security News writeup with the IOC table. https://www.hivepro.com/threat-advisory/when-your-ai-agent-hands-you-the-malware-inside-fakegits-agentbaiting-campaign
+- Triage sandbox runs of these hashes: https://tria.ge/260615-xedvlaes8y and https://tria.ge/260320-javqnabw3w
+- Prometheus, the open-source Lua obfuscator: https://github.com/prometheus-lua/Prometheus

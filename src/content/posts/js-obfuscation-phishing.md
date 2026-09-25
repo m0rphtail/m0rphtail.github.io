@@ -6,7 +6,6 @@ tags:
   - phishing
 ---
 
-
 When triaging phishing pages and malicious scripts, understanding how JavaScript obfuscation works makes deobfuscation much faster. Rather than a single complex cipher, most obfuscators layer simple transformations on top of each other until the script's actual logic is concealed under layers of indirection.
 
 ## Terminology
@@ -29,6 +28,7 @@ While minification and bundling serve legitimate purposes in web performance, ma
 
 Attackers often break apart sensitive strings or encode them to evade basic keyword searches. These five expressions all evaluate to the string `"eval"`:
 
+<!-- prettier-ignore -->
 ```js
 'e' + "va" + 'l'
 "\x65\x76\x61\x6c"
@@ -41,6 +41,7 @@ atob('ZXZhbA==')
 
 Hex-prefixed arrays like `_0x1234` are standard signatures of tools like javascript-obfuscator:
 
+<!-- prettier-ignore -->
 ```js
 const _0x1234 = ["fetch", "password", "https://example.com"];
 _0xabc = (i) => { return _0x1234[i - 0x10]; }
@@ -53,6 +54,7 @@ Resolving the array indices and renaming variables simplifies this down to `eval
 
 JavaScript allows object properties to be accessed via bracket notation with string expressions:
 
+<!-- prettier-ignore -->
 ```js
 window.document.cookie
 window["document"].cookie

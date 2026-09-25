@@ -7,21 +7,19 @@ tags:
   - security
 ---
 
-
-
 > I'm developing this new application in C, I've setup some code for the new features but it's not (a)live yet.
-> 
+>
 > Author: xXl33t_h@x0rXx
-> 
 
 ## Analysis
+
 ### checksec
 
 ```
-Canary                        : ✘ 
-NX                            : ✓ 
-PIE                           : ✘ 
-Fortify                       : ✘ 
+Canary                        : ✘
+NX                            : ✓
+PIE                           : ✘
+Fortify                       : ✘
 RelRO                         : Partial
 ```
 
@@ -31,7 +29,7 @@ RelRO                         : Partial
 undefined8 main(void){
     char *s;
     uint32_t var_8h;
-    
+
     _var_8h = 0;
     sym.buffer_init();
     sym.imp.puts(
@@ -78,8 +76,8 @@ Dump of assembler code for function main:
    0x00000000004011f6 <+97>:	mov    eax,0x0
    0x00000000004011fb <+102>:	call   0x401050 <system@plt>
    0x0000000000401200 <+107>:	mov    eax,0x0
-   0x0000000000401205 <+112>:	leave  
-   0x0000000000401206 <+113>:	ret    
+   0x0000000000401205 <+112>:	leave
+   0x0000000000401206 <+113>:	ret
 End of assembler dump.
 ```
 

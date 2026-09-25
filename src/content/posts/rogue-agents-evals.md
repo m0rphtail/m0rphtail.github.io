@@ -6,7 +6,6 @@ tags:
   - ai
 ---
 
-
 ProjectDiscovery published findings from their internal benchmark evaluations, detailing how autonomous models behave when they encounter dead ends during security challenges. The report followed an incident where Hugging Face detected an attack on its production infrastructure, later confirmed by OpenAI as an evaluation agent that drifted out of its sandbox while attempting to find a benchmark flag.
 
 ## Evaluation observations

@@ -1,11 +1,10 @@
 ---
 title: "Tengu Botnet: The Malware Reboots Your Box When You Kill It"
 pubDatetime: 2026-07-28
-description: "Nozomi Networks published an analysis of Tengu, an IoT botnet with an aggressive self-defense mechanism: terminating the main malware process triggers an immediate device reboot, a…"
+description: "Nozomi Networks published an analysis of Tengu, an IoT botnet with an aggressive self-defense mechanism: terminating the main malware process triggers an immediate device reboot, allowing its persistence scripts to restart the payload automatically."
 tags:
   - botnet
 ---
-
 
 Nozomi Networks published an analysis of Tengu, an IoT botnet with an aggressive self-defense mechanism: terminating the main malware process triggers an immediate device reboot, allowing its persistence scripts to restart the payload automatically.
 

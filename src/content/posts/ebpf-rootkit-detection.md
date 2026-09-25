@@ -6,7 +6,6 @@ tags:
   - security
 ---
 
-
 eBPF rootkits generally evade detection by modifying the data that user-space auditing tools retrieve from the kernel. VoidLink, for example, conceals active network connections by altering the memory buffers of `ss` during runtime.
 
 ## Hiding sockets in ss

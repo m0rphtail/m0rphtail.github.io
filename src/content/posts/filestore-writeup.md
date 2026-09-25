@@ -7,7 +7,6 @@ tags:
   - security
 ---
 
-
 ## Description
 
 We stored our flag on this platform, but forgot to save the id. Can you help us restore it?
@@ -30,27 +29,34 @@ Menu:
 - exit
 ```
 
-So we can 
+So we can
+
 - `load` -> retrieve the stored text using the id
+
 ```
 Send me the file id...
 QpNmkzQzzHy4SV8i
 123
 ```
+
 - `store` -> store some text
+
 ```
 Send me a line of data...
 123
 Stored! Here's your file id:
 QpNmkzQzzHy4SV8i
 ```
+
 - `status` -> view the memory status
+
 ```
 User: ctfplayer
 Time: Sun Jul 18 20:11:24 2021
 Quota: 0.026kB/64.000kB
 Files: 1
 ```
+
 - `exit` -> close the connection
 
 Before analyzing the given file we started to make some test and found that if we enter `CTF{` the `Quota` value didn't change

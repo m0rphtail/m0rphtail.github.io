@@ -7,22 +7,19 @@ tags:
   - security
 ---
 
-
-
 > Fool me once, shame on you. Fool me twice, shame on me.
 >
 > Author: xXl33t_h@x0rXx
->
 
 ## Analysis
 
 ### checksec
 
 ```
-Canary                        : ✘ 
-NX                            : ✓ 
-PIE                           : ✘ 
-Fortify                       : ✘ 
+Canary                        : ✘
+NX                            : ✓
+PIE                           : ✘
+Fortify                       : ✘
 RelRO                         : Partial
 ```
 
@@ -31,7 +28,7 @@ RelRO                         : Partial
 ```cpp
 undefined8 main(void){
     char *s;
-    
+
     sym.buffer_init();
     sym.imp.puts("\nFool me once, shame on you. Fool me twice, shame on me.");
     sym.imp.puts("\nSeriously though, what features would be cool? Maybe it could play a song?");
@@ -107,7 +104,7 @@ $ python outbackdoor exploit.py REMOTE
 
 
 
-W...w.. Wait? Who put this backdoor out back here? 
+W...w.. Wait? Who put this backdoor out back here?
 
 
 W...w.. Wait? Who put this backdoorcout back here?

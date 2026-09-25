@@ -6,7 +6,6 @@ tags:
   - security
 ---
 
-
 Securonix published an analysis of VEIL#DROP, a multi-stage loader delivering the PureLogs infostealer. The loader uses dynamic URL path construction on trusted web services to bypass URL-reputation filters and static network blocks.
 
 ## The execution chain
