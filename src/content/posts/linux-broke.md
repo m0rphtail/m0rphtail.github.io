@@ -8,6 +8,8 @@ tags:
 
 A compact 732-byte Python script surfaced recently that achieves reliable root privilege escalation across almost every mainstream Linux distribution released since 2017. The exploit does not require defeating KASLR or winning tight race conditions. Instead, it abuses an architectural optimization inside the kernel's cryptographic subsystem to overwrite read-only page-cache memory.
 
+## Table of contents
+
 ## The AF_ALG interface and scatterlists
 
 The vulnerability sits inside `AF_ALG`, the socket-based interface to the kernel crypto API. Applications open an `AF_ALG` socket, bind it to an algorithm name, and let the kernel perform the cryptographic operations. For authenticated encryption with associated data (AEAD), data must arrive in order: associated data (AAD), followed by ciphertext, followed by the authentication tag.

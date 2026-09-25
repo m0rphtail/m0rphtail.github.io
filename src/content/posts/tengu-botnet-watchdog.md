@@ -8,6 +8,8 @@ tags:
 
 Nozomi Networks published an analysis of Tengu, an IoT botnet with an aggressive self-defense mechanism: terminating the main malware process triggers an immediate device reboot, allowing its persistence scripts to restart the payload automatically.
 
+## Table of contents
+
 ## Hardware watchdog manipulation
 
 Embedded Linux devices frequently include hardware watchdogs (`/dev/watchdog`) to recover from kernel panics or application deadlocks. Software daemons must periodically write to the device node to "feed" the timer; if writes stop, the hardware resets the board.

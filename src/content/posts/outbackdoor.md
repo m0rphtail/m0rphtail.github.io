@@ -11,6 +11,8 @@ tags:
 >
 > Author: xXl33t_h@x0rXx
 
+## Table of contents
+
 ## Analysis
 
 ### checksec
@@ -113,4 +115,4 @@ DUCT {https://www.youtube.com/watch?v=XfR9iY5y94s}$
 [*] Closed connection to pwn-2021.duc.tf port 31921
 ```
 
-#### flag >> `DUCTF{https://www.youtube.com/watch?v=XfR9iY5y94s}`
+**flag >>** `DUCTF{https://www.youtube.com/watch?v=XfR9iY5y94s}`

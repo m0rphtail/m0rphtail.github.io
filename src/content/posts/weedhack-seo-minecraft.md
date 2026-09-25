@@ -8,6 +8,8 @@ tags:
 
 A campaign documented by McAfee shows how attackers use search engine optimization (SEO) poisoning to outrank legitimate open-source utility websites across Google, Bing, Brave, and DuckDuckGo. In this campaign, fraudulent download portals for Minecraft clients like Xenon and Nova ranked above the official repositories hosted on GitHub and Modrinth.
 
+## Table of contents
+
 ## Web cloning and domain spoofing
 
 The malicious domains cloned legitimate project sites, mirroring branding, FAQs, installation steps, and links to official developer repositories. Only the download button pointed to attacker-controlled files. Several sites were assembled using automated website generation platforms, making it trivial to generate dozens of convincing multi-page clones.

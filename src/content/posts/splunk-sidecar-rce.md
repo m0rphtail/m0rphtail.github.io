@@ -8,6 +8,8 @@ tags:
 
 When security researchers published an analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, it caught my attention immediately as someone who works with Splunk every day. The vulnerability lives inside the PostgreSQL Sidecar Service, an internal helper service added in recent versions.
 
+## Table of contents
+
 ## The initial advisory
 
 Splunk's June 10 advisory signaled high severity: no authentication required, a CVSS score of 9.8, but no direct mention of code execution. That combination prompted watchTowr researchers to investigate the underlying mechanics.

@@ -8,6 +8,8 @@ tags:
 
 Trend Micro identified 14 trojanized npm packages delivering a Linux implant for RedC2 4.0, a commercial command-and-control framework sold openly on the web for $99.99 under the name Red Offsec.
 
+## Table of contents
+
 ## Targeted packages
 
 The packages mimicked date and math utility libraries, versioned at 1.0.0 or 1.0.1:

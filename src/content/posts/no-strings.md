@@ -11,6 +11,8 @@ tags:
 >
 > Author: joseph#8210
 
+## Table of contents
+
 ## Analysis
 
 ### ghidra

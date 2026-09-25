@@ -8,6 +8,8 @@ tags:
 
 CVE-2026-34197 is a remote code execution vulnerability in Apache ActiveMQ Classic that went unnoticed for 13 years. The researcher who published the flaw used Claude to review the project source, where the model flagged an overly broad MBean permission block. The researcher then confirmed the behavior, chained it into a working exploit, and reported it.
 
+## Table of contents
+
 ## The configuration exception
 
 ActiveMQ Classic runs a web management console on port 8161 powered by Jolokia, an HTTP-to-JMX bridge. In 2022, ThreatBook showed how authenticated attackers could abuse Jolokia to execute JDK MBeans like `FlightRecorder` and drop webshells (CVE-2022-41678). The resulting fix restricted Jolokia to read-only mode and blocked hazardous MBeans, but it added an exception to keep the web console working:

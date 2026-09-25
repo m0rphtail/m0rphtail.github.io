@@ -11,6 +11,8 @@ tags:
 >
 > Author: xXl33t_h@x0rXx
 
+## Table of contents
+
 ## Analysis
 
 ### checksec
@@ -132,4 +134,4 @@ DUCTF[fOrm4t_5p3c1f13r_m3dsg!}
 [*] Closed connection to pwn-2021.duc.tf port 31918
 ```
 
-#### **flag >>** ` DUCTF{f0rm4t_5p3c1f13r_m3dsg!}`
+**flag >>** ` DUCTF{f0rm4t_5p3c1f13r_m3dsg!}`

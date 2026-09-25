@@ -9,6 +9,8 @@ tags:
 
 Cisco Talos published an analysis of the UAT-10147 toolkit, centered on SPECTRE, a cross-platform backdoor written in C. The malware features Bring Your Own Vulnerable Driver (BYOVD) capabilities on Windows and pairs with a custom kernel rootkit on Linux. The operators, tracked as Chinese-speaking threat actors, monetize compromised infrastructure through search engine optimization (SEO) fraud.
 
+## Table of contents
+
 ## Windows variant
 
 SPECTRE's Windows build derives from the Havoc post-exploitation framework and incorporates several defense evasion techniques:

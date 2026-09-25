@@ -8,6 +8,8 @@ tags:
 
 WordlistLoader is an obfuscated loader that encodes shellcode as a dictionary of ordinary English words. Each byte of shellcode maps to a specific word in an array, allowing raw payload bytes to pass through text filters without triggering binary entropy detectors. A related variant maps shellcode to 16-byte UUID strings to accomplish the same obfuscation.
 
+## Table of contents
+
 ## Multi-tier delivery architecture
 
 The delivery relies on the ClickFix social engineering pattern across several infrastructure layers:

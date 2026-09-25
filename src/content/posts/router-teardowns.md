@@ -8,6 +8,8 @@ tags:
 
 A recent security review of the Tenda AC10 V6 highlights common hardware security oversights in consumer routers: an unauthenticated endpoint enables a Telnet daemon, and the dynamically generated root password is printed directly to the serial console during factory resets.
 
+## Table of contents
+
 ## Enabling Telnet without authentication
 
 On this generation of Tenda hardware, requesting `http://<router>/goform/telnet` enables the Telnet service without any authentication check. Sending a simple GET or POST to that URL flips the service from closed to listening on port 23.

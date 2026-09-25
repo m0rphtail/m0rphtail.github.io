@@ -8,6 +8,8 @@ tags:
 
 Securonix published an analysis of VEIL#DROP, a multi-stage loader delivering the PureLogs infostealer. The loader uses dynamic URL path construction on trusted web services to bypass URL-reputation filters and static network blocks.
 
+## Table of contents
+
 ## The execution chain
 
 Initial delivery relies on a file disguised as a document, `transcript.pdf.js`, executed via Windows Script Host (WSH). The script spawns PowerShell with execution policy bypass flags, terminates the parent `wscript.exe` process to break process tracing, deletes the initial `.js` file, and initiates the payload fetch.

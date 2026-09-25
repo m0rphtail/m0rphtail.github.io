@@ -9,6 +9,8 @@ tags:
 
 Earlier blockchain C2 techniques, commonly grouped under EtherHiding, stored payload strings inside smart contracts on public ledgers. While this prevented defenders from seizing or taking down the hosting infrastructure, monitoring teams could still track the fixed contract address. A newer variant codenamed NullReceiver avoids fixed contract endpoints by embedding the C2 IP directly inside the recipient address bytes of standard Ethereum transfers.
 
+## Table of contents
+
 ## Address decoding mechanism
 
 An Ethereum transfer requires a 20-byte destination address. The network does not validate whether a destination address corresponds to an active account or private key. NullReceiver takes advantage of this property:

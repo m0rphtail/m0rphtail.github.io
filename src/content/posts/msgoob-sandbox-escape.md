@@ -8,6 +8,8 @@ tags:
 
 In August 2025, Project Zero published a writeup detailing CVE-2025-38236, a use-after-free in Linux's `MSG_OOB` support for UNIX domain sockets. The full exploit chain turns code execution in a Chrome renderer process into arbitrary kernel code execution, using a feature that almost no modern software relies on.
 
+## Table of contents
+
 ## An obscure socket feature
 
 `MSG_OOB` handles out-of-band data, allowing a single byte to be sent ahead of the normal stream. Support for it on `AF_UNIX` stream sockets was introduced in Linux 5.15 in 2021. The implementation is strict: exactly one byte at a time, and sending a second OOB byte before reading the first demotes the original byte back to in-band data. Outside of some legacy Oracle products, almost nothing relies on this behavior. A kernel RFC in 2024 even proposed dropping it entirely. Still, it remained compiled into the default `AF_UNIX` module with no option to disable it until late 2024.

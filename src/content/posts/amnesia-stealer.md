@@ -8,6 +8,8 @@ tags:
 
 AmnesiaStealer is a Rust-based macOS stealer that verifies entered passwords before attempting to use them. The malware presents a native system prompt masquerading as an installer and tests user input against the local directory service using `dscl`. If the check fails, it loops and prompts again until it receives the valid password.
 
+## Table of contents
+
 ## Delivery mechanism
 
 Initial access relies on a fake GitHub download page using a ClickFix lure that instructs users to paste a base64 command into Terminal. The execution chain consists of three components:

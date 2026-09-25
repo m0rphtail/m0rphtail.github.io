@@ -8,6 +8,8 @@ tags:
 
 A typosquatted package on NuGet demonstrates how targeted supply-chain malware can operate: rather than harvesting generic credentials or deploying standard backdoors, it behaved as a fully functional JSON serializer while manipulating the outcome of a specific online betting game.
 
+## Table of contents
+
 ## The typosquatted package
 
 The package was published under the name `Newtonsoftt.Json.Net`, adding a second "t" to the standard library name. Between August and October 2025, seven versions appeared on the registry (11.0.4 through 11.0.11, omitting 11.0.6), accumulating roughly 1,200 downloads. Although the publisher, `MagicalPuff96`, later unlisted the package from NuGet search, the packages remained retrievable via direct API calls.

@@ -8,6 +8,8 @@ tags:
 
 When triaging phishing pages and malicious scripts, understanding how JavaScript obfuscation works makes deobfuscation much faster. Rather than a single complex cipher, most obfuscators layer simple transformations on top of each other until the script's actual logic is concealed under layers of indirection.
 
+## Table of contents
+
 ## Terminology
 
 Minification strips whitespace and shortens variable identifiers to reduce file size.

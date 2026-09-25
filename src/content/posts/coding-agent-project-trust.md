@@ -8,6 +8,8 @@ tags:
 
 When a developer clones an unfamiliar repository and clicks "trust this folder" in an AI coding assistant, code can execute immediately, before entering any prompt or approving any command.
 
+## Table of contents
+
 ## Automatic execution vectors
 
 AI assistants often separate command execution prompts from workspace configuration. While explicit lifecycle hooks now prompt for user approval in newer releases, several configuration mechanisms still trigger execution during workspace initialization.

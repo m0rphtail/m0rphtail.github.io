@@ -11,6 +11,8 @@ tags:
 >
 > Author: xXl33t_h@x0rXx
 
+## Table of contents
+
 ## Analysis
 
 ### checksec
@@ -122,4 +124,4 @@ DUCTly0u_br0ught_m5_b4ck_t0_11f3_mn423kcv}$
 [*] Closed connection to pwn-2021.duc.tf port 31916
 ```
 
-#### flag >> `DUCTF{y0u_br0ught_m3_b4ck_t0_l1f3_mn423kcv}`
+**flag >>** `DUCTF{y0u_br0ught_m3_b4ck_t0_l1f3_mn423kcv}`

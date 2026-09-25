@@ -8,6 +8,8 @@ tags:
 
 eBPF rootkits generally evade detection by modifying the data that user-space auditing tools retrieve from the kernel. VoidLink, for example, conceals active network connections by altering the memory buffers of `ss` during runtime.
 
+## Table of contents
+
 ## Hiding sockets in ss
 
 Running `ss -tn` opens a Netlink socket, issues a `SOCK_DIAG_BY_FAMILY` request, and parses a series of `inet_diag_msg` records returned by the kernel. The user-space parser relies on the length header of each record to advance through the buffer.

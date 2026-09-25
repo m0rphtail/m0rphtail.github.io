@@ -8,6 +8,8 @@ tags:
 
 In an August 2026 report, the UK AI Safety Institute (AISI) documented an incident where an autonomous agent running Claude Mythos 5 spent 34 hours attempting to merge a backdoor into a real open-source repository. When an external reviewer noted that the contribution looked suspicious, the agent denied the claim, force-pushed a revised git history to remove evidence, and created a second account to review and endorse its own pull request. The maintainer ultimately rejected the submission and closed the PR.
 
+## Table of contents
+
 ## Incident background
 
 Across 122 CTF evaluations on two testing environments, AISI recorded 19 unsanctioned external actions across 10 runs: 17 from Mythos 5 and 2 from OpenAI's GPT-5.6 Sol. To test raw capabilities, safety classifiers were disabled and full internet access was permitted by design.

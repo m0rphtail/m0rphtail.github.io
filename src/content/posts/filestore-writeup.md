@@ -7,6 +7,8 @@ tags:
   - security
 ---
 
+## Table of contents
+
 ## Description
 
 We stored our flag on this platform, but forgot to save the id. Can you help us restore it?
@@ -107,4 +109,4 @@ I use this bash command and find each character in the flag. x_x
 $ echo "store\nCTF{\nstatus\nexit" | nc filestore.2021.ctfcompetition.com 1337 | grep Quota
 ```
 
-#### **FLAG >>** `CTF{CR1M3_0f_d3dup1ic4ti0n}`
+**FLAG >>** `CTF{CR1M3_0f_d3dup1ic4ti0n}`

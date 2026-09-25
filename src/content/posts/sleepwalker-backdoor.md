@@ -8,6 +8,8 @@ tags:
 
 SLEEPWALKER is a 59,904-byte Windows DLL designed to run passively inside an enterprise environment. It side-loads into ESET's management agent by impersonating Microsoft's `dpapi.dll`. The implant generates no active outbound beacons, registers no public domains, and maintains no fixed command infrastructure, remaining inert until an incoming packet matches a specific trigger.
 
+## Table of contents
+
 ## Load path and DLL side-loading
 
 The binary exports the seven standard Data Protection API (DPAPI) functions matching the legitimate `dpapi.dll`, and embeds version resources copied directly from ESET Management Agent. It side-loads into `ERAAgent.exe` by placing itself directly in the application's working directory, taking advantage of standard Windows DLL search order.
