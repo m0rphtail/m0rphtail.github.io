@@ -57,15 +57,14 @@ src/
     typography.css      Prose styles for post content
   types/                Type definitions for the config
   utils/                Helpers: sorting, slug rules, etc.
+.github/                CI workflow (.github/workflows/ci.yml)
 astro-paper.config.ts   MAIN SETTINGS: title, URL, socials, features
 astro.config.ts         Astro setup: integrations, markdown, fonts
 package.json            Scripts and dependencies
 AGENTS.md               Notes for AI agents working in this repo
-.github/                Theme's CI + community files (unused for deploys)
-Dockerfile, compose.yaml  Theme extras, not used here
 ```
 
-Content folders starting with `_` (like `_releases/`) are for organization only: their name is dropped from URLs, but the posts inside are still published.
+Content folders starting with `_` are for organization only: their name is dropped from URLs, but the posts inside are still published. (None are used right now.)
 
 ## Where to change things
 
@@ -113,7 +112,7 @@ canonicalURL: "https://..." # optional, if originally published elsewhere
 ---
 ```
 
-Images: put post images in `src/assets/images/posts/` and reference them as `![alt text](@/assets/images/posts/my-image.png)`. Astro then optimizes them (hashed `.webp`, lazy loading, width/height set). Images in `public/` are served raw and unoptimized — avoid for content images. Every image needs real alt text (empty alt gets flagged). The theme's own guide is at `src/content/posts/adding-new-post.mdx`.
+Images: put post images in `src/assets/images/posts/` and reference them as `![alt text](@/assets/images/posts/my-image.png)`. Astro then optimizes them (hashed `.webp`, lazy loading, width/height set). Images in `public/` are served raw and unoptimized — avoid for content images. Every image needs real alt text (empty alt gets flagged).
 
 Headings: the frontmatter `title` renders as the page h1, so start body headings at `##` and nest down. A stray `#` in the body breaks the outline.
 
@@ -123,7 +122,7 @@ Table of contents: put `## Table of contents` right after the intro, before the 
 
 ## Colors, fonts, nav
 
-Colors are seven CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Both modes are blue-accented: light is warm paper `#f9f5ee` with `#006cac` links, dark is grey `#2f2f2f` with `#4db8f0` links and blue-grey borders. Code blocks follow the shiki themes set in `astro.config.ts`, except the dark panel background, which `theme.css` forces to grey `#262626` with a `--shiki-dark-bg` override (shiki sets that variable inline on every `<pre>`, so the override carries `!important`). More ready-made palettes are documented in `src/content/posts/_color-schemes/`.
+Colors are seven CSS variables per theme (`--background`, `--foreground`, `--accent`, `--accent-foreground`, `--muted`, `--muted-foreground`, `--border`) in `src/styles/theme.css`. Both modes are blue-accented: light is warm paper `#f9f5ee` with `#006cac` links, dark is grey `#2f2f2f` with `#4db8f0` links and blue-grey borders. Code blocks follow the shiki themes set in `astro.config.ts`, except the dark panel background, which `theme.css` forces to grey `#262626` with a `--shiki-dark-bg` override (shiki sets that variable inline on every `<pre>`, so the override carries `!important`).
 
 Font is set in `astro.config.ts`. The nav menu in `src/components/Header.astro` is hardcoded (Blogs / Resume / Art / Music / About). Add new entries there when new pages arrive.
 
@@ -216,15 +215,10 @@ git branch -D old-migration
 
 Old posts that reference `/images/...` or `/shot-*.png` need their images copied from the same snapshot's `public/` folder.
 
-## Theme demo content
+## Theme content
 
-The site currently still contains the theme's own blog posts and docs (how-to guides, release notes, color scheme docs, examples). They build into the site. They are useful as reference now; delete them when the site is ready to go live:
-
-- `src/content/posts/how-to-*.md(x)`, `adding-new-post.mdx`, `setting-dates-via-git-hooks.md`, `dynamic-og-images.md`, `customizing-astropaper-theme-color-schemes.mdx`
-- `src/content/posts/examples/`, `_releases/`, `_color-schemes/`
-
-The `about` page is also still the theme's copy, waiting for your text.
+All theme demo posts (how-to guides, release notes, color-scheme docs, examples) were removed — the site ships only your content. The theme's own docs live at <https://astro-paper.pages.dev/> if you need a reference; they were also recoverable from git history before that commit (`git show <sha>:src/content/posts/…`).
 
 ## Theme
 
-AstroPaper by [Sat Naing](https://satnaing.dev), MIT licensed. Its full documentation lives in the theme posts listed above and at <https://astro-paper.pages.dev/>.
+AstroPaper by [Sat Naing](https://satnaing.dev), MIT licensed. Documentation at <https://astro-paper.pages.dev/>.
