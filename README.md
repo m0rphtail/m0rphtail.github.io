@@ -69,25 +69,25 @@ Content folders starting with `_` (like `_releases/`) are for organization only:
 
 ## Where to change things
 
-| I want to change...            | Edit this                                                                               |
-| ------------------------------ | --------------------------------------------------------------------------------------- |
-| Site title, URL, description   | `astro-paper.config.ts` under `site:`                                                   |
-| Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`                                                |
-| Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`                                             |
-| Posts per page / on homepage   | `astro-paper.config.ts` under `posts:`                                                  |
-| Search, back button, edit link | `astro-paper.config.ts` under `features:`                                               |
-| Site colors, light and dark    | `src/styles/theme.css`                                                                  |
-| Code-block colors              | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below |
-| Font                           | `astro.config.ts` under `fonts:`                                                        |
-| Nav menu items                 | `src/components/Header.astro` (hardcoded list)                                          |
-| Favicon + icons                | `public/` (see "Favicon" below)                                                         |
-| Domain                         | `public/CNAME`                                                                          |
-| Footer text                    | `src/i18n/lang/en.ts` under `footer:`                                                   |
-| About page                     | `src/content/pages/about.md`                                                            |
-| Resume page                    | `src/content/pages/resume.md`                                                           |
-| Art page (gallery)             | `src/content/pages/art.mdx`                                                             |
-| Music page (players)           | `src/content/pages/music.md`                                                            |
-| Homepage intro text            | `src/pages/index.astro`                                                                 |
+| I want to change...          | Edit this                                                                               |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| Site title, URL, description | `astro-paper.config.ts` under `site:`                                                   |
+| Social icons (header/footer) | `astro-paper.config.ts` under `socials:`                                                |
+| Share buttons on posts       | `astro-paper.config.ts` under `shareLinks:`                                             |
+| Posts per page / on homepage | `astro-paper.config.ts` under `posts:`                                                  |
+| Search, back button          | `astro-paper.config.ts` under `features:`                                               |
+| Site colors, light and dark  | `src/styles/theme.css`                                                                  |
+| Code-block colors            | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below |
+| Font                         | `astro.config.ts` under `fonts:`                                                        |
+| Nav menu items               | `src/components/Header.astro` (hardcoded list)                                          |
+| Favicon + icons              | `public/` (see "Favicon" below)                                                         |
+| Domain                       | `public/CNAME`                                                                          |
+| Footer text                  | `src/i18n/lang/en.ts` under `footer:`                                                   |
+| About page                   | `src/content/pages/about.md`                                                            |
+| Resume page                  | `src/content/pages/resume.md`                                                           |
+| Art page (gallery)           | `src/content/pages/art.mdx`                                                             |
+| Music page (players)         | `src/content/pages/music.md`                                                            |
+| Homepage intro text          | `src/pages/index.astro`                                                                 |
 
 ## Writing posts
 
@@ -184,7 +184,7 @@ GitHub Pages serves this repo from the `gh-pages` branch, with the custom domain
 
 At the moment `gh-pages` is built from the old Zola site on `main`. This branch has no deploy workflow yet. When the migration is ready: merge to `main`, then add a GitHub Actions workflow that builds with npm and publishes `dist/` to `gh-pages`. Until then, nothing here is live.
 
-The edit-post link on posts points at `main` (configured in `astro-paper.config.ts`), so "Edit page" starts working once the migration is merged.
+Posts don't show an edit link: `features.editPost` is disabled in `astro-paper.config.ts`. To bring it back, set `enabled: true` and point `url` at the repo's edit base (the theme default shape) — the link reappears under every post title.
 
 ## Porting posts from the old blog
 
