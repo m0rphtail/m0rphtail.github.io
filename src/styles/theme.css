@@ -10,25 +10,32 @@
   --font-app: var(--font-google-sans-code);
 }
 
-/* Light theme values */
+/* Light theme — warm paper white, blue accents */
 :root,
 [data-theme="light"] {
-  --background: #fdfdfd;
-  --foreground: #282728;
+  --background: #f9f5ee;
+  --foreground: #2f2f2f;
   --accent: #006cac;
-  --accent-foreground: #ffffff;
-  --muted: #d3d3d3;
-  --muted-foreground: #6b7280;
-  --border: #ece9e9;
+  --accent-foreground: #eef4fb;
+  --muted: #dce2e8;
+  --muted-foreground: #5c6b7d;
+  --border: #c4cdd6;
 }
 
-/* Dark theme values — Paper Dark (cyan accents) */
+/* Dark theme — dark grey, same blue family */
 [data-theme="dark"] {
-  --background: #1a1a1a;
-  --foreground: #e8e7e8;
+  --background: #2f2f2f;
+  --foreground: #ebe5e1;
   --accent: #4db8f0;
-  --accent-foreground: #0a1a24;
-  --muted: #616161;
-  --muted-foreground: #9a9fa8;
-  --border: #333030;
+  --accent-foreground: #1a1a1a;
+  --muted: #3f4750;
+  --muted-foreground: #a7c2dd;
+  --border: #48566f;
+}
+
+/* Code panel: shiki writes --shiki-dark-bg inline on every <pre>, so the grey
+   panel on the grey page needs !important to win. Light mode keeps the shiki
+   theme's own panel; only the dark panel is overridden. */
+[data-theme="dark"] .astro-code {
+  --shiki-dark-bg: #262626 !important;
 }
