@@ -28,6 +28,12 @@ export default defineConfig({
         config.features?.showArchives !== false || !page.endsWith("/archives/"),
     }),
   ],
+  redirects: {
+    // Old site served posts under /blogs/<slug>/. Redirect the whole
+    // namespace so existing links and search results survive the cutover.
+    "/blogs/[...slug]": "/posts/[...slug]",
+    "/blogs": "/posts",
+  },
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
