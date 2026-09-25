@@ -31,7 +31,12 @@ The dev server binds all interfaces, so it is reachable from other devices on th
 ```
 public/                 Static files, copied as-is to the site root
   CNAME                 Custom domain (kchitnis.com)
-  favicon.ico           Tab icon (KC mark, from the old site)
+  favicon.ico           Tab icon, 3 sizes (16/32/48) from the blue mark
+  favicon-16x16.png     Same mark as PNG (16 and 32 px)
+  favicon-32x32.png
+  apple-touch-icon.png  iOS home-screen icon (180px)
+  android-chrome-*.png  Android/PWA icons (192, 512)
+  site.webmanifest      PWA manifest (icon list, theme colours)
 src/
   assets/
     icons/              UI icons and socials/*.svg used by the theme
@@ -74,7 +79,7 @@ Content folders starting with `_` (like `_releases/`) are for organization only:
 | Site colors, light and dark    | `src/styles/theme.css`                         |
 | Font                           | `astro.config.ts` under `fonts:`               |
 | Nav menu items                 | `src/components/Header.astro` (hardcoded list) |
-| Favicon                        | `public/favicon.ico`                           |
+| Favicon + icons                | `public/` (see "Favicon" below)                |
 | Domain                         | `public/CNAME`                                 |
 | Footer text                    | `src/i18n/lang/en.ts` under `footer:`          |
 | About page                     | `src/content/pages/about.md`                   |
@@ -145,6 +150,21 @@ The /posts page shows all posts on one page, newest first. No pagination.
 Search uses [Pagefind](https://pagefind.app/), which indexes the built site. Run `npm run build` at least once before the search page works in dev; the page shows a reminder otherwise.
 
 Pagefind is pinned to `1.5.0` on purpose. Newer versions crash on this Raspberry Pi with a jemalloc page-size error (the Pi uses 16K pages). Do not bump it without testing; older versions work fine on normal x86 CI runners too.
+
+## Favicon
+
+The tab icon is the blue mark uploaded Sep 2026 (flat `#4770c2` background). `public/` holds the full set, all rendered from one square source image:
+
+- `favicon.ico` — 16/32/48 px, used by browsers
+- `favicon-16x16.png`, `favicon-32x32.png` — PNG fallbacks
+- `apple-touch-icon.png` — 180 px, iOS home screen
+- `android-chrome-192x192.png`, `android-chrome-512x512.png` + `site.webmanifest` — Android/PWA
+
+Links live in `src/layouts/Layout.astro` (keep the `.ico` first — browsers honour the first matching `<link rel="icon">`).
+
+To regenerate after a source change: `~/backups/favicon-2026-09-25/make-favicons.py` (kept out of the repo to avoid a stray script). Run it with the new square source image, copy the output over `public/`. It crops the artwork to a centred square at 86% fill, flattens JPEG noise against the background colour, and sharpens the 16/32 px renders.
+
+The previous KC-mark icon and the source upload are archived in the same backup folder.
 
 ## Deployment
 
