@@ -60,7 +60,7 @@ export default defineConfig({
   },
   fonts: [
     {
-      name: "JetBrains Mono",
+      name: "Fraunces",
       cssVariable: "--font-google-sans-code",
       provider: fontProviders.google(),
       fallbacks: ["monospace"],
