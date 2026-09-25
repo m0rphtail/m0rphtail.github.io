@@ -185,6 +185,8 @@ GitHub Pages serves this repo from the `gh-pages` branch, with the custom domain
 
 At the moment `gh-pages` is built from the old Zola site on `main`. This branch has no deploy workflow yet. When the migration is ready: merge to `main`, then add a GitHub Actions workflow that builds with npm and publishes `dist/` to `gh-pages`. Until then, nothing here is live.
 
+URL compatibility: the old site served posts at `/blogs/<slug>/`; this build serves `/posts/<slug>/`. The `redirects` map in `astro.config.ts` emits a static redirect page for every post plus the listing (36 total, `noindex` so search engines and pagefind skip them), so old links keep working after cutover. If a post moves again, add a matching entry there. Old top-level pages (`/about/`, `/art/`, `/music/`, `/resume/`) kept their paths and need no redirect.
+
 Posts don't show an edit link: `features.editPost` is disabled in `astro-paper.config.ts`. To bring it back, set `enabled: true` and point `url` at the repo's edit base (the theme default shape) — the link reappears under every post title.
 
 ## Porting posts from the old blog
