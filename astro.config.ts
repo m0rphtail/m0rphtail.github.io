@@ -60,11 +60,11 @@ export default defineConfig({
   },
   fonts: [
     {
-      name: "Fraunces",
+      name: "Literata",
       cssVariable: "--font-google-sans-code",
       provider: fontProviders.google(),
-      fallbacks: ["monospace"],
-      weights: [300, 400, 500, 600, 700],
+      fallbacks: ["serif"],
+      weights: [300, 400, 500, 600, 700, 800],
       styles: ["normal", "italic"],
       formats: ["woff", "ttf"],
     },
