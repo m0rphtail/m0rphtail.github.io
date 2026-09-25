@@ -24,11 +24,11 @@
 
 /* Dark theme values — Paper Dark (cyan accents) */
 [data-theme="dark"] {
-  --background: #2f3741;
-  --foreground: #e6e6e6;
-  --accent: #1ad9d9;
-  --accent-foreground: #0d2b2b;
-  --muted: #596b81;
-  --muted-foreground: #8faabb;
-  --border: #3b4655;
+  --background: #1a1a1a;
+  --foreground: #e8e7e8;
+  --accent: #4db8f0;
+  --accent-foreground: #0a1a24;
+  --muted: #2a2a2a;
+  --muted-foreground: #9a9fa8;
+  --border: #333030;
 }
