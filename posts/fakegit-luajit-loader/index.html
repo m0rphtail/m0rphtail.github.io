@@ -1,0 +1,971 @@
+<!DOCTYPE html><html dir="ltr" lang="en" class="overflow-y-scroll scroll-smooth"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://kchitnis.com/posts/fakegit-luajit-loader/"><meta name="generator" content="Astro v7.3.5"><!-- Font --><style>@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/c260df220905c474.woff") format("woff"), url("/_astro/fonts/8b71372bd3b039e2.ttf") format("truetype");font-display:swap;font-weight:300;font-style:italic;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/cf44cefb77be6be2.woff") format("woff"), url("/_astro/fonts/a2c9a055148c56c7.ttf") format("truetype");font-display:swap;font-weight:400;font-style:italic;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/6f78861667d75a5b.woff") format("woff"), url("/_astro/fonts/8f3fb871a446a2da.ttf") format("truetype");font-display:swap;font-weight:500;font-style:italic;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/ad01502e757e7ed9.woff") format("woff"), url("/_astro/fonts/7cb824c54b1e409f.ttf") format("truetype");font-display:swap;font-weight:600;font-style:italic;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/8170fc49bc6ad870.woff") format("woff"), url("/_astro/fonts/452054cd3a215f20.ttf") format("truetype");font-display:swap;font-weight:700;font-style:italic;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/c0888f39fde7d1a2.woff") format("woff"), url("/_astro/fonts/52c0dc628c628807.ttf") format("truetype");font-display:swap;font-weight:800;font-style:italic;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/b987a0aeb597145d.woff") format("woff"), url("/_astro/fonts/79b419ca7421740e.ttf") format("truetype");font-display:swap;font-weight:300;font-style:normal;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/93d4fd719dc0fb2c.woff") format("woff"), url("/_astro/fonts/1ca2850e6e7f70cd.ttf") format("truetype");font-display:swap;font-weight:400;font-style:normal;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/a3c30634e85b7b15.woff") format("woff"), url("/_astro/fonts/ffb1811899228cd9.ttf") format("truetype");font-display:swap;font-weight:500;font-style:normal;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/8439521be6c5ba41.woff") format("woff"), url("/_astro/fonts/410e83189e058599.ttf") format("truetype");font-display:swap;font-weight:600;font-style:normal;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/1b9c952ad5e0635c.woff") format("woff"), url("/_astro/fonts/ab3db1df29a5a971.ttf") format("truetype");font-display:swap;font-weight:700;font-style:normal;}@font-face{font-family:Literata-5effd7cf755fcbd9;src:url("/_astro/fonts/423b676a1ad751e7.woff") format("woff"), url("/_astro/fonts/7112266abf44e563.ttf") format("truetype");font-display:swap;font-weight:800;font-style:normal;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:300;font-style:italic;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:400;font-style:italic;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:500;font-style:italic;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:600;font-style:italic;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman Bold";src:local("Times New Roman Bold");font-display:swap;font-weight:700;font-style:italic;size-adjust:102.4%;ascent-override:114.9414%;descent-override:30.0781%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman Bold";src:local("Times New Roman Bold");font-display:swap;font-weight:800;font-style:italic;size-adjust:102.4%;ascent-override:114.9414%;descent-override:30.0781%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:300;font-style:normal;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:400;font-style:normal;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:500;font-style:normal;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman";src:local("Times New Roman");font-display:swap;font-weight:600;font-style:normal;size-adjust:109.0462%;ascent-override:107.9359%;descent-override:28.2449%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman Bold";src:local("Times New Roman Bold");font-display:swap;font-weight:700;font-style:normal;size-adjust:102.4%;ascent-override:114.9414%;descent-override:30.0781%;line-gap-override:0%;}@font-face{font-family:"Literata-5effd7cf755fcbd9 fallback: Times New Roman Bold";src:local("Times New Roman Bold");font-display:swap;font-weight:800;font-style:normal;size-adjust:102.4%;ascent-override:114.9414%;descent-override:30.0781%;line-gap-override:0%;}:root{--font-google-sans-code:Literata-5effd7cf755fcbd9,"Literata-5effd7cf755fcbd9 fallback: Times New Roman","Literata-5effd7cf755fcbd9 fallback: Times New Roman Bold",serif;}</style><!-- Primary meta --><title>FakeGit&#39;s LuaJIT Loader: Hidden Strings and a Polygon Dead Drop | kchitnis</title><meta name="title" content="FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop | kchitnis"><meta name="description" content="A GitHub repository named StanLeyJ03/mcp-for-security advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents."><meta name="author" content="Kshitij Chitnis"><link rel="sitemap" href="/sitemap-index.xml"><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:site_name" content="kchitnis"><meta property="og:title" content="FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop | kchitnis"><meta property="og:description" content="A GitHub repository named StanLeyJ03/mcp-for-security advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents."><meta property="og:url" content="https://kchitnis.com/posts/fakegit-luajit-loader/"><meta property="og:image" content="https://kchitnis.com/posts/fakegit-luajit-loader/index.png"><!-- Twitter / X --><meta property="twitter:card" content="summary_large_image"><meta property="twitter:url" content="https://kchitnis.com/posts/fakegit-luajit-loader/"><meta property="twitter:title" content="FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop | kchitnis"><meta property="twitter:description" content="A GitHub repository named StanLeyJ03/mcp-for-security advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents."><meta property="twitter:image" content="https://kchitnis.com/posts/fakegit-luajit-loader/index.png"><!-- RSS autodiscovery --><link rel="alternate" type="application/rss+xml" title="kchitnis" href="https://kchitnis.com/rss.xml/"><!-- Filled at runtime by theme.ts to match the current background colour --><meta name="theme-color" content=""><!-- Extra head content injected by child layouts (e.g. JSON-LD, article meta) --><meta property="og:type" content="article"><meta property="article:published_time" content="2026-09-14T00:00:00.000Z"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop | kchitnis","image":"https://kchitnis.com/posts/fakegit-luajit-loader/index.png","datePublished":"2026-09-14T00:00:00.000Z","author":[{"@type":"Person","name":"Kshitij Chitnis","url":"https://kchitnis.com"}]}</script><!--
+      Inline FOUC-prevention script: sets data-theme on <html> before
+      the browser paints. Runs synchronously, no defer/async.
+    --><script>
+      (function () {
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
+        const theme = stored ?? (prefersDark ? "dark" : "light");
+        const root = document.firstElementChild;
+        root?.setAttribute("data-theme", theme);
+        root?.classList.toggle("dark", theme === "dark");
+        // Expose value so theme.ts can skip re-detection.
+        window.__theme = { value: theme };
+      })();
+    </script><!--
+      Analytics — GoatCounter. The stock snippet only counts full page
+      loads; this block also counts client-side navigations by re-firing
+      on every astro:page-load. Settings merge into window.goatcounter so
+      a re-run can never clobber the loaded script.
+    --><script>
+      window.goatcounter = window.goatcounter || {};
+      window.goatcounter.endpoint = "https://kchitnis.goatcounter.com/count";
+      window.goatcounter.no_onload = true;
+      window.goatcounter.no_events = true;
+      // Register once, even if this script re-runs after a navigation.
+      if (!window.__gcSpaHooked) {
+        window.__gcSpaHooked = true;
+        document.addEventListener("astro:page-load", function () {
+          var fire = function () {
+            if (window.goatcounter && window.goatcounter.count) {
+              window.goatcounter.count();
+              return true;
+            }
+            return false;
+          };
+          if (!fire()) {
+            var n = 0;
+            var t = setInterval(function () {
+              if (fire() || ++n > 50) clearInterval(t);
+            }, 100);
+          }
+        });
+      }
+    </script><!-- Self-hosted copy of gc.zgo.at/count.js (see public/js/). Same-origin,
+         so no SRI is needed; update by re-copying the file. --><script async data-goatcounter="https://kchitnis.goatcounter.com/count" src="/js/count.js"></script><!-- LLM/agent index — tells agents where the llms.txt overview lives. --><link rel="describedby" href="/llms.txt"><meta name="astro-view-transitions-enabled" content="true"><meta name="astro-view-transitions-fallback" content="animate"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang.CYDbzu1r.js"></script><link rel="stylesheet" href="/_astro/Footer.D8Rc6uZQ.css"></head><body class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"><a id="skip-to-content" href="#main-content" class="bg-background text-accent absolute inset-s-16 -top-full z-50 px-3 py-2 backdrop-blur-lg transition-all focus:top-4">Skip to content</a><header class="app-layout flex flex-col items-center justify-between sm:flex-row"><div class="border-border bg-background relative flex w-full items-baseline justify-between border-b py-4 sm:items-center sm:py-6"><a href="/" class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none">kchitnis</a><nav id="nav-menu" class="flex w-full flex-col items-center sm:ms-2 sm:flex-row sm:justify-end sm:space-x-4 sm:py-0"><button id="menu-btn" class="focus-outline self-end p-2 sm:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="menu-items" data-label-open="Open menu" data-label-close="Close menu"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="hidden" viewBox="0 0 24 24" id="close-icon"><path stroke="none" d="M0 0h24v24H0z" /><path d="M18 6 6 18M6 6l12 12" /></svg><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="icon icon-tabler icons-tabler-outline icon-tabler-menu-deep" viewBox="0 0 24 24" id="menu-icon"><path stroke="none" d="M0 0h24v24H0z" /><path d="M4 6h16M7 12h13M10 18h10" /></svg></button><ul id="menu-items" class="[&amp;&gt;li&gt;a]:hover:text-accent mt-4 hidden w-44 grid-cols-2 place-content-center gap-2 sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0 sm:[&amp;&gt;li]:h-8 [&amp;&gt;li&gt;a]:block [&amp;&gt;li&gt;a]:px-4 [&amp;&gt;li&gt;a]:py-3 [&amp;&gt;li&gt;a]:text-center [&amp;&gt;li&gt;a]:font-medium sm:[&amp;&gt;li&gt;a]:px-2 sm:[&amp;&gt;li&gt;a]:py-1"><li class="col-span-2"><a href="/posts/" class="active-nav">Blogs</a></li><li class="col-span-2"><a href="/resume/">Resume</a></li><li class="col-span-2"><a href="/art/">Art</a></li><li class="col-span-2"><a href="/music/">Music</a></li><li class="col-span-2"><a href="/about/">About</a></li><li class="col-span-1 flex items-center justify-center"><a href="/search/" title="Search" aria-label="Search" class="group inline-flex items-center gap-1 hover:text-accent focus-outline relative size-8"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M3 10a7 7 0 1 0 14 0 7 7 0 1 0-14 0M21 21l-6-6" /></svg><span class="sr-only">Search</span></a></li><li class="col-span-1 flex items-center justify-center"><button id="theme-btn" class="focus-outline hover:[&amp;&gt;svg]:stroke-accent relative size-12 p-4 sm:size-8" title="Toggle theme" aria-label="auto" aria-live="polite"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="absolute top-[50%] left-[50%] translate-[-50%] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M12 3h.393a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 2.992z" /></svg><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="absolute top-[50%] left-[50%] translate-[-50%] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M14.828 14.828a4 4 0 1 0-5.656-5.656 4 4 0 0 0 5.656 5.656M6.343 17.657l-1.414 1.414M6.343 6.343 4.929 4.929M17.657 6.343l1.414-1.414M17.657 17.657l1.414 1.414M4 12H2M12 4V2M20 12h2M12 20v2" /></svg></button></li></ul></nav></div></header><script type="module">function e(){let e=document.querySelector(`#menu-btn`),t=document.querySelector(`#menu-items`),n=document.querySelector(`#menu-icon`),r=document.querySelector(`#close-icon`);if(!e||!t||!n||!r)return;let i=e.dataset.labelOpen??`Open menu`,a=e.dataset.labelClose??`Close menu`;e.addEventListener(`click`,()=>{let o=e.getAttribute(`aria-expanded`)===`true`;e.setAttribute(`aria-expanded`,o?`false`:`true`),e.setAttribute(`aria-label`,o?i:a),t.classList.toggle(`hidden`),t.classList.toggle(`grid`),n.classList.toggle(`hidden`),r.classList.toggle(`hidden`)})}function t(){let e=document.getElementById(`skip-to-content`);e&&e.addEventListener(`click`,e=>{if(e.defaultPrevented||e.metaKey||e.ctrlKey||e.shiftKey||e.button!==0)return;e.preventDefault();let t=document.getElementById(`main-content`);t&&(t.setAttribute(`tabindex`,`-1`),t.addEventListener(`blur`,()=>t.removeAttribute(`tabindex`),{once:!0}),t.focus(),t.scrollIntoView({behavior:`smooth`}))})}e(),document.addEventListener(`astro:after-swap`,e),t(),document.addEventListener(`astro:after-swap`,t);</script><div class="app-layout flex items-center justify-start"><a id="back-button" href="/" class="group inline-flex items-center gap-1 hover:text-accent focus-outline hover:text-foreground/75 -ms-2 mt-8 mb-2"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 rtl:rotate-180" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="m15 6-6 6 6 6" /></svg><span>Go back</span></a></div><script type="module">function e(){let e=document.querySelector(`#back-button`),t=sessionStorage.getItem(`backUrl`);t&&e&&(e.href=t)}document.addEventListener(`astro:page-load`,e),e();</script><main id="main-content" class="app-layout" data-pagefind-body><h1 style="view-transition-name:fakegit-luajit-loader" class="text-accent inline-block text-2xl font-bold sm:text-3xl">FakeGit&#39;s LuaJIT Loader: Hidden Strings and a Polygon Dead Drop</h1><div class="my-2 flex items-center gap-2"><div class="text-muted-foreground flex items-center gap-x-2"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 min-w-5.5" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zM16 3v4M8 3v4M4 11h16M7 14h.013M10.01 14h.005M13.01 14h.005M16.015 14h.005M13.015 17h.005M7.01 17h.005M10.01 17h.005" /></svg><time class="text-sm sm:text-base" datetime="2026-09-14T00:00:00.000Z">14 Sep, 2026</time></div><span aria-hidden="true" class="text-muted-foreground max-sm:hidden hidden">|</span></div><article id="article" class="mt-8 w-full app-prose max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"><p>A GitHub repository named <code>StanLeyJ03/mcp-for-security</code> advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents. While the repository mirrored the structure and documentation of a legitimate project, all 13 links in the README (including badges, installation commands, documentation references, and contact addresses) pointed to the same download target: <code>for-security-mcp-3.3.zip</code>.</p>
+<h2 id="table-of-contents">Table of contents</h2>
+<p></p><details><summary>Open Table of contents</summary><p></p>
+<ul>
+<li><a href="#tldr">TL;DR</a></li>
+<li><a href="#what-was-in-the-zip">What was in the zip</a></li>
+<li><a href="#how-the-lure-worked">How the lure worked</a></li>
+<li><a href="#execution-chain">Execution chain</a></li>
+<li><a href="#the-obfuscator-behind-it">The obfuscator behind it</a></li>
+<li><a href="#the-string-cipher">The string cipher</a></li>
+<li><a href="#what-it-does-once-running">What it does once running</a></li>
+<li><a href="#c2-plain-http-and-a-blockchain-dead-drop">C2: plain HTTP and a blockchain dead drop</a></li>
+<li><a href="#indicators-of-compromise">Indicators of compromise</a></li>
+<li><a href="#detection-and-response">Detection and response</a></li>
+<li><a href="#yara-rules">YARA rules</a></li>
+<li><a href="#mitre-attck-mapping">MITRE ATT&amp;CK mapping</a></li>
+<li><a href="#verdict">Verdict</a></li>
+<li><a href="#appendix-reproducibility-and-further-reading">Appendix: reproducibility and further reading</a></li>
+</ul>
+<p></p></details><p></p>
+<h2 id="tldr">TL;DR</h2>
+<ul>
+<li><code>StanLeyJ03/mcp-for-security</code> is a history-preserving clone of a real security MCP project. Two commits on 2026-02-19 turned its README into a funnel aimed at <code>for-security-mcp-3.3.zip</code>.</li>
+<li>Inside the ZIP: a 28-byte launcher, a freshly built LuaJIT interpreter, and 309KB of single-line Lua that decrypts itself as it runs.</li>
+<li>The obfuscation is Prometheus, the open-source Lua obfuscator, run with its heaviest settings and randomized build keys.</li>
+<li>All 996 encrypted strings are decrypted here, including the C2, the Polygon dead drop, the persistence commands, and the PowerShell one-liner that exempts <code>.exe</code> and <code>.dll</code> across the entire system drive from Defender.</li>
+<li>The campaign is publicly tracked as FakeGit and attributed by Trend Micro to Water Kurita, also tracked as Storm-2477.</li>
+<li>The loader sits upstream of the SmartLoader chain that ends in StealC. Nothing was executed to produce this report, and no IOC was ever contacted.</li>
+</ul>
+<h2 id="what-was-in-the-zip">What was in the zip</h2>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>Launcher.cmd      28 B</span></span>
+<span class="line"><span>  md5             fc3979a7ae6f3b0d64986c93b7911991</span></span>
+<span class="line"><span>  sha1            ab9685d1f483f40a5bd995173519a12473fa450f</span></span>
+<span class="line"><span>  sha256          ce1e33483d353200a266b3bc383ccf500e5a760c6dcd8218747260f5bbe39509</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>luajit.exe        878,080 B</span></span>
+<span class="line"><span>  md5             bff3a81de5ffacbeddd5de793cede666</span></span>
+<span class="line"><span>  sha1            d49590bfb8b160595382339433535c481ce425ac</span></span>
+<span class="line"><span>  sha256          f3e34c9e36f3be065d80d456281d31dd1cc85eb4980db7fa8c1b0eb6f29c25d8</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>uix.txt           309,352 B</span></span>
+<span class="line"><span>  md5             fe67c54a6387db6bf31f73ea6d695c12</span></span>
+<span class="line"><span>  sha1            97134dbb856b11be3b018508e980f58622bc5350</span></span>
+<span class="line"><span>  sha256          8cede35b80b1deaf732c2b178d908f91b3e7a0c114d06dfae9075b8a9bf78b8f</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>2nd-stage blob    8,514 B   (still encrypted as extracted)</span></span>
+<span class="line"><span>  sha256          3516ff63d6bfddcc8250bb8b63a9dddeec0cb9fd43747e1c6a0b9e84c332ad0d</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>2nd-stage plaintext  8,514 B   (ffi.cdef, in memory after decryption)</span></span>
+<span class="line"><span>  sha256          b74f433a796448f2cedb5acd393db3f987d1c7cdb8af2fa1d2a32c66229be5b8</span></span></code></pre>
+<p><code>luajit.exe</code> contains no malicious code. Static analysis found KERNEL32-only imports, no resources, no overlay, no TLS callbacks, no delay imports, no embedded C2, and exactly one URL string (<code>http://luajit.org/</code>). It is abused the same way <code>mshta</code> or <code>rundll32</code> is: a legitimate interpreter that will happily run someone else’s script.</p>
+<p>The LuaJIT project distributes source code rather than official Windows binaries, meaning pre-compiled executables vary by build environment. This binary carries a compilation timestamp of 2026-02-18 22:40 UTC and was linked as a GUI subsystem executable rather than a console application, preventing a terminal window from flashing when launched. While some vendor reporting describes the executable as trojanized, static analysis indicates an unmodified interpreter compiled specifically for headless execution. The repository received the ZIP archive roughly ten hours after this compile timestamp.</p>
+<h2 id="how-the-lure-worked">How the lure worked</h2>
+<p>The technique has a name now: AgentBaiting. An AI agent hunting for a capability (a Skill, an MCP server, a plugin) can find the attacker’s repository on its own, read the attacker’s README as documentation, and hand the install steps to its user. Island documented the pattern in July 2026 across a FakeGit operation of roughly 7,600 repositories. More than 800 of them posed as AI Skills or MCP servers.</p>
+<p>This repository is one of them. The README keeps every heading from the project it copied, and then:</p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>badge image        -&gt; .../raw/refs/heads/main/nmap-mcp/src/for-security-mcp-3.3.zip</span></span>
+<span class="line"><span>git clone command  -&gt; .../raw/refs/heads/main/nmap-mcp/src/for-security-mcp-3.3.zip</span></span>
+<span class="line"><span>pip install -r     -&gt; .../raw/refs/heads/main/nmap-mcp/src/for-security-mcp-3.3.zip</span></span>
+<span class="line"><span>python server.py   -&gt; .../raw/refs/heads/main/nmap-mcp/src/for-security-mcp-3.3.zip</span></span>
+<span class="line"><span>Email              -&gt; .../raw/refs/heads/main/nmap-mcp/src/for-security-mcp-3.3.zip</span></span></code></pre>
+<p>Thirteen occurrences of the same ZIP URL in a 4,991-byte README.</p>
+<p><img src="/_astro/fakegit-01-readme-lure.BtBRV5c7_ZrzNlx.webp" alt="The cloned repository's README on GitHub, with both badges broken because every link points at the ZIP file." loading="lazy" decoding="async" width="2800" height="2000"></p>
+<p><em>The README on GitHub. Both badges are broken images, since they point at the ZIP.</em></p>
+<p>The repository is a clone of <code>cyproxio/mcp-for-security</code>, originally created by Serhat Çiçek. Ten commit hashes in the clone match the original repository byte-for-byte. The copy was created two days after the upstream project and remained largely inactive until a README edit in August 2025.</p>
+<p><img src="/_astro/shot-20260914173405.fyvwFDhx_Z1gRrBq.webp" alt="Contributors chart: Serhatcck built the project with 10 commits and 8,099 additions; StanLeyJ03 made 3 commits and removed more lines than it added." loading="lazy" decoding="async" width="1856" height="1382"></p>
+<p><em>Contributors. Serhatcck built the project: 10 commits, 8,099 lines added. StanLeyJ03 made 3 commits and removed more than it added.</em></p>
+<p>On February 19, 2026, two commits completed the lure: at 09:01 UTC the archive was added to the repository tree, and at 12:41 UTC a second commit updated the README to point all links at the ZIP.</p>
+<p><img src="/_astro/shot-20260914173718.CLZoFQlJ_26Salj.webp" alt="The weaponizing commit's diff: every real link replaced with the ZIP path, +12/-12, with the working git clone line swapped for a download." loading="lazy" decoding="async" width="2868" height="1282"></p>
+<p><em>The weaponizing commit. Every real link replaced with the ZIP path, +12/-12. The diff shows the working <code>git clone</code> line swapped for a download.</em></p>
+<p>The archive is located at <code>nmap-mcp/src/for-security-mcp-3.3.zip</code>, stored alongside ordinary source files:</p>
+<p><img src="/_astro/fakegit-02-zip-in-tree.DmXz4ytj_1RzS6B.webp" alt="The for-security-mcp-3.3.zip archive sitting in the repository tree among ordinary source files." loading="lazy" decoding="async" width="2800" height="2000"></p>
+<p><em>One ZIP among ordinary source files.</em></p>
+<h2 id="execution-chain">Execution chain</h2>
+<p><code>Launcher.cmd</code> is a 28-byte batch script containing <code>start luajit.exe uix.txt</code>. Using <code>start</code> spawns the interpreter in a detached process, and the Lua script hides its console window immediately upon execution.</p>
+<h2 id="the-obfuscator-behind-it">The obfuscator behind it</h2>
+<p><code>uix.txt</code> is an obfuscated virtual machine that executes a second, encrypted program. The obfuscation is generated by Prometheus, an open-source Lua obfuscator, with heavy virtualization and anti-tamper configurations enabled.</p>
+<p>Prometheus’s source lists its transformation steps, and the sample matches them one for one:</p>
+<div class="overflow-hidden [&amp;_table]:my-0 [&amp;_table]:min-w-xl"><div class="relative w-full overflow-x-auto">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Prometheus step</th><th>What it does</th><th>Where it shows up in <code>uix.txt</code></th></tr></thead><tbody><tr><td><code>Vmify</code></td><td>compiles the script into a randomized VM</td><td>the 553-block dispatch, closure factories, heap and refcount machinery</td></tr><tr><td><code>EncryptStrings</code></td><td>per-site string encryption with a random seed</td><td>all 996 encrypted literals</td></tr><tr><td><code>AntiTamper</code></td><td>breaks the script when it is edited</td><td>the traceback line-number check that ends in <code>error(&quot;Tamper Detected!&quot;)</code></td></tr><tr><td><code>NumbersToExpressions</code></td><td>rewrites constants as junk arithmetic</td><td><code>-1273246-((228191+-839136)+340691)</code> and friends</td></tr><tr><td><code>SplitStrings</code></td><td>splits names into chunk tables</td><td>the <code>mn</code> / <code>xn</code> reassembly helpers, 403 call sites</td></tr><tr><td><code>ConstantArray</code></td><td>hoists constants into a big table</td><td>the literal tables the VM indexes at runtime</td></tr></tbody></table></div></div>
+<p>The VM mechanics, for anyone who wants the details:</p>
+<ul>
+<li>Everything is wrapped in <code>return (function(...) return (function(z,E,A,j,r,l,Q,F,V,L,N,G,q,s,g,d,k,O,K,c,u,y,U,t) ... end)(...))( ... )(E(Q))</code>.</li>
+<li><code>BIGFUNC(y, A, j, r)</code> interprets a numeric program counter. <code>while y do if y&lt;N then ...</code> is a binary-search dispatch over 553 basic blocks. <code>F</code> is a slot-indexed heap, <code>c</code> a refcount array, <code>t()</code> an allocator.</li>
+<li>Nine closure factories with fixed arities (<code>G</code> = 0, <code>d</code> = 1, <code>g</code> = 2, <code>u</code> = 3, <code>O</code> = 4, <code>V</code> = 5, <code>q</code> = 6, <code>s</code> = 8, <code>U</code> = varargs) produce 64 closures.</li>
+<li>Eighty-eight sentinel globals are read as <code>z[&quot;...&quot;]</code>. The VM never writes to globals, so these expressions evaluate to <code>nil</code> to terminate specific interpreter loops.</li>
+<li>Dead-code basic blocks contain deliberately invalid expressions (such as <code>&quot;1xp&quot; / c</code>) to confuse static analysis tools.</li>
+<li>The anti-tamper check triggers intentional exceptions, inspects the resulting traceback string (<code>file:LINE:</code>), and compares line offsets against expected values. Modifying the file triggers <code>Tamper Detected!</code> and halts execution.</li>
+</ul>
+<p>Public deobfuscators exist for Prometheus (0x251’s <code>Prometheus-Deobfuscator</code> and its V2). This analysis did not use them. Their strongest step executes the script under stubbed natives to observe behavior, and this payload is architecture-independent, so running it here would mean a live sample on a machine that already has <code>luajit</code> installed. A Python emulator that models the VM instead, with natives stubbed to symbolic values and no Lua runtime involved, does the same job without the risk.</p>
+<h2 id="the-string-cipher">The string cipher</h2>
+<p>Every meaningful name in <code>uix.txt</code> is encrypted: API names, registry paths, URLs, commands. There are 996 encrypted literals, each with its own fresh seed, and the cipher is length-preserving with add-with-feedback.</p>
+<p>Prometheus ships this as a documented step, and <code>EncryptStrings.lua</code> contains the whole thing:</p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="lua"><code><span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">state_45 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> seed_53 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">%</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 35184372088832</span></span>
+<span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">state_8  </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> seed_53 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">%</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 255</span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668"> +</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 2</span></span>
+<span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">param_mul_8  </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#F07171;--shiki-dark:#F07178"> primitive_root_257</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">(secret_key_7)</span></span>
+<span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">param_mul_45 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> secret_key_6 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">*</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 4</span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668"> +</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 1</span></span>
+<span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">param_add_45 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> secret_key_44 </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">*</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 2</span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668"> +</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 1</span></span>
+<span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">out[i] </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#F07171;--shiki-dark:#F07178"> string.char</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">((byte </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">-</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> (</span><span style="--shiki-light:#F07171;--shiki-dark:#F07178">get_next_pseudo_random_byte</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">() </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">+</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> prevVal)) </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">%</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 256</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">)</span></span>
+<span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">prevVal </span><span style="--shiki-light:#F2A191;--shiki-dark:#F29668">=</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> byte</span></span></code></pre>
+<p>That makes the constants in the sample checkable against the generator’s parameter ranges. Every one of them lands inside:</p>
+<div class="overflow-hidden [&amp;_table]:my-0 [&amp;_table]:min-w-xl"><div class="relative w-full overflow-x-auto">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>In the sample</th><th>Prometheus parameter</th><th>Checks out because</th></tr></thead><tbody><tr><td><code>% 2^45</code></td><td><code>35184372088832</code></td><td>same modulus</td></tr><tr><td><code>172</code></td><td><code>primitive_root_257(secret_key_7)</code></td><td>172 is a primitive root modulo 257</td></tr><tr><td><code>181</code></td><td><code>secret_key_6 * 4 + 1</code></td><td>back-computes to 45, inside the 0..63 range</td></tr><tr><td><code>22231257191003</code></td><td><code>secret_key_44 * 2 + 1</code></td><td>back-computes to an integer inside the 0..2^44 range</td></tr><tr><td>seed init <code>% 255 + 2</code></td><td><code>seed_53 % 255 + 2</code></td><td>identical</td></tr><tr><td>IV <code>238</code></td><td><code>secret_key_8</code></td><td>inside the 0..255 range</td></tr></tbody></table></div></div>
+<p>The string table is therefore recoverable by anyone with the public obfuscator source. It also explains the version sprawl: the “16 obfuscator generations” tracked under ESET’s <code>Lua/Agent.Z</code> through <code>Lua/Agent.BT</code> are not 16 hand-written variants. Prometheus re-randomizes its keys on every build, so re-obfuscating the same code produces what looks like a new generation while nothing underneath has moved.</p>
+<p>All 996 strings came out clean, and the separate 8,514-byte blob decrypts to coherent C: a LuaJIT <code>ffi.cdef</code> header declaring the whole Win32 surface the loader uses. Hashes for both, encrypted and plaintext, are in the IOC list.</p>
+<p><img src="/_astro/fakegit-05-prometheus-public.Cj3KW_OL_2ku3cS.webp" alt="Prometheus on GitHub: 506 stars, with a docs folder covering every transformation this loader uses." loading="lazy" decoding="async" width="2800" height="2000"></p>
+<p><em>Prometheus on GitHub: 506 stars, and a docs folder covering every transformation this loader uses.</em></p>
+<h2 id="what-it-does-once-running">What it does once running</h2>
+<p>Everything below is reconstructed from the decrypted strings and the decrypted <code>ffi.cdef</code> header.</p>
+<ul>
+<li>
+<p>Windows API resolution: The <code>ffi.cdef</code> header declares the full Win32 surface: PE structures (<code>IMAGE_DOS_HEADER</code>, <code>IMAGE_NT_HEADERS32/64</code>, <code>IMAGE_EXPORT_DIRECTORY</code>), loader walking structures (<code>PEB</code>, <code>PEB_LDR_DATA</code>, <code>LDR_DATA_TABLE_ENTRY</code>, <code>UNICODE_STRING</code>), <code>RtlInitUnicodeString</code>, and <code>LdrLoadDll</code>. APIs get resolved by walking the loader list at runtime, keeping the Import Address Table clean.</p>
+</li>
+<li>
+<p>Host profiling: Gathers computer name, username, <code>GetSystemMetrics</code>, <code>VerifyVersionInfoW</code> (OS build), <code>IsWow64Process</code>, <code>GetTokenInformation</code> with <code>TOKEN_ELEVATION</code> (checking administrator privileges), the <code>MachineGuid</code> registry value as a unique host ID, and queries <code>ip-api[.]com</code> for geolocation. The C2 parameters confirm it: <code>guid= os= arch= user= computer= country= city= timezone= loaderId= taskId= brand= location= query=</code>.</p>
+</li>
+<li>
+<p>Persistence mechanisms: A Run key plus the matching <code>Explorer\StartupApproved\Run</code> entry, a scheduled task created both ways (<code>schtasks</code> and PowerShell <code>Register-ScheduledTask</code>), and file drops including <code>C:/Windows/System32/oobe/Setup.exe</code> registered with <code>/rl highest</code>.</p>
+</li>
+<li>
+<p>Defender evasion: Runs <code>Add-MpPreference -ExclusionPath $env:SystemDrive -ExclusionExtension .exe, .dll -Force</code> through hidden PowerShell. One command exempts <code>.exe</code> and <code>.dll</code> files on the system drive from Microsoft Defender scans.</p>
+</li>
+<li>
+<p>Payload execution: Uses <code>VirtualAlloc</code>, <code>VirtualProtect</code>, and <code>CreateThread</code> with the <code>LPTHREAD_START_ROUTINE</code> signature for in-memory shellcode and PE execution. Dropped files can be launched through <code>rundll32</code>, <code>WinExec</code>, <code>cmd /c</code>, or PowerShell. Handled extensions: <code>.exe .dll .bin .luac .json .bat .cmd .ps1</code>.</p>
+</li>
+<li>
+<p>Screen capture: Calls <code>GetDC</code>, <code>CreateDIBSection</code>, and <code>BitBlt</code> with full bitmap headers to capture screenshots saved in <code>.bmp</code> format.</p>
+</li>
+<li>
+<p>Process stealth: Hides the console window using <code>GetConsoleWindow</code> and <code>ShowWindow(SW_HIDE)</code>, and enforces a single instance via <code>CreateMutexW</code>. The mutex name is derived from a runtime table lookup rather than a hardcoded literal.</p>
+</li>
+</ul>
+<p>The DLLs it reaches for: <code>kernel32</code>, <code>ntdll</code>, <code>wininet</code>, <code>advapi32</code>, <code>shlwapi</code>, <code>shell32</code>, <code>winbrand</code>, and <code>user32</code>/<code>gdi32</code>. It leans on the LuaJIT <code>bit</code> library throughout, plus <code>ffi</code>, <code>cdef</code>, <code>cast</code>, <code>sizeof</code>, and casts like <code>ulong[1]</code> and <code>TOKEN_ELEVATION[1]</code>. None of this would survive a plain Lua interpreter, which is why the interpreter ships in the ZIP.</p>
+<h2 id="c2-plain-http-and-a-blockchain-dead-drop">C2: plain HTTP and a blockchain dead drop</h2>
+<p>Channel one is plain HTTP to a bare IPv4 address, defanged here as <code>hxxp://213[.]176[.]73[.]151</code>, with REST-ish paths <code>/api/</code>, <code>/json/</code>, and <code>/task/</code>. Check-ins carry the victim profile above. Exfiltration is a <code>POST</code> with <code>multipart/form-data</code>, boundary <code>a1u4xbodohy2cqdc2n0i336qy9tcap8w64yb424</code>, one part named <code>data</code> and one named <code>file</code>. <code>GET</code> polls for tasks. <code>hxxps://www[.]microsoft[.]com</code> appears to be a connectivity check. The User-Agent is a stock Chrome string (<code>Chrome/145.0.0.0</code>), and the frozen minor version is exactly what Chrome’s User-Agent Reduction produces, so it dates the build rather than proving fakery.</p>
+<p>The check-in URL carries a specific identifier. Triage captured a live request from this sample:</p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>POST /api/NTE3YjdjNWU1NjYzNjU2YTA1N2Y= HTTP/1.1</span></span></code></pre>
+<p>Decoding that base64 segment yields <code>517b7c5e5663656a057f</code>, corresponding to the unique loader ID in the decrypted strings. Every check-in carries it as a path segment.</p>
+<p>The secondary C2 channel uses Polygon blockchain infrastructure as a dead drop. An embedded JSON-RPC template handles queries:</p>
+
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="json"><code><span class="line"><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6">{ </span><span style="--shiki-light:#55B4D4;--shiki-dark:#39BAE6">&quot;jsonrpc&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">:</span><span style="--shiki-light:#86B300;--shiki-dark:#AAD94C"> &quot;2.0&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">,</span><span style="--shiki-light:#55B4D4;--shiki-dark:#39BAE6"> &quot;method&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">:</span><span style="--shiki-light:#86B300;--shiki-dark:#AAD94C"> &quot;eth_call&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">,</span></span>
+<span class="line"><span style="--shiki-light:#55B4D4;--shiki-dark:#39BAE6">  &quot;params&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">:</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> [ { </span><span style="--shiki-light:#55B4D4;--shiki-dark:#39BAE6">&quot;to&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">:</span><span style="--shiki-light:#86B300;--shiki-dark:#AAD94C"> &quot;%s&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">,</span><span style="--shiki-light:#55B4D4;--shiki-dark:#39BAE6"> &quot;data&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">:</span><span style="--shiki-light:#86B300;--shiki-dark:#AAD94C"> &quot;%s&quot;</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> }</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">,</span><span style="--shiki-light:#86B300;--shiki-dark:#AAD94C"> &quot;latest&quot;</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> ]</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">,</span><span style="--shiki-light:#55B4D4;--shiki-dark:#39BAE6"> &quot;id&quot;</span><span style="--shiki-light:#5C6166B3;--shiki-dark:#BFBDB6B3">:</span><span style="--shiki-light:#A37ACC;--shiki-dark:#D2A6FF"> 1</span><span style="--shiki-light:#5C6166;--shiki-dark:#BFBDB6"> }</span></span></code></pre>
+<p>The contract is hardcoded as <code>0x1823A9a0Ec8e0C25dD957D0841e3D41a4474bAdc</code> with the 4-byte selector <code>0x3bc5de30</code>. Five Polygon mainnet RPC providers sit behind it as fallbacks: <code>polygon-mainnet[.]gateway[.]tatum[.]io</code>, <code>polygon-public[.]nodies[.]app</code>, <code>polygon[.]drpc[.]org</code>, <code>polygon[.]publicnode[.]com</code>, <code>rpc-mainnet[.]matic[.]quiknode[.]pro</code>.</p>
+<blockquote><p>The contract address is not a payment wallet or ransom endpoint. <code>eth_call</code> is a read-only query used for EtherHiding: the operators store the active C2 address in smart contract storage, allowing them to rotate backend IP addresses without modifying deployed files on disk.</p></blockquote>
+<p>Dynamic analysis confirms this rotation mechanism. In a June 2026 Triage sandbox run, the loader sent a POST request to <code>85[.]137[.]52[.]21</code>, an IP that does not appear in the static strings or earlier C2 lists. The request occurred immediately after the initial check-in and the <code>eth_call</code> query, demonstrating dynamic fallback to rotated infrastructure.</p>
+<p><img src="/_astro/fakegit-06-sandbox-telemetry.D_uWOi8t_2399vY.webp" alt="Sandbox telemetry: luajit.exe checking in to the original C2, calling the contract through polygon[.]drpc[.]org, then posting to a second address absent from all 996 static strings." loading="lazy" decoding="async" width="2800" height="2000"></p>
+<p><em>The sandbox run, live: <code>luajit.exe</code> checking in to the original C2, calling the contract through <code>polygon[.]drpc[.]org</code>, and then posting to a second address that exists in none of the 996 static strings.</em></p>
+<p><strong>Attribution.</strong> Trend Micro tracks this operation as Water Kurita, also tracked as Storm-2477, and assesses FakeGit as a continuation of an earlier Lumma Stealer campaign. derp.ca independently ties the distribution tooling to a single Vietnamese-speaking operator. This analysis corroborates the toolchain.</p>
+<h2 id="indicators-of-compromise">Indicators of compromise</h2>
+<p>Everything below is defanged. Re-fang inside your tooling. Do not click or resolve anything.</p>
+<p><strong>Files</strong></p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>for-security-mcp-3.3.zip                    (repo path: nmap-mcp/src/for-security-mcp-3.3.zip)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Launcher.cmd          28 B</span></span>
+<span class="line"><span>  md5                  fc3979a7ae6f3b0d64986c93b7911991</span></span>
+<span class="line"><span>  sha1                 ab9685d1f483f40a5bd995173519a12473fa450f</span></span>
+<span class="line"><span>  sha256               ce1e33483d353200a266b3bc383ccf500e5a760c6dcd8218747260f5bbe39509</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>luajit.exe            878,080 B</span></span>
+<span class="line"><span>  md5                  bff3a81de5ffacbeddd5de793cede666</span></span>
+<span class="line"><span>  sha1                 d49590bfb8b160595382339433535c481ce425ac</span></span>
+<span class="line"><span>  sha256               f3e34c9e36f3be065d80d456281d31dd1cc85eb4980db7fa8c1b0eb6f29c25d8</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>uix.txt               309,352 B</span></span>
+<span class="line"><span>  md5                  fe67c54a6387db6bf31f73ea6d695c12</span></span>
+<span class="line"><span>  sha1                 97134dbb856b11be3b018508e980f58622bc5350</span></span>
+<span class="line"><span>  sha256               8cede35b80b1deaf732c2b178d908f91b3e7a0c114d06dfae9075b8a9bf78b8f</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>2nd-stage blob (encrypted on disk)</span></span>
+<span class="line"><span>  sha256               3516ff63d6bfddcc8250bb8b63a9dddeec0cb9fd43747e1c6a0b9e84c332ad0d</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>2nd-stage plaintext (ffi.cdef; exists in memory after decryption)</span></span>
+<span class="line"><span>  sha256               b74f433a796448f2cedb5acd393db3f987d1c7cdb8af2fa1d2a32c66229be5b8</span></span></code></pre>
+<p><strong>Network</strong></p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>hxxp://213[.]176[.]73[.]151                primary C2 (HTTP, bare IPv4, ASN 207957)</span></span>
+<span class="line"><span>   paths:      /api/   /json/   /task/</span></span>
+<span class="line"><span>   check-in:   POST /api/&lt;base64 loader id&gt;</span></span>
+<span class="line"><span>   profile:    guid= os= arch= user= computer= country= city= timezone=</span></span>
+<span class="line"><span>               loaderId= taskId= brand= location= query=</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>ip-api[.]com                               victim IP geolocation (legitimate service, abused)</span></span>
+<span class="line"><span>hxxps://www[.]microsoft[.]com              connectivity check</span></span>
+<span class="line"><span>85[.]137[.]52[.]21                         second C2, June 2026 sandbox run only: absent from the</span></span>
+<span class="line"><span>                                           static strings and from the March C2 tables. Surfaces after</span></span>
+<span class="line"><span>                                           the contract call and the original-C2 check-in, consistent</span></span>
+<span class="line"><span>                                           with a rotated address being picked up at runtime.</span></span>
+<span class="line"><span>polygon-mainnet[.]gateway[.]tatum[.]io     blockchain C2 fallback (Polygon RPC)</span></span>
+<span class="line"><span>polygon-public[.]nodies[.]app</span></span>
+<span class="line"><span>polygon[.]drpc[.]org</span></span>
+<span class="line"><span>polygon[.]publicnode[.]com</span></span>
+<span class="line"><span>rpc-mainnet[.]matic[.]quiknode[.]pro</span></span></code></pre>
+<p><strong>Blockchain</strong></p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>contract (read via eth_call): 0x1823A9a0Ec8e0C25dD957D0841e3D41a4474bAdc</span></span>
+<span class="line"><span>selector:                     0x3bc5de30        (getData())</span></span></code></pre>
+<p><strong>Host</strong></p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>File:   C:\Windows\Setup\Scripts\ErrorHandler.cmd</span></span>
+<span class="line"><span>File:   C:\Windows\System32\oobe\Setup.exe        (masquerade; registered with /rl highest)</span></span>
+<span class="line"><span>File:   %LOCALAPPDATA%\ODM5\ODM5.exe              (observed in sandbox; folder name is per-build random)</span></span>
+<span class="line"><span>File:   %LOCALAPPDATA%\ODM5\uix.txt</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Task:   CloudDrive_ODM5                           (observed; daily at 14:11)</span></span>
+<span class="line"><span>        name pool: CloudDrive, AdobeCreativeCloud, AudioManager</span></span>
+<span class="line"><span>        created via schtasks and via PowerShell Register-ScheduledTask</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>Reg:    HKCU|HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</span></span>
+<span class="line"><span>Reg:    HKCU|HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run</span></span>
+<span class="line"><span>Reg:    HKLM\SOFTWARE\Microsoft\Cryptography      (MachineGuid read as host ID)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>CMD:    luajit.exe &lt;script&gt;</span></span>
+<span class="line"><span>CMD:    start /min cmd /c &quot;&quot;</span></span>
+<span class="line"><span>CMD:    schtasks /create /sc daily /st %02d:%02d /f</span></span>
+<span class="line"><span>CMD:    /tn Setup /tr &quot;C:/Windows/System32/oobe/Setup.exe&quot; /rl highest</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>PS:     Add-MpPreference -ExclusionPath $env:SystemDrive -ExclusionExtension .exe, .dll -Force</span></span>
+<span class="line"><span>PS:     powershell -WindowStyle Hidden -ExecutionPolicy Bypass -File &quot;</span></span>
+<span class="line"><span>PS:     Register-ScheduledTask -TaskName &#39;&lt;name&gt;&#39; -Action (New-ScheduledTaskAction -Execute &#39;&lt;path&gt;&#39;)</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>HTTP:   Content-Type: multipart/form-data; boundary=a1u4xbodohy2cqdc2n0i336qy9tcap8w64yb424</span></span>
+<span class="line"><span>        part &quot;data&quot; and part &quot;file&quot;; recovered part filename:</span></span>
+<span class="line"><span>        r9psctse47itn45wmikjdsf5o5jhra0sjb2ad9crqk90pny5uhuql46f7aybl8adf2fglpxiii1wnsabtyp01kwusyo8k9hupl2i</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>UA:     Mozilla/5.0 (Windows NT 10.0; Win64; x64) ... Chrome/145.0.0.0 Safari/537.36</span></span>
+<span class="line"><span>Mutex:  CreateMutexW(NULL, FALSE, &lt;name&gt;)      single-instance guard.</span></span>
+<span class="line"><span>                                               The name is resolved through a runtime table</span></span>
+<span class="line"><span>                                               lookup keyed by a 45-char opaque identifier, so it</span></span>
+<span class="line"><span>                                               is not present in the static string set.</span></span></code></pre>
+<p><strong>Recovered constants</strong></p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="text"><code><span class="line"><span>ECe6VGLRJum2qYtl79OiOU7aHot7Zhbn               32 chars; XOR key for the GitHub dead-drop blobs (per derp.ca)</span></span>
+<span class="line"><span>517b7c5e5663656a057f                           10 bytes hex; the loader ID, sent base64 in the C2 path</span></span>
+<span class="line"><span>26bbudy13hydiihesb72eoyx8t8rqg0sifvolvn71nyq7  45-char plaintext literal; an opaque identifier used as a runtime table key</span></span>
+<span class="line"><span>839                                            three-character string literal, used as a runtime table key</span></span>
+<span class="line"><span>0x3bc5de30                                     contract selector (getData)</span></span></code></pre>
+<h2 id="detection-and-response">Detection and response</h2>
+<p>What to hunt for:</p>
+<ul>
+<li><code>luajit.exe</code> (or <code>lua51.dll</code>) making outbound HTTP to a bare IP, especially to <code>/api/</code>, <code>/json/</code>, or <code>/task/</code>, or posting <code>multipart/form-data</code> to an IP literal.</li>
+<li><code>luajit.exe</code> resolving Polygon RPC hosts. Legitimate software has little reason to combine a Lua interpreter with <code>drpc[.]org</code> or <code>publicnode[.]com</code>.</li>
+<li>Parent and child processes: <code>cmd.exe</code> launching <code>luajit.exe</code> with a <code>.txt</code> or <code>.luac</code> argument.</li>
+<li>A new <code>Run</code> value plus a matching <code>StartupApproved\Run</code> entry created in the same window. The pairing is the tell; either one alone happens legitimately.</li>
+<li><code>Add-MpPreference -ExclusionPath</code> from anything that is not admin tooling.</li>
+<li>A fresh scheduled task whose action points under <code>System32\oobe\</code> or <code>Windows\Setup\Scripts\</code>.</li>
+<li>The two file paths above, plus <code>GetDC</code>/<code>BitBlt</code> activity from a process with no UI.</li>
+</ul>
+<p>Response order that matters:</p>
+<ol>
+<li>Isolate the host. Block the C2 IP and the RPC endpoints if they are not business-required.</li>
+<li>Remove the Defender exclusions first (<code>Get-MpPreference | select ExclusionPath, ExclusionExtension</code>, then <code>Remove-MpPreference</code>). Until you do, every later scan is blind by design.</li>
+<li>Delete the Run key, the <code>StartupApproved\Run</code> value, and the scheduled task.</li>
+<li>Collect <code>System32\oobe\Setup.exe</code> and <code>Windows\Setup\Scripts\ErrorHandler.cmd</code> as evidence before deleting them.</li>
+<li>Hunt for delivered payloads by extension (<code>.exe .dll .bin .luac .ps1 .bat .cmd .json</code>) in Desktop, Temp, and recent download locations.</li>
+<li>Treat the contract as a network pivot, not something to block.</li>
+<li>Revoke sessions, tokens, and credentials if the host held anything sensitive. The SmartLoader chain ends in StealC, which takes live sessions, and resetting passwords does not reclaim those.</li>
+</ol>
+<h2 id="yara-rules">YARA rules</h2>
+<p>Two rules, compiled with yara-python and tested against the live sample and against a memory image rebuilt from the decrypted strings. The first catches the payload on disk. The second catches it after it decrypts itself, which is where the interesting strings spend most of their life. The strings inside the rules are live on purpose, because they have to match real bytes. Everything in the prose above stays defanged.</p>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="plaintext"><code><span class="line"><span>rule LuaJIT_FakeGit_Loader_uix</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    meta:</span></span>
+<span class="line"><span>        description = &quot;FakeGit/SmartLoader LuaJIT loader: single-line Prometheus-vmified Lua payload&quot;</span></span>
+<span class="line"><span>        author      = &quot;Kshitij Chitnis&quot;</span></span>
+<span class="line"><span>        date        = &quot;2026-09-15&quot;</span></span>
+<span class="line"><span>        reference   = &quot;https://www.derp.ca/research/fakegit-luajit-github-campaign/&quot;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    strings:</span></span>
+<span class="line"><span>        $wrap = &quot;return(function(...)return(function(&quot; ascii</span></span>
+<span class="line"><span>        $disp = &quot;while y do if y&lt;&quot; ascii</span></span>
+<span class="line"><span>        $np   = &quot;newproxy&quot; ascii</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    condition:</span></span>
+<span class="line"><span>        uint16(0) != 0x5A4D and</span></span>
+<span class="line"><span>        filesize &gt; 200KB and filesize &lt; 600KB and</span></span>
+<span class="line"><span>        all of them</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<pre class="astro-code astro-code-themes ayu-light ayu-dark" style="--shiki-light:#5c6166;--shiki-dark:#bfbdb6;--shiki-light-bg:#f8f9fa;--shiki-dark-bg:#0d1017;overflow-x:auto;--file-name-offset:-0.75rem" tabindex="0" data-language="plaintext"><code><span class="line"><span>rule LuaJIT_FakeGit_Loader_decrypted</span></span>
+<span class="line"><span>{</span></span>
+<span class="line"><span>    meta:</span></span>
+<span class="line"><span>        description = &quot;Decrypted material from the FakeGit/SmartLoader LuaJIT loader (memory scan): these strings exist only after runtime decryption&quot;</span></span>
+<span class="line"><span>        author      = &quot;Kshitij Chitnis&quot;</span></span>
+<span class="line"><span>        date        = &quot;2026-09-15&quot;</span></span>
+<span class="line"><span>        reference   = &quot;https://www.derp.ca/research/fakegit-luajit-github-campaign/&quot;</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    strings:</span></span>
+<span class="line"><span>        $p1 = &quot;213.176.73.151&quot; ascii</span></span>
+<span class="line"><span>        $p2 = &quot;polygon-public.nodies.app&quot; ascii</span></span>
+<span class="line"><span>        $p3 = &quot;rpc-mainnet.matic.quiknode.pro&quot; ascii</span></span>
+<span class="line"><span>        $p4 = &quot;0x1823A9a0Ec8e0C25dD957D0841e3D41a4474bAdc&quot; ascii</span></span>
+<span class="line"><span>        $p5 = &quot;a1u4xbodohy2cqdc2n0i336qy9tcap8w64yb424&quot; ascii</span></span>
+<span class="line"><span>        $p6 = &quot;Add-MpPreference -ExclusionPath $env:SystemDrive&quot; ascii</span></span>
+<span class="line"><span>        $p7 = &quot;CloudDrive&quot; ascii</span></span>
+<span class="line"><span>        $p8 = &quot;C:\\Windows\\Setup\\Scripts\\ErrorHandler.cmd&quot; ascii</span></span>
+<span class="line"><span></span></span>
+<span class="line"><span>    condition:</span></span>
+<span class="line"><span>        2 of them</span></span>
+<span class="line"><span>}</span></span></code></pre>
+<p><img src="/_astro/fakegit-08-yara-test.CothMUON_1UUtgj.webp" alt="YARA test run: the structural rule fires on uix.txt, the decrypted rule fires on the rebuilt string table, and the interpreter and launcher stay clean." loading="lazy" decoding="async" width="1400" height="438"></p>
+<p>*Both rules compiled and run. The structural rule fires on <code>uix.txt</code> and nothing else. The decrypted rule fires on the rebuilt string table with all eight anchors. The interpreter and launcher stay clean, which is correct: neither one contains the malware.</p>
+<h2 id="mitre-attck-mapping">MITRE ATT&amp;CK mapping</h2>
+<div class="overflow-hidden [&amp;_table]:my-0 [&amp;_table]:min-w-xl"><div class="relative w-full overflow-x-auto">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>ID</th><th>Technique</th><th>Evidence</th></tr></thead><tbody><tr><td>T1218</td><td>System binary proxy execution (LOLbin)</td><td>LuaJIT runtime runs the attacker’s script</td></tr><tr><td>T1059.011</td><td>Command and scripting interpreter: Lua</td><td>the entire loader runs as Lua</td></tr><tr><td>T1027 / .002 / .013</td><td>Obfuscated files, packing, encrypted file</td><td>Prometheus <code>Vmify</code> + <code>EncryptStrings</code></td></tr><tr><td>T1140</td><td>Deobfuscate/decode files or information</td><td>996 strings + 8,514-byte blob decrypted at runtime</td></tr><tr><td>T1129 / T1106</td><td>Execution via native API</td><td>FFI-declared APIs, <code>CreateThread</code>, <code>WinExec</code></td></tr><tr><td>T1055</td><td>Process injection</td><td><code>VirtualAlloc</code> + <code>VirtualProtect</code> + <code>CreateThread</code></td></tr><tr><td>T1620</td><td>Reflective code loading</td><td>API resolution by PEB walk + <code>LdrLoadDll</code></td></tr><tr><td>T1547.001</td><td>Registry Run keys / Startup folder</td><td><code>CurrentVersion\Run</code> + <code>StartupApproved\Run</code></td></tr><tr><td>T1053.005</td><td>Scheduled task</td><td><code>schtasks</code>, <code>Register-ScheduledTask</code></td></tr><tr><td>T1562.001</td><td>Impair defences</td><td><code>Add-MpPreference -ExclusionPath $env:SystemDrive</code></td></tr><tr><td>T1070.004 / T1036.005</td><td>Indicator removal, masquerading</td><td><code>oobe\Setup.exe</code>, <code>ErrorHandler.cmd</code></td></tr><tr><td>T1012 / T1082</td><td>System discovery</td><td>OS version, arch, <code>MachineGuid</code></td></tr><tr><td>T1033</td><td>User discovery</td><td>user, computer name, admin token</td></tr><tr><td>T1614 / .001</td><td>Location discovery</td><td><code>ip-api[.]com</code>, <code>country=</code> / <code>city=</code> / <code>timezone=</code> params</td></tr><tr><td>T1113</td><td>Screen capture</td><td><code>BitBlt</code> + <code>CreateDIBSection</code> + bitmap headers</td></tr><tr><td>T1071.001</td><td>Application-layer C2 over web protocols</td><td>WinINet HTTP GET/POST</td></tr><tr><td>T1102 / .001</td><td>Web service / dead-drop resolver</td><td>Polygon <code>eth_call</code> contract read</td></tr><tr><td>T1041 / T1567</td><td>Exfiltration over C2 channel</td><td>multipart upload, parts <code>data</code> and <code>file</code></td></tr><tr><td>T1105</td><td>Ingress tool transfer</td><td><code>/task/</code> downloads, seven handled extensions</td></tr><tr><td>T1497</td><td>Virtualization/sandbox evasion (partial)</td><td>anti-tamper traceback check; <code>VerifyVersionInfoW</code></td></tr></tbody></table></div></div>
+<h2 id="verdict">Verdict</h2>
+<p><strong>What it is:</strong> a task-driven loader and backdoor. It rides on a clean interpreter, calls the Windows API through LuaJIT FFI without importing anything, persists three ways, exempts itself from Defender, profiles and screenshots the victim, and takes orders from HTTP with a blockchain dead drop as backup. It fetches and executes arbitrary code, in memory or on disk.</p>
+<p><strong>Severity: HIGH.</strong> It achieves elevated persistence, defence evasion, remote code execution, and data exfiltration. It is not self-propagating and contains no ransomware component.</p>
+<p><strong>Family:</strong> the FakeGit / SmartLoader chain, per public reporting. No new family name asserted here.</p>
+<p><strong>Attribution:</strong> Water Kurita (Storm-2477) per Trend Micro; single Vietnamese-speaking operator per derp.ca. This analysis corroborates the toolchain and does not add an independent attribution.</p>
+<p><strong>Confidence:</strong> HIGH that the file is malicious and that the capabilities and IOCs listed are correct, resting on two independent cipher implementations agreeing on 996 out of 996 strings and a coherent decrypted artifact. MEDIUM on exact runtime ordering, since nothing was executed.</p>
+<h2 id="appendix-reproducibility-and-further-reading">Appendix: reproducibility and further reading</h2>
+<p>Artifacts from the analysis: <code>decoder.py</code> (cipher plus CLI), <code>decoder_notes.md</code>, <code>decoded_all.json</code> (offset, seed, ciphertext, and plaintext for all 996 sites), <code>decoded_names.txt</code> (406 distinct plaintexts), <code>verify.py</code>, <code>blob_8514.bin</code> with notes, <code>callsites.json</code>, <code>lits.json</code>, <code>closures_full.md</code>, <code>closure_sites.json</code>, <code>all_blocks.lua</code>, plus the PE check and the two YARA rules above.</p>
+<p>Nothing was executed at any point. Every result comes from parsing bytes, constant folding, and re-implementing the recovered cipher in Python.</p>
+<ul>
+<li>Island: AgentBaiting, how 800+ fake AI skills and MCP servers delivered malware (July 2026). <a href="https://www.island.io/blog/agentbaiting-how-800-fake-ai-skills-and-mcp-servers-delivered-malware">https://www.island.io/blog/agentbaiting-how-800-fake-ai-skills-and-mcp-servers-delivered-malware</a></li>
+<li>derp.ca: FakeGit, LuaJIT malware distributed via GitHub at scale (March 2026). <a href="https://www.derp.ca/research/fakegit-luajit-github-campaign/">https://www.derp.ca/research/fakegit-luajit-github-campaign/</a></li>
+<li>Hexastrike: Cloned, Loaded, and Stolen (April 2026). <a href="https://hexastrike.com/resources/blog/threat-intelligence/cloned-loaded-and-stolen-how-109-fake-github-repositories-delivered-smartloader-and-stealc/">https://hexastrike.com/resources/blog/threat-intelligence/cloned-loaded-and-stolen-how-109-fake-github-repositories-delivered-smartloader-and-stealc/</a></li>
+<li>Hive Pro advisory TA2026209, and the Cyber Security News writeup with the IOC table. <a href="https://www.hivepro.com/threat-advisory/when-your-ai-agent-hands-you-the-malware-inside-fakegits-agentbaiting-campaign">https://www.hivepro.com/threat-advisory/when-your-ai-agent-hands-you-the-malware-inside-fakegits-agentbaiting-campaign</a></li>
+<li>Triage sandbox runs of these hashes: <a href="https://tria.ge/260615-xedvlaes8y">https://tria.ge/260615-xedvlaes8y</a> and <a href="https://tria.ge/260320-javqnabw3w">https://tria.ge/260320-javqnabw3w</a></li>
+<li>Prometheus, the open-source Lua obfuscator: <a href="https://github.com/prometheus-lua/Prometheus">https://github.com/prometheus-lua/Prometheus</a></li>
+</ul></article><hr class="my-8 border-dashed"><div id="btt-btn-container" class="fixed inset-e-4 bottom-8 z-50 md:sticky md:inset-e-auto md:float-end md:me-1 translate-y-14 opacity-0 transition duration-500"><button data-button="back-to-top" class="group bg-background relative px-2 py-1 size-14 rounded-full shadow-xl md:h-8 md:w-fit md:rounded-md md:shadow-none md:focus-visible:rounded-none md:bg-background/35 md:bg-clip-padding md:backdrop-blur-lg"><span id="progress-indicator" class="absolute inset-0 -z-10 block size-14 scale-110 rounded-full bg-transparent md:hidden md:h-8 md:rounded-md"></span><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block rotate-90 md:hidden" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M5 12h14M5 12l6 6M5 12l6-6" /></svg><span class="group-hover:text-accent sr-only text-sm md:not-sr-only"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-4" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M12 5v14M16 9l-4-4M8 9l4-4" /></svg>Back to top</span></button></div><script data-astro-rerun>
+  function backToTop() {
+    const rootElement = document.documentElement;
+    const btnContainer = document.querySelector("#btt-btn-container");
+    const backToTopBtn = document.querySelector("[data-button='back-to-top']");
+    const progressIndicator = document.querySelector("#progress-indicator");
+
+    if (!rootElement || !btnContainer || !backToTopBtn || !progressIndicator)
+      return;
+
+    backToTopBtn.addEventListener("click", () => {
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    });
+
+    let lastVisible = null;
+    function handleScroll() {
+      const scrollTotal = rootElement.scrollHeight - rootElement.clientHeight;
+      const scrollTop = rootElement.scrollTop;
+      const scrollPercent = Math.floor((scrollTop / scrollTotal) * 100);
+
+      progressIndicator.style.setProperty(
+        "background-image",
+        `conic-gradient(var(--accent), var(--accent) ${scrollPercent}%, transparent ${scrollPercent}%)`
+      );
+
+      const isVisible = scrollTop / scrollTotal > 0.3;
+
+      if (isVisible !== lastVisible) {
+        btnContainer.classList.toggle("opacity-100", isVisible);
+        btnContainer.classList.toggle("translate-y-0", isVisible);
+        btnContainer.classList.toggle("opacity-0", !isVisible);
+        btnContainer.classList.toggle("translate-y-14", !isVisible);
+        lastVisible = isVisible;
+      }
+    }
+
+    let ticking = false;
+    document.addEventListener("scroll", () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+  }
+  backToTop();
+</script><div class="flex flex-none flex-col items-center justify-center gap-1 md:items-start"><span class="italic">Share this post:</span><div class="text-center"><a href="https://x.com/intent/post?url=https://kchitnis.com/posts/fakegit-luajit-loader/" title="Share this post on X" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent scale-90 p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="m4 4 11.733 16H20L8.267 4zM4 20l6.768-6.768m2.46-2.46L20 4" /></svg><span class="sr-only">Share this post on X</span></a><a href="https://www.linkedin.com/sharing/share-offsite/?url=https://kchitnis.com/posts/fakegit-luajit-loader/" title="Share this post on Linkedin" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent scale-90 p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0" /><path d="M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" /></svg><span class="sr-only">Share this post on Linkedin</span></a><a href="https://wa.me/?text=https://kchitnis.com/posts/fakegit-luajit-loader/" title="Share this post on Whatsapp" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent scale-90 p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="m3 21 1.65-3.8a9 9 0 1 1 3.4 2.9z" /><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0za5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1" /></svg><span class="sr-only">Share this post on Whatsapp</span></a><a href="https://t.me/share/url?url=https://kchitnis.com/posts/fakegit-luajit-loader/" title="Share this post on Telegram" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent scale-90 p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="m15 10-4 4 6 6 4-16-18 7 4 2 2 6 3-4" /></svg><span class="sr-only">Share this post on Telegram</span></a><a href="mailto:?subject=See%20this%20post&amp;body=https://kchitnis.com/posts/fakegit-luajit-loader/" title="Share this post via email" target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-1 hover:text-accent scale-90 p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m3 7 9 6 9-6" /></svg><span class="sr-only">Share this post via email</span></a></div></div><hr class="my-8 border-dashed"><div data-pagefind-ignore class="my-8 grid grid-cols-1 gap-6 sm:grid-cols-2"><a href="/posts/papercut-zero-day/" class="flex w-full gap-1 hover:opacity-75"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block flex-none rtl:rotate-180" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M5 12h14M5 12l6 6M5 12l6-6" /></svg><div><span>Previous Post</span><div class="text-accent/85 text-sm">PaperCut&#39;s Pre-Auth RCE: What the IOCs and the Payload Tell Us</div></div></a></div></main><footer class="app-layout mt-auto"><div class="border-border flex flex-col items-center justify-between border-t py-6 sm:flex-row-reverse sm:py-4"><div class="flex flex-wrap items-center gap-1"><a href="https://github.com/m0rphtail/" title="kchitnis on Github" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" /></svg><span class="sr-only">kchitnis on Github</span></a><a href="https://x.com/MorphTail" title="kchitnis on X" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="m4 4 11.733 16H20L8.267 4zM4 20l6.768-6.768m2.46-2.46L20 4" /></svg><span class="sr-only">kchitnis on X</span></a><a href="https://linkedin.com/in/kshitijchitnis" title="kchitnis on Linkedin" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0" /><path d="M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z" /></svg><span class="sr-only">kchitnis on Linkedin</span></a><a href="mailto:chitniskshitij@gmail.com" title="Send an email to kchitnis" class="group inline-flex items-center gap-1 hover:text-accent p-2 hover:rotate-6 sm:p-1"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="inline-block size-6 scale-125 fill-transparent stroke-current stroke-2 opacity-90 group-hover:fill-transparent sm:scale-110" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z" /><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="m3 7 9 6 9-6" /></svg><span class="sr-only">Send an email to kchitnis</span></a></div><div class="my-2 flex flex-col items-center whitespace-nowrap sm:flex-row"><span>Copyright &#169; 2026</span><span class="hidden sm:inline">&nbsp;|&nbsp;</span><span>All rights reserved.</span></div></div></footer><!--
+      No-JS fallback pageview (1x1 pixel). The body placement is required:
+      the router parses fetched pages with scripting disabled, so a head
+      <noscript> with an <img> gets hoisted into the body as a live element
+      that its noscript cleanup cannot catch — firing a duplicate hit on
+      every client-side navigation. Inside the body the img stays wrapped
+      in the noscript, and the router strips the whole element on swaps.
+    --><noscript><img src="https://kchitnis.goatcounter.com/count?p=%2Fposts%2Ffakegit-luajit-loader%2F&amp;t=FakeGit's%20LuaJIT%20Loader%3A%20Hidden%20Strings%20and%20a%20Polygon%20Dead%20Drop%20%7C%20kchitnis" alt="" width="1" height="1"></noscript><script type="module">var e=`theme`,t=`light`,n=`dark`;function r(){return localStorage.getItem(e)||(window.matchMedia(`(prefers-color-scheme: dark)`).matches?n:t)}var i=window.__theme?.value??r();function a(){localStorage.setItem(e,i),o()}function o(){let e=document.firstElementChild;e?.setAttribute(`data-theme`,i),e?.classList.toggle(`dark`,i===n),document.querySelector(`#theme-btn`)?.setAttribute(`aria-label`,i);let t=window.getComputedStyle(document.body).backgroundColor;document.querySelector(`meta[name='theme-color']`)?.setAttribute(`content`,t)}function s(){o(),document.querySelector(`#theme-btn`)?.addEventListener(`click`,()=>{i=i===t?n:t,a()})}s(),document.addEventListener(`astro:after-swap`,s),document.addEventListener(`astro:before-swap`,e=>{let t=document.querySelector(`meta[name='theme-color']`)?.getAttribute(`content`);t&&e.newDocument.querySelector(`meta[name='theme-color']`)?.setAttribute(`content`,t)}),window.matchMedia(`(prefers-color-scheme: dark)`).addEventListener(`change`,({matches:e})=>{i=e?n:t,a()});</script></body></html><script data-astro-rerun>
+  function createProgressBar() {
+    const progressContainer = document.createElement("div");
+    progressContainer.className =
+      "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar h-1 w-0 bg-accent";
+    progressBar.id = "myBar";
+
+    progressContainer.appendChild(progressBar);
+    document.body.appendChild(progressContainer);
+  }
+  createProgressBar();
+
+  function updateScrollProgress() {
+    document.addEventListener("scroll", () => {
+      const winScroll =
+        document.body.scrollTop || document.documentElement.scrollTop;
+      const height =
+        document.documentElement.scrollHeight -
+        document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      if (document) {
+        const myBar = document.getElementById("myBar");
+        if (myBar) {
+          myBar.style.width = scrolled + "%";
+        }
+      }
+    });
+  }
+  updateScrollProgress();
+
+  function addHeadingLinks() {
+    const headings = Array.from(
+      document.querySelectorAll("h2, h3, h4, h5, h6")
+    );
+    for (const heading of headings) {
+      heading.classList.add("group");
+      const link = document.createElement("a");
+      link.className =
+        "heading-link ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
+      link.href = "#" + heading.id;
+
+      const span = document.createElement("span");
+      span.ariaHidden = "true";
+      span.innerText = "#";
+      link.appendChild(span);
+      heading.appendChild(link);
+    }
+  }
+  addHeadingLinks();
+
+  function attachCopyButtons() {
+    const copyButtonLabel = "Copy";
+    const codeBlocks = Array.from(document.querySelectorAll("pre"));
+
+    for (const codeBlock of codeBlocks) {
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+
+      const computedStyle = getComputedStyle(codeBlock);
+      const hasFileNameOffset =
+        computedStyle.getPropertyValue("--file-name-offset").trim() !== "";
+
+      const topClass = hasFileNameOffset
+        ? "top-(--file-name-offset)"
+        : "-top-3";
+
+      const copyButton = document.createElement("button");
+      copyButton.className = `copy-code absolute end-3 ${topClass} rounded bg-muted border border-muted px-2 py-1 text-xs leading-4 text-foreground font-medium`;
+      copyButton.innerHTML = copyButtonLabel;
+      codeBlock.setAttribute("tabindex", "0");
+      codeBlock.appendChild(copyButton);
+
+      codeBlock?.parentNode?.insertBefore(wrapper, codeBlock);
+      wrapper.appendChild(codeBlock);
+
+      copyButton.addEventListener("click", async () => {
+        await copyCode(codeBlock, copyButton);
+      });
+    }
+
+    async function copyCode(block, button) {
+      const code = block.querySelector("code");
+      const text = code?.innerText;
+
+      await navigator.clipboard.writeText(text ?? "");
+
+      button.innerText = "Copied";
+
+      setTimeout(() => {
+        button.innerText = copyButtonLabel;
+      }, 700);
+    }
+  }
+  attachCopyButtons();
+
+  /** Accessible image lightbox for article images. */
+  function initLightbox() {
+    const article = document.getElementById("article");
+    if (!article) return;
+
+    const prefersReducedMotion = () =>
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let overlay = null;
+    let lastFocused = null;
+
+    // Defer attribute mutations so they don't push the LCP timestamp.
+    // Event listeners below use delegation and don't need the attributes to exist yet.
+    requestAnimationFrame(() => {
+      const images = Array.from(article.querySelectorAll("img"));
+      for (const image of images) {
+        if (image.closest("a")) continue;
+        image.setAttribute("role", "button");
+        image.setAttribute("tabindex", "0");
+        image.setAttribute("aria-haspopup", "dialog");
+        image.setAttribute(
+          "aria-label",
+          image.alt ? `Zoom image: ${image.alt}` : "Zoom image"
+        );
+      }
+    });
+
+    function open(src, alt, trigger) {
+      if (overlay) return;
+      lastFocused = trigger ?? document.activeElement;
+
+      overlay = document.createElement("div");
+      overlay.setAttribute("role", "dialog");
+      overlay.setAttribute("aria-modal", "true");
+      overlay.setAttribute(
+        "aria-label",
+        alt ? `Image preview: ${alt}` : "Image preview"
+      );
+      overlay.className =
+        "fixed inset-0 z-50 flex cursor-zoom-out items-center justify-center bg-black/70 backdrop-blur-sm opacity-0 transition-opacity duration-200 motion-reduce:transition-none";
+
+      const closeButton = document.createElement("button");
+      closeButton.type = "button";
+      closeButton.setAttribute("aria-label", "Close image preview");
+      closeButton.className =
+        "absolute end-4 top-4 rounded p-2 text-3xl leading-none text-white";
+      closeButton.innerHTML = "&#10005;";
+      closeButton.addEventListener("click", close);
+
+      const image = document.createElement("img");
+      image.src = src;
+      image.alt = "";
+      image.className =
+        "max-h-[90dvh] max-w-[90dvw] cursor-default object-contain";
+
+      overlay.append(closeButton, image);
+      overlay.addEventListener("click", e => {
+        if (e.target === overlay && currentScale <= 1) close();
+      });
+
+      let currentScale = 1;
+      let translateX = 0;
+      let translateY = 0;
+      let initialDist = 0;
+      let initialScale = 1;
+      let panStartX = 0;
+      let panStartY = 0;
+      let panStartTranslateX = 0;
+      let panStartTranslateY = 0;
+      let lastTapTime = 0;
+
+      function applyTransform() {
+        image.style.transform = `scale(${currentScale}) translate(${translateX}px, ${translateY}px)`;
+      }
+
+      function resetTransform() {
+        currentScale = 1;
+        translateX = 0;
+        translateY = 0;
+        image.style.transform = "";
+      }
+
+      overlay.addEventListener(
+        "touchstart",
+        e => {
+          const t = e.touches;
+          if (t.length === 2) {
+            initialDist = Math.hypot(
+              t[1].clientX - t[0].clientX,
+              t[1].clientY - t[0].clientY
+            );
+            initialScale = currentScale;
+          } else if (t.length === 1) {
+            const now = Date.now();
+            if (now - lastTapTime < 300) {
+              e.preventDefault();
+              if (currentScale > 1) {
+                resetTransform();
+              } else {
+                currentScale = 2;
+                translateX = 0;
+                translateY = 0;
+                applyTransform();
+              }
+              lastTapTime = 0;
+              panStartX = t[0].clientX;
+              panStartY = t[0].clientY;
+              panStartTranslateX = translateX;
+              panStartTranslateY = translateY;
+            } else {
+              lastTapTime = now;
+              if (currentScale > 1) {
+                panStartX = t[0].clientX;
+                panStartY = t[0].clientY;
+                panStartTranslateX = translateX;
+                panStartTranslateY = translateY;
+              }
+            }
+          }
+        },
+        { passive: false }
+      );
+
+      overlay.addEventListener(
+        "touchmove",
+        e => {
+          const t = e.touches;
+          if (t.length === 2) {
+            e.preventDefault();
+            const dist = Math.hypot(
+              t[1].clientX - t[0].clientX,
+              t[1].clientY - t[0].clientY
+            );
+            currentScale = Math.min(
+              4,
+              Math.max(1, initialScale * (dist / initialDist))
+            );
+            applyTransform();
+          } else if (t.length === 1) {
+            if (currentScale > 1) {
+              e.preventDefault();
+              translateX =
+                panStartTranslateX + (t[0].clientX - panStartX) / currentScale;
+              translateY =
+                panStartTranslateY + (t[0].clientY - panStartY) / currentScale;
+              const maxX = Math.max(
+                0,
+                (image.clientWidth - overlay.clientWidth / currentScale) / 2
+              );
+              const maxY = Math.max(
+                0,
+                (image.clientHeight - overlay.clientHeight / currentScale) / 2
+              );
+              translateX = Math.min(maxX, Math.max(-maxX, translateX));
+              translateY = Math.min(maxY, Math.max(-maxY, translateY));
+              applyTransform();
+            } else {
+              e.preventDefault();
+            }
+          }
+        },
+        { passive: false }
+      );
+
+      overlay.addEventListener("touchend", e => {
+        if (e.touches.length === 0 && currentScale <= 1.05) {
+          resetTransform();
+        }
+      });
+
+      overlay.addEventListener("touchcancel", e => {
+        if (e.touches.length === 0 && currentScale <= 1.05) {
+          resetTransform();
+        }
+      });
+
+      document.body.appendChild(overlay);
+      document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", onKeyDown);
+      window.__closeLightbox = close;
+
+      requestAnimationFrame(() => overlay?.classList.add("opacity-100"));
+      closeButton.focus();
+    }
+
+    function close() {
+      if (!overlay) return;
+      const el = overlay;
+      overlay = null;
+      window.__closeLightbox = null;
+
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+      lastFocused?.focus();
+      lastFocused = null;
+
+      if (prefersReducedMotion()) {
+        el.remove();
+        return;
+      }
+      const remove = () => el.remove();
+      el.addEventListener("transitionend", remove, { once: true });
+      setTimeout(remove, 250); // fallback in case transitionend never fires
+      el.classList.remove("opacity-100");
+    }
+
+    function onKeyDown(e) {
+      if (e.key === "Escape") {
+        close();
+      } else if (e.key === "Tab") {
+        trapFocus(e);
+      }
+    }
+
+    // Keep keyboard focus inside the open dialog.
+    function trapFocus(e) {
+      if (!overlay) return;
+      const focusables = overlay.querySelectorAll(
+        'a[href], button, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    function triggerFromEvent(e) {
+      const image = e.target.closest("img");
+      if (!image || !article.contains(image) || image.closest("a")) return null;
+      return image;
+    }
+
+    function activate(image) {
+      open(image.currentSrc || image.src, image.alt, image);
+    }
+
+    article.addEventListener("click", e => {
+      const image = triggerFromEvent(e);
+      if (!image) return;
+      e.preventDefault();
+      activate(image);
+    });
+
+    article.addEventListener("keydown", e => {
+      if (e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+      const image = triggerFromEvent(e);
+      if (!image) return;
+      e.preventDefault();
+      activate(image);
+    });
+  }
+  initLightbox();
+
+  if (!window.__lightboxSwapBound) {
+    window.__lightboxSwapBound = true;
+    document.addEventListener("astro:before-swap", () =>
+      window.__closeLightbox?.()
+    );
+  }
+
+  document.addEventListener("astro:after-swap", () =>
+    window.scrollTo({ left: 0, top: 0, behavior: "instant" })
+  );
+</script>

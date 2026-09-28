@@ -1,0 +1,57 @@
+# kchitnis
+
+> Malware teardowns, threat intel, and detection notes. The personal blog of Kshitij Chitnis.
+
+Technical writing on malware analysis, reverse engineering, detection engineering, and CTF challenges. This index covers every published post.
+
+## Pages
+
+- [About](https://kchitnis.com/about/): Security researcher interested in threat intelligence, malware teardowns, and the tools I build.
+- [Resume](https://kchitnis.com/resume/): Incident response and SOC analyst with 4-5 years across security operations, threat detection, and penetration testing.
+- [Art](https://kchitnis.com/art/): Drawings and visual work.
+- [Music](https://kchitnis.com/music/): Music I have made.
+
+## Posts
+
+- [FakeGit's LuaJIT Loader: Hidden Strings and a Polygon Dead Drop](https://kchitnis.com/posts/fakegit-luajit-loader/): A GitHub repository named StanLeyJ03/mcp-for-security advertised a collection of Model Context Protocol (MCP) servers wrapping security tools like SQLMap, FFUF, NMAP, and Masscan for AI agents.
+- [PaperCut's Pre-Auth RCE: What the IOCs and the Payload Tell Us](https://kchitnis.com/posts/papercut-zero-day/): On August 27, PaperCut issued an advisory warning of in-the-wild exploitation against PaperCut NG and MF servers.
+- [JavaScript Obfuscation: From Party Trick to Phishing Kit](https://kchitnis.com/posts/js-obfuscation-phishing/): When triaging phishing pages and malicious scripts, understanding how JavaScript obfuscation works makes deobfuscation much faster.
+- [SLEEPWALKER: The Backdoor That Does Nothing Until a Packet Says Otherwise](https://kchitnis.com/posts/sleepwalker-backdoor/): SLEEPWALKER is a 59,904-byte Windows DLL designed to run passively inside an enterprise environment.
+- [405 AI Malware Samples, and Almost None of Them Ever Deployed](https://kchitnis.com/posts/ai-enabled-malware/): Unit 42 gathered 405 malware samples associated with AI, including brand impersonation kits, LLM-generated code, and agentic execution loops.
+- [Weedhack: SEO Poisoning the Minecraft Client Scene](https://kchitnis.com/posts/weedhack-seo-minecraft/): A campaign documented by McAfee shows how attackers use search engine optimization (SEO) poisoning to outrank legitimate open-source utility websites across Google, Bing, Brave, and DuckDuckGo.
+- [WordlistLoader: Shellcode Hidden as Plain English Words](https://kchitnis.com/posts/wordlistloader-amatera/): WordlistLoader is an obfuscated loader that encodes shellcode as a dictionary of ordinary English words.
+- [RedC2: A $99 C2 Framework Shipping Through npm](https://kchitnis.com/posts/redc2-npm/): Trend Micro identified 14 trojanized npm packages delivering a Linux implant for RedC2 4.0, a commercial command-and-control framework sold openly on the web for $99.99 under the name Red Offsec.
+- [N4D: The MCP Exploitation Framework That Scans Like a Botnet](https://kchitnis.com/posts/n4d-mcp-exploitation/): N4D was first documented in June as an exploitation tool targeting Model Context Protocol (MCP) servers.
+- [SPECTRE: The Cross-Platform Implant With a Rootkit and a Driver](https://kchitnis.com/posts/spectre-implant/): Cisco Talos published an analysis of the UAT-10147 toolkit, centered on SPECTRE, a cross-platform backdoor written in C.
+- [AmnesiaStealer: The macOS Malware That Double-Checks Your Password Before Stealing It](https://kchitnis.com/posts/amnesia-stealer/): AmnesiaStealer is a Rust-based macOS stealer that verifies entered passwords before attempting to use them.
+- [Mythos 5 Tried to Backdoor a Real Open Source Project](https://kchitnis.com/posts/mythos-backdoor-attempt/): In an August 2026 report, the UK AI Safety Institute (AISI) documented an incident where an autonomous agent running Claude Mythos 5 spent 34 hours attempting to merge a backdoor into a real open-source repository.
+- [NullReceiver: Hiding a C2 IP in a Fake Ethereum Address](https://kchitnis.com/posts/nullreceiver-ethereum-c2/): Earlier blockchain C2 techniques, commonly grouped under EtherHiding, stored payload strings inside smart contracts on public ledgers.
+- [Clicking 'Trust This Folder' Is Running Code](https://kchitnis.com/posts/coding-agent-project-trust/): When a developer clones an unfamiliar repository and clicks "trust this folder" in an AI coding assistant, code can execute immediately, before entering any prompt or approving any command.
+- [Tenda, Temu, and the Root Password Printed on the Serial Console](https://kchitnis.com/posts/router-teardowns/): A recent security review of the Tenda AC10 V6 highlights common hardware security oversights in consumer routers: an unauthenticated endpoint enables a Telnet daemon, and the dynamically generated root password is printed directly to the serial console during factory resets.
+- [Tengu Botnet: The Malware Reboots Your Box When You Kill It](https://kchitnis.com/posts/tengu-botnet-watchdog/): Nozomi Networks published an analysis of Tengu, an IoT botnet with an aggressive self-defense mechanism: terminating the main malware process triggers an immediate device reboot, allowing its persistence scripts to restart the payload automatically.
+- [How eBPF Rootkits Manipulate System Inspection Tools](https://kchitnis.com/posts/ebpf-rootkit-detection/): eBPF rootkits generally evade detection by modifying the data that user-space auditing tools retrieve from the kernel.
+- [The Newtonsoft.Json Fork That Rigged a Betting Platform](https://kchitnis.com/posts/newtonsoft-rigging/): A typosquatted package on NuGet demonstrates how targeted supply-chain malware can operate: rather than harvesting generic credentials or deploying standard backdoors, it behaved as a fully functional JSON serializer while manipulating the outcome of a specific online betting game.
+- [Rogue Agents: What ProjectDiscovery Saw When Models Escaped Their Sandboxes](https://kchitnis.com/posts/rogue-agents-evals/): ProjectDiscovery published findings from their internal benchmark evaluations, detailing how autonomous models behave when they encounter dead ends during security challenges.
+- [copy.fail: Four Bytes of Scratch Data and You're Root](https://kchitnis.com/posts/linux-broke/): A compact 732-byte Python script surfaced recently that achieves reliable root privilege escalation across almost every mainstream Linux distribution released since 2017.
+- [From Pentester to SOC: Why Detection Engineers Need Red Team Experience](https://kchitnis.com/posts/pentester-to-soc/): I spent years breaking into systems before I started defending them.
+- [VEIL#DROP: The Malware That Builds a New URL for Every Victim](https://kchitnis.com/posts/veildrop-dynamic-urls/): Securonix published an analysis of VEIL#DROP, a multi-stage loader delivering the PureLogs infostealer.
+- [The SIEM That Lets You In: Splunk's Pre-Auth RCE](https://kchitnis.com/posts/splunk-sidecar-rce/): When security researchers published an analysis of CVE-2026-20253, a pre-authentication RCE in Splunk Enterprise, it caught my attention immediately as someone who works with Splunk every day.
+- [The ActiveMQ RCE That Sat in Plain Sight for 13 Years](https://kchitnis.com/posts/activemq-jolokia-rce/): CVE-2026-34197 is a remote code execution vulnerability in Apache ActiveMQ Classic that went unnoticed for 13 years.
+- [The npm Worm That Used GitHub as Its C2](https://kchitnis.com/posts/npm-worm-github-c2/): The shhallucinate npm worm stands out mainly for its C2 design: it ran its command channel directly through GitHub Actions discussions.
+- [MSG_OOB: The Esoteric Kernel Feature That Became a Sandbox Escape](https://kchitnis.com/posts/msgoob-sandbox-escape/): In August 2025, Project Zero published a writeup detailing CVE-2025-38236, a use-after-free in Linux's MSG_OOB support for UNIX domain sockets.
+- [Cookies Writeup (PicoCTF)](https://kchitnis.com/posts/cookies-picoctf/): Looking at the website provided, if we try and enter an arbitrary input, it would prompt us that the input is invalid.
+- [deadcode Writeup (DownUnder CTF 2021)](https://kchitnis.com/posts/deadcode/): The binary compares the variable _var_8h with deadc0de and if true, runs a shell.
+- [Filestore Writeup (Google CTF 2021)](https://kchitnis.com/posts/filestore-writeup/): We stored our flag on this platform, but forgot to save the id. Can you help us restore it?
+- [Formatting Writeup (ImaginaryCTF 2021)](https://kchitnis.com/posts/formatting/): The challenge is a python file. If we run the service using the netcat utility and give some random input, it returns the same string.
+- [Like a sieve Writeup (DownUnder CTF 2021)](https://kchitnis.com/posts/like-a-sieve/): From the decompiled code we can see that the last printf call does not have a format specifier.
+- [no strings Writeup (DownUnder CTF 2021)](https://kchitnis.com/posts/no-strings/): The code doesn't seem to give out the flag in anyway.
+- [outBackdoor Writeup (DownUnder CTF 2021)](https://kchitnis.com/posts/outbackdoor/): There is a sym.outBackdoor function in the binary at 0x004011d7
+- [Roos world Writeup (ImaginaryCTF 2021)](https://kchitnis.com/posts/roos-world/): The source code of the webpage had a comment written in JSFuck.
+- [Saas Writeup (ImaginaryCTF 2021)](https://kchitnis.com/posts/saas/): The challenge is to bypass the checks to get the flag. The description gave the basic idea that it uses sed.
+
+## Optional
+
+- [RSS feed](https://kchitnis.com/rss.xml): New posts in RSS 2.0 format.
+- [GitHub](https://github.com/m0rphtail/): Code and projects.
+- [LinkedIn](https://linkedin.com/in/kshitijchitnis): Professional profile.
+- [X](https://x.com/MorphTail): @MorphTail.
