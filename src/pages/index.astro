@@ -1,7 +1,9 @@
 ---
+import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import { getRelativeLocaleUrl } from "astro:i18n";
 import IconArrowRight from "@/assets/icons/IconArrowRight.svg";
+import seascape from "@/assets/images/home/seascape-with-lighthouse.webp";
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
@@ -61,6 +63,19 @@ const homePath = getRelativeLocaleUrl(locale, "");
           </div>
         )
       }
+
+      <Image
+        src={seascape}
+        priority
+        alt="Watercolor of a rocky coastline with a lighthouse and a sailboat with red sails beneath a cloudy sky."
+        widths={[720, 1440]}
+        sizes="(max-width: 768px) 100vw, 768px"
+        class="mt-6 h-[210px] w-full rounded-lg object-cover object-[center_45%]"
+      />
+      <p class="text-muted-foreground mt-2 text-xs italic">
+        Seascape with Lighthouse, attributed to James Bulwer · National Gallery
+        of Art, Rosenwald Collection
+      </p>
     </section>
 
     {

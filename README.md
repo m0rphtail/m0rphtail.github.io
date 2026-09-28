@@ -68,25 +68,25 @@ Content folders starting with `_` are for organization only: their name is dropp
 
 ## Where to change things
 
-| I want to change...          | Edit this                                                                               |
-| ---------------------------- | --------------------------------------------------------------------------------------- |
-| Site title, URL, description | `astro-paper.config.ts` under `site:`                                                   |
-| Social icons (header/footer) | `astro-paper.config.ts` under `socials:`                                                |
-| Share buttons on posts       | `astro-paper.config.ts` under `shareLinks:`                                             |
-| Posts per page / on homepage | `astro-paper.config.ts` under `posts:`                                                  |
-| Search, back button          | `astro-paper.config.ts` under `features:`                                               |
-| Site colors, light and dark  | `src/styles/theme.css`                                                                  |
-| Code-block colors            | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below |
-| Font                         | `astro.config.ts` under `fonts:`                                                        |
-| Nav menu items               | `src/components/Header.astro` (hardcoded list)                                          |
-| Favicon + icons              | `public/` (see "Favicon" below)                                                         |
-| Domain                       | `public/CNAME`                                                                          |
-| Footer text                  | `src/i18n/lang/en.ts` under `footer:`                                                   |
-| About page                   | `src/content/pages/about.md`                                                            |
-| Resume page                  | `src/content/pages/resume.md`                                                           |
-| Art page (gallery)           | `src/content/pages/art.mdx`                                                             |
-| Music page (players)         | `src/content/pages/music.md`                                                            |
-| Homepage intro text          | `src/pages/index.astro`                                                                 |
+| I want to change...            | Edit this                                                                               |
+| ------------------------------ | --------------------------------------------------------------------------------------- |
+| Site title, URL, description   | `astro-paper.config.ts` under `site:`                                                   |
+| Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`                                                |
+| Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`                                             |
+| Posts per page / on homepage   | `astro-paper.config.ts` under `posts:`                                                  |
+| Search, back button            | `astro-paper.config.ts` under `features:`                                               |
+| Site colors, light and dark    | `src/styles/theme.css`                                                                  |
+| Code-block colors              | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below |
+| Font                           | `astro.config.ts` under `fonts:`                                                        |
+| Nav menu items                 | `src/components/Header.astro` (hardcoded list)                                          |
+| Favicon + icons                | `public/` (see "Favicon" below)                                                         |
+| Domain                         | `public/CNAME`                                                                          |
+| Footer text                    | `src/i18n/lang/en.ts` under `footer:`                                                   |
+| About page                     | `src/content/pages/about.md`                                                            |
+| Resume page                    | `src/content/pages/resume.md`                                                           |
+| Art page (gallery)             | `src/content/pages/art.mdx`                                                             |
+| Music page (players)           | `src/content/pages/music.md`                                                            |
+| Homepage intro text + hero art | `src/pages/index.astro` (hero image lives in `src/assets/images/home/`)                 |
 
 ## Writing posts
 
