@@ -1,5 +1,7 @@
 # build output
 dist/
+# scratch copies of build output (e.g. kept aside for a diff)
+dist-*/
 
 # generated types
 .astro/

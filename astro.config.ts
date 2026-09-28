@@ -33,6 +33,8 @@ export default defineConfig({
     // namespace so existing links and search results survive the cutover.
     "/blogs/[...slug]": "/posts/[...slug]",
     "/blogs": "/posts",
+    // Old site exposed a single sitemap.xml; point it at the new sitemap index.
+    "/sitemap.xml": "/sitemap-index.xml",
   },
   i18n: {
     locales: ["en"],
