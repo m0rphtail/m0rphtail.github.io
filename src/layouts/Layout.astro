@@ -170,6 +170,9 @@ const rssHref = getRelativeLocaleUrl(
       data-goatcounter="https://kchitnis.goatcounter.com/count"
       src={getAssetPath("js/count.js")}></script>
 
+    <!-- LLM/agent index — tells agents where the llms.txt overview lives. -->
+    <link rel="describedby" href={getAssetPath("llms.txt")} />
+
     <ClientRouter />
   </head>
   <body
