@@ -5,7 +5,7 @@ description: "Security researcher interested in threat intelligence, malware tea
 
 I'm Kshitij Chitnis, a security researcher interested in threat intelligence. Most of what I do looks like this: taking apart malware, following threat actors, and building small tools when the existing ones aren't enough.
 
-It started with taking things apart as a kid. Toys first, then websites, then anything else in reach. At some point "how does this work" turned into "how would I break this," and the question stuck. I studied Information Technology at Pune University and Cybersecurity at Stevens Institute of Technology. Started out in penetration testing, and later moved to the defensive side. I'm glad I've seen both. Knowing how an attack works on the way in makes me better at catching it on the way out. Every year in this field shows me how much I still don't know, which is honestly the best part of it.
+It started with taking things apart as a kid. Toys first, then websites, then anything else in reach. At some point _"how does this work"_ turned into _"how would I break this"_ and the question stuck. I studied Information Technology at Pune University and Cybersecurity at Stevens Institute of Technology. Started out in penetration testing, and later moved to the defensive side. I'm glad I've seen both. Knowing how an attack works on the way in makes me better at catching it on the way out. Every year in this field shows me how much I still don't know, which is honestly the best part of it.
 
 The posts here are that curiosity written down: malware teardowns, threat intelligence, and everything in between.
 
