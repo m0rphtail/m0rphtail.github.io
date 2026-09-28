@@ -24,7 +24,9 @@ const t = useTranslations(locale);
 
   <Main pageTitle={t.pages.postsTitle} pageDesc={t.pages.postsDesc}>
     <ul>
-      {sortedPosts.map(data => <Card {...data} />)}
+      {sortedPosts.map(data => (
+        <Card {...data} />
+      ))}
     </ul>
   </Main>
 

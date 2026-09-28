@@ -103,14 +103,9 @@ const rssHref = getRelativeLocaleUrl(
     <!-- Extra head content injected by child layouts (e.g. JSON-LD, article meta) -->
     <slot name="head" />
 
-    {
-      site.googleVerification && (
-        <meta
-          name="google-site-verification"
-          content={site.googleVerification}
-        />
-      )
-    }
+    {site.googleVerification && (
+      <meta name="google-site-verification" content={site.googleVerification} />
+    )}
 
     <!--
       Inline FOUC-prevention script: sets data-theme on <html> before
@@ -130,7 +125,6 @@ const rssHref = getRelativeLocaleUrl(
         window.__theme = { value: theme };
       })();
     </script>
-
     <!--
       Analytics — GoatCounter. The stock snippet only counts full page
       loads; this block also counts client-side navigations by re-firing
@@ -168,16 +162,14 @@ const rssHref = getRelativeLocaleUrl(
       is:inline
       async
       data-goatcounter="https://kchitnis.goatcounter.com/count"
-      src={getAssetPath("js/count.js")}></script>
-
+      src={getAssetPath("js/count.js")}
+    ></script>
     <!-- LLM/agent index — tells agents where the llms.txt overview lives. -->
     <link rel="describedby" href={getAssetPath("llms.txt")} />
 
     <ClientRouter />
   </head>
-  <body
-    class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col"
-  >
+  <body class="bg-background font-app text-foreground selection:bg-accent/75 selection:text-accent-foreground flex min-h-svh flex-col">
     <slot />
     <!--
       No-JS fallback pageview (1x1 pixel). The body placement is required:
