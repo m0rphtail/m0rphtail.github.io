@@ -2,7 +2,7 @@
 
 Personal site for Kshitij Chitnis. Blog posts, resume, art, and music pages. Built with [Astro](https://astro.build) on the [AstroPaper](https://github.com/satnaing/astro-paper) theme.
 
-Status: migration complete, cutover pending. `main` still serves the old Zola site; merging `clean-astro-migration` deploys the new build (see [Deployment](#deployment)).
+Status: live — `main` deploys to GitHub Pages (`gh-pages`) on every push via GitHub Actions (see [Deployment](#deployment)).
 
 ## Quick start
 
@@ -25,6 +25,27 @@ npx astro dev stop
 ```
 
 The dev server binds all interfaces, so it is reachable from other devices on the network at `http://192.168.1.16:4321`.
+
+## Dependencies and lockfiles
+
+CI installs with **pnpm** (`pnpm-lock.yaml`; the workflows pin pnpm 12.6.0). Local npm works too — keep both lockfiles in sync after any dependency change:
+
+```bash
+pnpm install                     # updates pnpm-lock.yaml — this is what CI uses
+npm install --package-lock-only  # updates package-lock.json
+```
+
+Two packages are pinned on purpose — don't bump them blindly:
+
+- `pagefind` / `@pagefind/default-ui` `1.5.0` — 1.5.2 still crashes on the Raspberry Pi used for local builds (`jemalloc: Unsupported system page size`; 16K pages). Retest on the Pi before bumping.
+- `typescript` `6.0.3` — `astro check` and typescript-eslint don't support TypeScript 7 yet.
+
+Everything else: `pnpm update --latest`, re-pin the two above, `prettier --write .`, then rehearse CI locally before pushing:
+
+```bash
+mkdir -p /tmp/rehearse && git archive HEAD | tar -x -C /tmp/rehearse
+cd /tmp/rehearse && pnpm install --frozen-lockfile && pnpm run lint && pnpm run format:check && pnpm run build
+```
 
 ## Project structure
 
@@ -164,11 +185,13 @@ The /posts page shows all posts on one page, newest first. No pagination.
 
 Search uses [Pagefind](https://pagefind.app/), which indexes the built site. Run `npm run build` at least once before the search page works in dev; the page shows a reminder otherwise.
 
-Pagefind is pinned to `1.5.0` on purpose. Newer versions crash on this Raspberry Pi with a jemalloc page-size error (the Pi uses 16K pages). Do not bump it without testing; older versions work fine on normal x86 CI runners too.
+Pagefind is pinned to `1.5.0` on purpose. Newer versions crash on this Raspberry Pi with a jemalloc page-size error (the Pi uses 16K pages); retested 2026-09-29 — 1.5.2 still crashes. Do not bump it without testing on the Pi; older versions work fine on normal x86 CI runners too.
 
 ## Analytics
 
 Pageviews are counted with [GoatCounter](https://www.goatcounter.com/) — dashboard at <https://kchitnis.goatcounter.com>. No cookies, no consent banner.
+
+Verified on the live site 2026-09-29 (beacons intercepted locally so no test traffic reached the endpoint): one count per navigation — initial load plus SPA navigations — with the correct page path and title in each beacon.
 
 The wiring is in `src/layouts/Layout.astro` and is SPA-aware: the theme navigates client-side (`ClientRouter`), and the stock snippet only counts full page loads, so an inline script sets `window.goatcounter` (endpoint, `no_onload`, `no_events`) and re-fires `goatcounter.count()` on every `astro:page-load` — initial load plus every navigation. Settings go on `window`, not just the script tag: the router's head swap removes the tag, and the script re-reads it at count time.
 
@@ -197,11 +220,9 @@ The previous KC-mark icon and the source upload are archived in the same backup 
 
 ## Deployment
 
-GitHub Pages serves this repo from the `gh-pages` branch, with the custom domain set by `public/CNAME`. HTTPS is enforced and the certificate is managed by GitHub.
+Live at <https://kchitnis.com>. GitHub Pages serves from `gh-pages` (custom domain via `public/CNAME`, HTTPS enforced). Every push to `main` runs `.github/workflows/deploy.yml`: pnpm 12.6.0 + Node 26 → lint → format check → build → publish `dist/` to `gh-pages` with JamesIves/github-pages-deploy-action (`clean: true`). The workflow pushes with the repo's `TOKEN` secret on purpose — a push authenticated with the default `GITHUB_TOKEN` does not trigger a GitHub Pages build, so the live site would silently keep serving the old deploy; the checkout step also sets `persist-credentials: false` so the two credentials can't conflict. Pull requests run `.github/workflows/ci.yml` (lint / format / build).
 
-Cutover: merge this branch into `main` (fast-forward — the branches have not diverged). The push to `main` triggers `.github/workflows/deploy.yml`, which installs with pnpm, runs lint, format check, and build, then publishes `dist/` to `gh-pages` using JamesIves/github-pages-deploy-action. The workflow authenticates the push with the repo's `TOKEN` secret on purpose: a push made with the default `GITHUB_TOKEN` does not trigger a GitHub Pages build, so the live site would silently keep serving the old deploy.
-
-Rollback: `zola-final` tags the last old-site build on `gh-pages` — `git push --force origin zola-final:gh-pages` restores it. A pre-cutover git bundle and commit SHAs are archived outside the repo in `~/backups/site-cutover-2026-09-28/`.
+Rollback: `zola-final` tags the last old-Zola build on `gh-pages` — `git push --force origin zola-final:gh-pages` restores it. The pre-cutover git bundle and SHAs are archived at `~/backups/site-cutover-2026-09-28/`.
 
 URL compatibility: the old site served posts at `/blogs/<slug>/`; this build serves `/posts/<slug>/`. The `redirects` map in `astro.config.ts` emits a static redirect page for every post plus the listing and the old `/sitemap.xml` path (37 total, `noindex` so search engines and pagefind skip them), so old links keep working after cutover. If a post moves again, add a matching entry there. Old top-level pages (`/about/`, `/art/`, `/music/`, `/resume/`) kept their paths and need no redirect.
 
