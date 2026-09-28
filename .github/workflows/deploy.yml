@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+# Builds the site on every push to main and publishes dist/ to the gh-pages
+# branch, which is the branch GitHub Pages serves (Settings -> Pages).
+# The legacy Zola workflow this replaces did the same thing via shalzz/zola-deploy-action.
+# Rollback: git push --force origin zola-final:gh-pages (re-publishes the previous live build).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# The repo's default workflow permissions are read-only; grant write access
+# for the gh-pages push (the token input below takes precedence, but keep this
+# so the job still works if it ever falls back to GITHUB_TOKEN).
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-deploy
+  # Let an in-flight deploy finish; a newer queued run supersedes older queued ones.
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build & deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: "☁️ Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          # Keep the checkout token out of the local git config: the deploy
+          # step pushes with the TOKEN secret, and a persisted GITHUB_TOKEN
+          # credential can conflict with that push (documented by the action).
+          persist-credentials: false
+
+      - name: "📦 Install pnpm"
+        uses: pnpm/action-setup@v4
+        with:
+          version: "11.3.0"
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: "📦 Install dependencies"
+        run: pnpm install --frozen-lockfile
+
+      - name: "🔎 Lint code"
+        run: pnpm run lint
+
+      - name: "📝 Checking code format"
+        run: pnpm run format:check
+
+      - name: "🚀 Build the project"
+        run: pnpm run build
+
+      - name: "🚀 Deploy to gh-pages"
+        uses: JamesIves/github-pages-deploy-action@v4.9.0
+        with:
+          branch: gh-pages
+          folder: dist
+          clean: true
+          # Use the repo's TOKEN secret (a PAT), not the default GITHUB_TOKEN:
+          # a GITHUB_TOKEN-authenticated push does not trigger a GitHub Pages
+          # build, so the live site would silently keep serving the old deploy.
+          token: ${{ secrets.TOKEN }}
