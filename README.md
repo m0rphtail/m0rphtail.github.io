@@ -40,10 +40,10 @@ public/                 Static files, copied as-is to the site root
 src/
   assets/
     icons/              UI icons and socials/*.svg used by the theme
-    images/             Images imported by pages (theme art + art/ gallery)
+    images/             Images imported by pages (hero, about, art gallery)
   components/           Reusable UI pieces (Header, Footer, Card, ...)
   content/
-    pages/              Standalone pages (about.md, art.mdx, music.md)
+    pages/              Standalone pages (about.mdx, art.mdx, music.md)
     posts/              Blog posts (all your content lives here)
   i18n/                 UI strings, English text in lang/en.ts
   layouts/              Page shells (Layout.astro, PostLayout.astro)
@@ -82,7 +82,7 @@ Content folders starting with `_` are for organization only: their name is dropp
 | Favicon + icons                | `public/` (see "Favicon" below)                                                         |
 | Domain                         | `public/CNAME`                                                                          |
 | Footer text                    | `src/i18n/lang/en.ts` under `footer:`                                                   |
-| About page                     | `src/content/pages/about.md`                                                            |
+| About page                     | `src/content/pages/about.mdx` (image in `src/assets/images/about/`)                     |
 | Resume page                    | `src/content/pages/resume.md`                                                           |
 | Art page (gallery)             | `src/content/pages/art.mdx`                                                             |
 | Music page (players)           | `src/content/pages/music.md`                                                            |
