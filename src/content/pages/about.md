@@ -1,10 +1,12 @@
 ---
 title: "About"
-description: "A bit about me."
+description: "Security operations, malware analysis, and the tools I build."
 ---
 
-I'm Kshitij Chitnis. I work in security operations, mostly detection and response.
+I'm Kshitij Chitnis. I work in security operations, focused on detection and response.
 
-I've always liked taking things apart. These days the things are malware. The best part is when a sample starts making sense: what it does, how it hides, where it calls home. Most of what I write starts with a question I couldn't leave alone.
+I started out in penetration testing and moved to the defensive side, where I've been since. I like looking at an attack from both directions: how it works and what it leaves behind for a defender to notice.
 
-Before this I did threat detection and penetration testing. I studied IT in Pune and cybersecurity at Stevens Institute of Technology. I also play CTFs, build small tools, make music as Morphtail, and draw when I get the chance. I'm a GNU/Linux fanatic and a FOSS evangelist.
+The posts here are malware teardowns, threat intelligence, and notes on the tools I build.
+
+I studied IT at Pune University and cybersecurity at Stevens Institute of Technology. Outside work I play CTFs, make music as Morphtail, and draw. I'm a GNU/Linux fanatic and a FOSS evangelist.
