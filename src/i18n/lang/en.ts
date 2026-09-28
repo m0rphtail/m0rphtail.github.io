@@ -30,7 +30,7 @@ export default {
   },
   home: {
     socialLinks: "Social Links",
-    featured: "Featured",
+    featured: "Featured Blogs",
     recentPosts: "Recent Blogs",
     allPosts: "All Blogs",
   },
