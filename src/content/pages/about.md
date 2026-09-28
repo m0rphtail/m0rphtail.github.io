@@ -3,8 +3,8 @@ title: "About"
 description: "A bit about me."
 ---
 
-My journey into cybersecurity began with childhood curiosity - a desire to understand how things work. From dismantling toys to exploring websites, my interests naturally evolved into coding and ethical hacking. This passion led me through a Bachelor's in Information Technology and a Master's in Cybersecurity from Stevens Institute of Technology.
+I'm Kshitij Chitnis. I work in security operations, mostly detection and response.
 
-Each step has been a humble learning experience, reminding me of the vast knowledge still to be discovered in this field. Even now, I'm constantly learning, eager to explore new technologies and methodologies.
+I've always liked taking things apart. These days the things are malware. The best part is when a sample starts making sense: what it does, how it hides, where it calls home. Most of what I write starts with a question I couldn't leave alone.
 
-As I continue to navigate the intricate landscape of cybersecurity, I'm driven by the thrill of the unknown and the pursuit of innovative solutions to the world's most pressing security challenges.
+Before this I did threat detection and penetration testing. I studied IT in Pune and cybersecurity at Stevens Institute of Technology. I also play CTFs, build small tools, make music as Morphtail, and draw when I get the chance. I'm a GNU/Linux fanatic and a FOSS evangelist.
