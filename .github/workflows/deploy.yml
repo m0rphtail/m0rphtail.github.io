@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # Keep the checkout token out of the local git config: the deploy
           # step pushes with the TOKEN secret, and a persisted GITHUB_TOKEN
@@ -37,14 +37,14 @@ jobs:
           persist-credentials: false
 
       - name: "📦 Install pnpm"
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
-          version: "11.3.0"
+          version: "12.6.0"
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          # Matches the runtime the build was rehearsed on (Node 26 + pnpm 11.3.0).
+          # Matches the runtime the build was rehearsed on (Node 26 + pnpm 12.6.0).
           node-version: "26"
           cache: "pnpm"
 

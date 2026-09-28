@@ -20,17 +20,17 @@ jobs:
 
     steps:
       - name: "☁️ Checkout repository"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: "📦 Install pnpm"
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
-          version: "11.3.0"
+          version: "12.6.0"
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          # Matches the deploy workflow (and the runtime the build was rehearsed on).
+          # Matches the deploy workflow and the local runtime (Node 26).
           node-version: "26"
           cache: "pnpm"
 
