@@ -1,105 +1,116 @@
 ---
 title: "Resume"
-description: "Kshitij Chitnis - security engineer and CTF player."
+description: "Incident response and SOC analyst with 4-5 years across security operations, threat detection, and penetration testing."
 ---
 
-> A developer, hacker, CTF player and learner, with a masters in Cybersecurity and experience as a CyberSecurity Analyst and Penetration Tester. Also a huge GNU/linux fanatic and FOSS evangelist.
+## Summary
+
+Incident response and SOC analyst with 4-5 years across security operations, threat detection, and penetration testing. Most recently at TD Bank, a top-10 North American bank: triaged 20-25 alerts daily across Microsoft Sentinel, Splunk, Defender, and CrowdStrike, correlating endpoint, network, identity, DLP, and UEBA telemetry, and cut false positives **30%** by tuning SIEM detections and EDR policies. Before that, built custom detections from threat feeds at FileHive and spent two years in offensive security finding **200+** vulnerabilities.
 
 ---
 
 ## Skills
 
-- **Programming Languages:** Assembly, Bash, C, C++, Go, Java, Javascript, Perl, Python, Ruby, Rust, SQL.
-- **Platforms:** Linux, Windows, MacOS, AWS, GCP, Azure Sentinel, Active Directory, FortiGate, Docker, Palo Alto Firewall, Akamai, Theia.
-- **Tools:** Git, Ghidra, GDB, IDA, BurpSuite, Metasploit, Wireshark, IBM Qradar, Splunk, Shodan, NetCat, Nessus, Nikto, Hydra, Yara, Symantec, Crowdstrike, XSOAR.
-- **Frameworks:** NIST Cybersecurity Framework (CSF), OWASP Top 10, MITRE ATT&CK, ISO 27001, SANS, Cyber Kill Chain.
-- **Others:** IR, SOC, EDR, SIEM, Github, GitLab, IAM, SOAR, Automation, Log Analysis.
-
----
-
-## Certifications
-
-- CompTIA Security+
-- Fortinet Certified Associate in Cybersecurity
-- Google Cybersecurity
-- IBM Cybersecurity Analyst
-
----
-
-## Education
-
-- **Masters of Science, Cybersecurity** \
-  Stevens Institute of Technology, Hoboken, NJ, USA
-
-- **Bachelors of Engineering, Information Technology** \
-  Pune University, Pune, India
+- **Languages & Scripting:** Python, Bash, PowerShell, SQL, Go, C, C++, Rust
+- **Security Operations:** SOC, Incident Response, Log Analysis, IOC Analysis, Phishing Analysis, Vulnerability Management, Network Security, DLP, UEBA
+- **SIEM & Detection:** Splunk, Microsoft Sentinel, Sigma, KQL, YARA, Detection-as-Code
+- **EDR & SOAR:** CrowdStrike Falcon, Microsoft Defender, SentinelOne, XDR, MDR, XSOAR, SOAR, Threat Hunting
+- **Cloud & Identity:** AWS, GCP, Azure, Kubernetes, Docker, Active Directory, Entra ID, Okta, IAM, Cloud Security, Zero Trust
+- **Threat Intelligence & Frameworks:** MITRE ATT&CK, Cyber Kill Chain, Diamond Model, NIST CSF, ISO 27001, OWASP Top 10, TTP Analysis, CTI, VirusTotal
+- **AI Security:** MITRE ATLAS, NIST AI RMF, OWASP Top 10 for LLM Applications, OWASP MCP Top 10, AI Kill Chain
+- **DFIR & Malware Analysis:** Digital Forensics, Memory Forensics, Volatility, Velociraptor, Malware Analysis, Reverse Engineering, YARA
+- **Analysis & Offensive Tools:** Ghidra, IDA, Frida, JADX, Burp Suite, Metasploit, Nessus, Wireshark
+- **Automation & Infrastructure:** Terraform, Ansible, GitHub Actions, CI/CD, Git, GitHub, Linux, Windows, ServiceNow
 
 ---
 
 ## Work Experience
 
-### Information Security Analyst I @ TD Bank
+### Information Security Analyst — TD Bank <span style="float:right">12/2024 – 05/2026</span>
 
-- Investigate Cybersecurity Incidents and Cybersecurity Events and perform root cause analysis.
-- Collect indicators and escalate finding for containment and recovery
-- Contribute to the definition, development, and oversight of a global security management strategy and frameworks.
-- Ensure technology, processes, and governance are in place to monitor, detect, prevent, and react to both current and emerging technology and security threats against the business.
-- Contribute to development of on-going operational enhancements for Cybersecurity including alerting, monitoring, and detection across multiple security domains.
-- Adhere to internal policies and procedures, technology control standards, and applicable regulatory guidelines.
-- Contribute to the review of internal processes and activities and assist in identifying potential opportunities for improvement.
-- Adhere to, advise, oversee, monitor and enforce enterprise frameworks and methodologies that relate to technology controls / information security activities.
-- Reduce risk and foster a strong technology risk management culture throughout the enterprise.
+- Triaged 20-25 alerts daily across Microsoft Sentinel, Splunk, Defender, and CrowdStrike, correlating endpoint, network, identity, DLP, and UEBA telemetry to identify true positives, contain threats, and drive root-cause analysis inside a top-10 North American bank.
+- Tuned SIEM detections and EDR policies to cut false positives by **30%** and improve MTTD/MTTR, with SOAR (XSOAR) playbooks automating alert enrichment and containment.
+- Standardized incident handling across the SOC with automated XSOAR IR playbooks.
+- Conducted phishing triage via PhishLabs, analyzing headers, URLs, and attachments to disposition suspected malicious email.
+- Enriched IOCs (domains, IPs, hashes, paths) and mapped activity to MITRE ATT&CK, feeding vetted indicators into threat intel and detection pipelines.
+- Developed Splunk dashboards that let L1/L2 analysts work alert queues faster.
+- Wrote Python and Bash automation for IOC handling and recurring triage workflows.
 
-### Threat Detection Analyst @ FileHive.io
+### Threat Detection Analyst — FileHive.io <span style="float:right">05/2023 – 08/2023</span>
 
-- Created custom detections using threat feed sources, managed version lifecycles in a GitHub repository, and leveraged Git and GitHub Actions.
-- Used honeypots (T-Pot and RDP) to collect basic threat telemetry and leveraged Red Canary's Atomic Red Team for pre-deployed, mapped tests.
-- Utilized Terraform for infrastructure provisioning and Ansible for configuring the ELK stack, ensuring a minimal reproducible detections environment.
+- Built custom detection rules from threat feed sources as detection-as-code with Git and GitHub Actions, so every rule had a version history and a repeatable deploy path.
+- Collected live adversary telemetry from T-Pot and RDP honeypots, and validated detections by replaying Atomic Red Team's mapped, pre-deployed attack tests.
+- Provisioned the detection environment with Terraform and Ansible so the full ELK detection pipeline could be rebuilt identically on demand.
 
-### Penetration Tester @ Newton's Apple Security Solutions
+### Penetration Tester — Newton's Apple Security Solutions <span style="float:right">02/2020 – 08/2022</span>
 
-- Executed penetration testing on critical infrastructures, reinforcing security for multinational corporations across diverse technologies.
-- Identified and resolved 200+ vulnerabilities in micro-services, web applications, and IoT devices, boosting system resilience.
-- Developed automated tools, streamlining workflows and saving 500 hours annually, enhancing operational efficiency by 30%.
-
-### Research Fellow @ Muellners Foundation
-
-- Evaluated blockchain APIs and DAO governance, increasing fintech security robustness by 25% through secure implementations.
-- Authored smart contract documentation, reducing technical support requests by 30% and improving integration efficiency.
-- Achieved 40% reduction in potential security incidents by identifying vulnerabilities and implementing preventive measures.
+- Identified and resolved **200+** vulnerabilities across micro-services, web applications, and IoT devices for multinational clients. That hands-on knowledge of how attacks chain now informs detection and response work.
+- Executed penetration tests on critical infrastructure for multinational corporations across diverse technologies.
+- Built automated tooling that saved **500 hours** annually and cut operational effort by **30%**.
 
 ---
 
 ## Projects
 
-### Automated Subdomain Recon Tool
+### triagedy — Jev-Powered Alert Triage
 
-- Designed a custom automated tool named Poseidon for comprehensive subdomain enumeration for any given domain, tested with over 50,000 subdomains.
-- Identified open ports on these subdomains, reducing the reconnaissance phase time by 50% in penetration testing.
-- Enhanced subdomain mapping and increased the efficiency of identification of assets by 40%.
+- Rust CLI that turns JSONL security alerts into typed, calibrated decision records via TypeSafe's Jev (System One) decision API. **Under 100ms per alert** (64 alerts in 6 seconds)
+- Benchmarked at **8/8 exact dispositions** on a labeled corpus. On 1,185 real Sysmon events from an attack capture, it ranked the single genuine attack **#1 of 64** by severity and closed all 63 benign alerts
+- Ingests Elastic ECS, CrowdStrike FDR, and Sysmon XML natively. Output order always matches input order, one bad record never kills the batch, and routing stays deterministic in unit-tested code
 
-### Firmware Dumping
+### Agentic Memory Forensics Tool
 
-- Extracted live firmware from embedded devices using the UART interface, analyzing firmware from over 10 different consumer devices like routers.
-- Conducted real-time system analysis and reverse engineering, identifying 6 critical firmware vulnerabilities and potential exploits.
-- Delivered critical insights into firmware vulnerabilities, reducing potential exploit risks by 30%.
+- LLM-orchestrated memory forensics agent: sequences Volatility 3 plugins (pslist, malfind, netscan, dlllist) from dump artifacts
+- Correlates output into ATT&CK-mapped findings (injected code, beaconing, persistence), emitting analyst-reviewable reports with confidence levels
+- Runs locally via Ollama on a Raspberry Pi 5; evaluated against known-malicious dumps for ground-truth accuracy and false positives
 
-### Network Intrusion Detection System with Suricata
+### STIX/TAXII Threat-Intel Pipeline
 
-- Installed and configured a Network Intrusion Detection System (NIDS) using Suricata on a virtual machine.
-- Developed a custom rule to detect ICMP ping traffic, enhancing the system's ability to monitor specific network activities.
-- Successfully tested the system by generating alerts and analyzing the detection results to ensure accurate threat identification.
+- Self-hosted MISP and OpenCTI wired as TAXII 2.1 clients, pulling structured STIX 2.1 intel from abuse.ch, AlienVault OTX, and CISA on a schedule
+- Indicators pass a quality gate before anything moves: deduplication, confidence scoring, and indicator-type filtering weed out noise feeds
+- High-confidence indicators flow straight into SIEM detection rules automatically, so fresh intel reaches detections without an analyst retyping IOCs
 
-### ADS-B Aircraft Radar
+### Poseidon — Automated Subdomain Recon Tool
 
-- Implemented a real-time ADS-B aircraft radar system utilizing RTL-SDR technology.
-- Used the system to identify aircraft flying over the location, capturing real-time data.
-- Visualized aircraft movements, providing a clear representation of air traffic in the vicinity.
+- Custom automated subdomain recon tool, tested against **50,000+** subdomains
+- Enumerates subdomains and identifies open ports; reconnaissance-phase time dropped **50%** in penetration testing
+- Asset-identification efficiency rose **40%**
+
+### Android Malware Analysis Framework
+
+- Static analysis framework for Android samples: automated WebView and FileProvider exposure checks
+- Permission and component auditing (broadcast receivers, services)
+- Signature generation for common malware patterns and intent-based attacks
+
+### Firmware Dumping — UART Extraction
+
+- Extracted live firmware from 10+ consumer devices (routers and similar) over the UART interface
+- Reverse-engineered extracted images with real-time system analysis
+- Found **6** critical firmware vulnerabilities and potential exploits, cutting potential exploit risk by **30%**
 
 ---
 
-## Awards
+## Education
 
-- Awarded a prize in the highly competitive Cytaka New York Capture The Flag (CTF) cybersecurity challenge.
-- As part of an elite CTF team, secured the top global ranking on CTF-Time.
-- Achieved a solo rank in the top 14.8% at the DownUnderCTF and ranked within the top 11.6% at the H@ctivityCon CTF.
+### Master of Science, Cybersecurity — Stevens Institute of Technology <span style="float:right">09/2022 – 05/2024</span>
+
+### Bachelor of Engineering, Information Technology — Pune University <span style="float:right">08/2018 – 06/2022</span>
+
+---
+
+## Certifications
+
+- CompTIA Security+ <span style="float:right">**07/2024**</span>
+- Fortinet Certified Associate in Cybersecurity <span style="float:right">**06/2024**</span>
+- Google Cybersecurity <span style="float:right">**09/2023**</span>
+- IBM Cybersecurity Analyst <span style="float:right">**06/2023**</span>
+
+---
+
+## Awards & Honors
+
+- Top global ranking on **CTFTime** <span style="float:right">**2020 - 2022**</span>
+- Runner up prize, **Cytaka New York CTF** <span style="float:right">**2022**</span>
+- Top 14.8% solo rank, **DownUnderCTF** <span style="float:right">**2021**</span>
+- Top 11.6% rank, **H@ctivityCon CTF** <span style="float:right">**2021**</span>
+- Volunteer, **BSides NYC** <span style="float:right">**2023, 2024, 2025**</span>

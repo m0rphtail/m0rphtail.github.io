@@ -140,7 +140,9 @@ If tags are ever wanted back: `~/backups/old-migration-2026-09-25/removed-tag-fe
 
 All three are content-collection pages served by `src/pages/[page].astro` — drop any new `.md`/`.mdx` file in `src/content/pages/` (except about, which has its own route) and it gets a route and breadcrumb automatically. Add a nav entry in `Header.astro` if it warrants one.
 
-The resume (`src/content/pages/resume.md`) is plain markdown: `##` sections, `###` entries, `---` rules between sections. Note the frontmatter `title` renders as the page h1, so job/project entries sit at `###` — don't jump straight to `#`. Same content as the old Zola site's `/resume` page.
+The resume (`src/content/pages/resume.md`) is plain markdown: `##` sections, `###` entries, `---` rules between sections. Note the frontmatter `title` renders as the page h1, so job/project entries sit at `###` — don't jump straight to `#`. Content mirrors the master CV (`~/HermesMemory/cv/kshitij-chitnis-master-cv.md`); when it changes, update this page from the same source.
+
+Dates sit flush right via inline spans, e.g. `### Information Security Analyst — TD Bank <span style="float:right">12/2024 – 05/2026</span>`. Works on headings (jobs, education) and list items (certifications, awards); bold wraps inside the span (`<span style="float:right">**07/2024**</span>`). Checked at 390px — no overflow, dates wrap cleanly under long entries.
 
 The art gallery (`src/content/pages/art.mdx`) uses Astro's `<Image>` component, so images live in `src/assets/images/art/` and are served hashed. Each needs real alt text. To add a piece: drop the file in that folder, add an import and an `<Image>` line.
 
