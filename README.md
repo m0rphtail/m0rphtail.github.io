@@ -2,7 +2,7 @@
 
 Personal site for Kshitij Chitnis. Blog posts, resume, art, and music pages. Built with [Astro](https://astro.build) on the [AstroPaper](https://github.com/satnaing/astro-paper) theme.
 
-Status: migration in progress. This branch (`clean-astro-migration`) is not live yet. The old Zola site still serves from `main` until the migration is finished and merged.
+Status: migration complete, cutover pending. `main` still serves the old Zola site; merging `clean-astro-migration` deploys the new build (see [Deployment](#deployment)).
 
 ## Quick start
 
@@ -57,7 +57,7 @@ src/
     typography.css      Prose styles for post content
   types/                Type definitions for the config
   utils/                Helpers: sorting, slug rules, etc.
-.github/                CI workflow (.github/workflows/ci.yml)
+.github/                CI + deploy workflows (ci.yml, deploy.yml)
 astro-paper.config.ts   MAIN SETTINGS: title, URL, socials, features
 astro.config.ts         Astro setup: integrations, markdown, fonts
 package.json            Scripts and dependencies
@@ -199,15 +199,17 @@ The previous KC-mark icon and the source upload are archived in the same backup 
 
 GitHub Pages serves this repo from the `gh-pages` branch, with the custom domain set by `public/CNAME`. HTTPS is enforced and the certificate is managed by GitHub.
 
-At the moment `gh-pages` is built from the old Zola site on `main`. This branch has no deploy workflow yet. When the migration is ready: merge to `main`, then add a GitHub Actions workflow that builds with npm and publishes `dist/` to `gh-pages`. Until then, nothing here is live.
+Cutover: merge this branch into `main` (fast-forward — the branches have not diverged). The push to `main` triggers `.github/workflows/deploy.yml`, which installs with pnpm, runs lint, format check, and build, then publishes `dist/` to `gh-pages` using JamesIves/github-pages-deploy-action. The workflow authenticates the push with the repo's `TOKEN` secret on purpose: a push made with the default `GITHUB_TOKEN` does not trigger a GitHub Pages build, so the live site would silently keep serving the old deploy.
 
-URL compatibility: the old site served posts at `/blogs/<slug>/`; this build serves `/posts/<slug>/`. The `redirects` map in `astro.config.ts` emits a static redirect page for every post plus the listing (36 total, `noindex` so search engines and pagefind skip them), so old links keep working after cutover. If a post moves again, add a matching entry there. Old top-level pages (`/about/`, `/art/`, `/music/`, `/resume/`) kept their paths and need no redirect.
+Rollback: `zola-final` tags the last old-site build on `gh-pages` — `git push --force origin zola-final:gh-pages` restores it. A pre-cutover git bundle and commit SHAs are archived outside the repo in `~/backups/site-cutover-2026-09-28/`.
+
+URL compatibility: the old site served posts at `/blogs/<slug>/`; this build serves `/posts/<slug>/`. The `redirects` map in `astro.config.ts` emits a static redirect page for every post plus the listing and the old `/sitemap.xml` path (37 total, `noindex` so search engines and pagefind skip them), so old links keep working after cutover. If a post moves again, add a matching entry there. Old top-level pages (`/about/`, `/art/`, `/music/`, `/resume/`) kept their paths and need no redirect.
 
 Posts don't show an edit link: `features.editPost` is disabled in `astro-paper.config.ts`. To bring it back, set `enabled: true` and point `url` at the repo's edit base (the theme default shape) — the link reappears under every post title.
 
 ## Porting posts from the old blog
 
-The old site's posts were converted to this format once, but only the good ones should come over. The full conversion is preserved outside the repo:
+All 35 posts from the old site are converted and committed in `src/content/posts/`. The conversion snapshot is kept outside the repo as a recovery net:
 
 - `~/backups/old-migration-2026-09-25/astro-migration.bundle` (git bundle with all 35 converted posts)
 - `~/backups/old-migration-2026-09-25/post-manifest.txt` (list of every converted post: file, title, date)
