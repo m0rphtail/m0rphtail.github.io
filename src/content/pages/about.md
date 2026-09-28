@@ -1,12 +1,14 @@
 ---
 title: "About"
-description: "Security operations, malware analysis, and the tools I build."
+description: "Security researcher interested in threat intelligence, malware teardowns, and the tools I build."
 ---
 
-I'm Kshitij Chitnis. I work in security operations, focused on detection and response.
+I'm Kshitij Chitnis, a security researcher interested in threat intelligence. Most of what I do looks like this: taking apart malware, following threat actors, and building small tools when the existing ones aren't enough.
 
-I started out in penetration testing and moved to the defensive side, where I've been since. I like looking at an attack from both directions: how it works and what it leaves behind for a defender to notice.
+It started with taking things apart as a kid. Toys first, then websites, then anything else in reach. At some point "how does this work" turned into "how would I break this," and the question stuck. I studied Information Technology at Pune University and Cybersecurity at Stevens Institute of Technology. Started out in penetration testing, and later moved to the defensive side. I'm glad I've seen both. Knowing how an attack works on the way in makes me better at catching it on the way out. Every year in this field shows me how much I still don't know, which is honestly the best part of it.
 
-The posts here are malware teardowns, threat intelligence, and notes on the tools I build.
+The posts here are that curiosity written down: malware teardowns, threat intelligence, and everything in between.
 
-I studied IT at Pune University and cybersecurity at Stevens Institute of Technology. Outside work I play CTFs, make music as Morphtail, and draw. I'm a GNU/Linux fanatic and a FOSS evangelist.
+Outside of security I keep a lot going, mostly because I'd rather be curious than bored. I'm an aviation geek, which is how I got into ADS-B and flight tracking, and from there into radio: SDR, signals, the SIGINT side of things. I tinker with firmware and electronics, mostly around ESP32 boards, and those projects drift toward robotics more often than not. I run a homelab on a Raspberry Pi that hosts most of my services, and it's also where I test AI agents and run local models, since they're useful and a security problem worth paying attention to. I play CTFs, I've volunteered at BSides NYC three years running, and I'm a GNU/Linux fanatic and a FOSS evangelist.
+
+None of these feel like separate hobbies to me. Security, radio, aviation, art, music: it's all the same question pointed at different things. How does this work, and what happens when I poke it?
