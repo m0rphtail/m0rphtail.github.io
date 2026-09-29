@@ -4,7 +4,7 @@ export default defineAstroPaperConfig({
   site: {
     url: "https://kchitnis.com/",
     title: "kchitnis",
-    description: "Malware teardowns, threat intel, and detection notes.",
+    description: "Personal Blog",
     author: "Kshitij Chitnis",
     profile: "https://kchitnis.com",
     lang: "en",
