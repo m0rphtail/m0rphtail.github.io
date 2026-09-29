@@ -41,18 +41,15 @@
 
     /* Right-floating date spans (resume rows) escape a normal li/h3 box:
        the float paints past the element's bottom edge onto the next row.
-       flow-root gives the row a BFC so the float stays inside it;
-       list rows additionally keep the bullet marker via flow-root list-item
-       (plain flow-root on an h3 would strip nothing, but list-item on an h3
-       would ADD a bullet — so the two get distinct displays). */
-    h3:has(> span[style*="float"]) {
-      display: flow-root;
-    }
-
-    li:has(> span[style*="float"]) {
-      /* two-value display: spec order is `list-item flow-root` — Chromium
-         parses either order, WebKit drops `flow-root list-item` entirely */
-      display: list-item flow-root;
+       WebKit ignores the flow-root half of two-value display (WebKit bug
+       224809 — <display-listitem> unimplemented), so the row can't become a
+       BFC without losing its bullet marker. A ::after clearfix is the
+       universal containment: extends the row's box past the float in every
+       engine while ::marker stays intact. */
+    :is(h3, li):has(> span[style*="float"])::after {
+      content: "";
+      display: block;
+      clear: both;
     }
 
     hr {
