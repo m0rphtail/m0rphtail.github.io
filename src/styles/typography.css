@@ -50,7 +50,9 @@
     }
 
     li:has(> span[style*="float"]) {
-      display: flow-root list-item;
+      /* two-value display: spec order is `list-item flow-root` — Chromium
+         parses either order, WebKit drops `flow-root list-item` entirely */
+      display: list-item flow-root;
     }
 
     hr {
