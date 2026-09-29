@@ -34,9 +34,18 @@ const navLabels: Record<string, string> = {
   search: t.nav.search,
 };
 
-// if breadcrumb is Home > Posts, keep it as the localized label
+// if breadcrumb is Home > Posts, keep it as the localized label.
+// On paginated pages (eg /posts/2) show "Posts (page 2)"; page 1
+// renders as plain "Posts" because Astro emits /posts/1 → /posts/.
 if (breadcrumbList[0] === "posts") {
-  breadcrumbList.splice(0, 2, t.nav.posts);
+  const pageNum = Number(breadcrumbList[1]);
+  breadcrumbList.splice(
+    0,
+    2,
+    `${t.nav.posts} ${
+      pageNum > 1 ? `(${t.pagination.page.toLowerCase()} ${pageNum})` : ""
+    }`.trim()
+  );
 }
 ---
 
