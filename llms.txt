@@ -1,6 +1,6 @@
 # kchitnis
 
-> Malware teardowns, threat intel, and detection notes. The personal blog of Kshitij Chitnis.
+> Personal Blog The personal blog of Kshitij Chitnis.
 
 Technical writing on malware analysis, reverse engineering, detection engineering, and CTF challenges. This index covers every published post.
 
