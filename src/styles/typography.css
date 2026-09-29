@@ -39,6 +39,20 @@
       @apply marker:text-accent;
     }
 
+    /* Right-floating date spans (resume rows) escape a normal li/h3 box:
+       the float paints past the element's bottom edge onto the next row.
+       flow-root gives the row a BFC so the float stays inside it;
+       list rows additionally keep the bullet marker via flow-root list-item
+       (plain flow-root on an h3 would strip nothing, but list-item on an h3
+       would ADD a bullet — so the two get distinct displays). */
+    h3:has(> span[style*="float"]) {
+      display: flow-root;
+    }
+
+    li:has(> span[style*="float"]) {
+      display: flow-root list-item;
+    }
+
     hr {
       @apply border-border;
     }
