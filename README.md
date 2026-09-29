@@ -89,26 +89,26 @@ Content folders starting with `_` are for organization only: their name is dropp
 
 ## Where to change things
 
-| I want to change...            | Edit this                                                                               |
-| ------------------------------ | --------------------------------------------------------------------------------------- |
-| Site title, URL, description   | `astro-paper.config.ts` under `site:`                                                   |
-| Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`                                                |
-| Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`                                             |
-| External links (new-tab)       | `astro.config.ts` under `rehypePlugins` + `src/components/Socials.astro`                |
-| Posts per page / on homepage   | `astro-paper.config.ts` under `posts:`                                                  |
-| Search, back button            | `astro-paper.config.ts` under `features:`                                               |
-| Site colors, light and dark    | `src/styles/theme.css`                                                                  |
-| Code-block colors              | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below |
-| Font                           | `astro.config.ts` under `fonts:`                                                        |
-| Nav menu items                 | `src/components/Header.astro` (hardcoded list)                                          |
-| Favicon + icons                | `public/` (see "Favicon" below)                                                         |
-| Domain                         | `public/CNAME`                                                                          |
-| Footer text                    | `src/i18n/lang/en.ts` under `footer:`                                                   |
-| About page                     | `src/content/pages/about.mdx` (image in `src/assets/images/about/`)                     |
-| Resume page                    | `src/content/pages/resume.md`                                                           |
-| Art page (gallery)             | `src/content/pages/art.mdx`                                                             |
-| Music page (players)           | `src/content/pages/music.md`                                                            |
-| Homepage intro text + hero art | `src/pages/index.astro` (hero image lives in `src/assets/images/home/`)                 |
+| I want to change...            | Edit this                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------- |
+| Site title, URL, description   | `astro-paper.config.ts` under `site:`                                                             |
+| Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`                                                          |
+| Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`                                                       |
+| External links (new-tab)       | `astro.config.ts` under `rehypePlugins` + `src/components/Socials.astro`                          |
+| Posts per page / on homepage   | `astro-paper.config.ts` under `posts:` — `perPage` (blogs listing), `perIndex` (homepage recents) |
+| Search, back button            | `astro-paper.config.ts` under `features:`                                                         |
+| Site colors, light and dark    | `src/styles/theme.css`                                                                            |
+| Code-block colors              | `astro.config.ts` under `shikiConfig:` — except the dark panel, see "Code blocks" below           |
+| Font                           | `astro.config.ts` under `fonts:`                                                                  |
+| Nav menu items                 | `src/components/Header.astro` (hardcoded list)                                                    |
+| Favicon + icons                | `public/` (see "Favicon" below)                                                                   |
+| Domain                         | `public/CNAME`                                                                                    |
+| Footer text                    | `src/i18n/lang/en.ts` under `footer:`                                                             |
+| About page                     | `src/content/pages/about.mdx` (image in `src/assets/images/about/`)                               |
+| Resume page                    | `src/content/pages/resume.md`                                                                     |
+| Art page (gallery)             | `src/content/pages/art.mdx`                                                                       |
+| Music page (players)           | `src/content/pages/music.md`                                                                      |
+| Homepage intro text + hero art | `src/pages/index.astro` (hero image lives in `src/assets/images/home/`)                           |
 
 ## Writing posts
 
@@ -180,7 +180,7 @@ The music page (`src/content/pages/music.md`) is plain markdown with SoundCloud 
 
 ## Posts list
 
-The /posts page shows all posts on one page, newest first. No pagination.
+The /posts page is paginated: 6 posts per page (`posts.perPage` in `astro-paper.config.ts`), newest first, with Prev/Next controls (the theme's `Pagination.astro`; page 2+ shows "Blogs (page 2)" in the breadcrumb via `Breadcrumb.astro`). Page 1 is served at `/posts/`; Astro leaves `/posts/1/` unbuilt and nothing links to it. The homepage's "Recent Blogs" section shows the 3 latest posts (`posts.perIndex`).
 
 ## External links
 
