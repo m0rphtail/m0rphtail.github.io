@@ -3,6 +3,16 @@ title: "Resume"
 description: "Incident response and SOC analyst with 4-5 years across security operations, threat detection, and penetration testing."
 ---
 
+## Contents
+
+- [Summary](#summary)
+- [Skills](#skills)
+- [Work Experience](#work-experience)
+- [Projects](#projects)
+- [Education](#education)
+- [Certifications](#certifications)
+- [Awards & Honors](#awards--honors)
+
 ## Summary
 
 Incident response and SOC analyst with 4-5 years across security operations, threat detection, and penetration testing. Most recently at TD Bank, a top-10 North American bank: triaged 20-25 alerts daily across Microsoft Sentinel, Splunk, Defender, and CrowdStrike, correlating endpoint, network, identity, DLP, and UEBA telemetry, and cut false positives **30%** by tuning SIEM detections and EDR policies. Before that, built custom detections from threat feeds at FileHive and spent two years in offensive security finding **200+** vulnerabilities.

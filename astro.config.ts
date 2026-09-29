@@ -47,8 +47,14 @@ export default defineConfig({
   markdown: {
     processor: unified({
       remarkPlugins: [
-        remarkToc,
-        [remarkCollapse, { test: "Table of contents" }],
+        // remark-toc's default heading regex also matches a bare "Contents"
+        // heading, which would overwrite the hand-written TOC on pages that
+        // use one (resume). Pin it to the exact "Table of contents" heading
+        // the posts use, plus plain "toc".
+        [remarkToc, { heading: "table[ -]of[ -]contents|toc" }],
+        // Collapse whichever spelling the heading uses ("Table of contents"
+        // on posts, "Contents" on the resume page).
+        [remarkCollapse, { test: /^(table[ -]of[ -])?contents$/i }],
       ],
       rehypePlugins: [
         rehypeCallouts,
