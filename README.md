@@ -94,6 +94,7 @@ Content folders starting with `_` are for organization only: their name is dropp
 | Site title, URL, description   | `astro-paper.config.ts` under `site:`                                                   |
 | Social icons (header/footer)   | `astro-paper.config.ts` under `socials:`                                                |
 | Share buttons on posts         | `astro-paper.config.ts` under `shareLinks:`                                             |
+| External links (new-tab)       | `astro.config.ts` under `rehypePlugins` + `src/components/Socials.astro`                |
 | Posts per page / on homepage   | `astro-paper.config.ts` under `posts:`                                                  |
 | Search, back button            | `astro-paper.config.ts` under `features:`                                               |
 | Site colors, light and dark    | `src/styles/theme.css`                                                                  |
@@ -181,6 +182,10 @@ The music page (`src/content/pages/music.md`) is plain markdown with SoundCloud 
 
 The /posts page shows all posts on one page, newest first. No pagination.
 
+## External links
+
+Links to other sites from post bodies, and the social icons in the header and footer, open in a new tab with `rel="noopener noreferrer"`. Body links are rewritten at build time by [rehype-external-links](https://github.com/rehypejs/rehype-external-links), configured under `rehypePlugins` in `astro.config.ts`; the social icons set the attributes themselves in `src/components/Socials.astro`. Only absolute `http(s)` URLs are touched — internal links are never rewritten, and `mailto:` links stay in the same tab.
+
 ## Search
 
 Search uses [Pagefind](https://pagefind.app/), which indexes the built site. Run `npm run build` at least once before the search page works in dev; the page shows a reminder otherwise.
@@ -222,7 +227,7 @@ The previous KC-mark icon and the source upload are archived in the same backup 
 
 Live at <https://kchitnis.com>. GitHub Pages serves from `gh-pages` (custom domain via `public/CNAME`, HTTPS enforced). Every push to `main` runs `.github/workflows/deploy.yml`: pnpm 12.6.0 + Node 26 → lint → format check → build → publish `dist/` to `gh-pages` with JamesIves/github-pages-deploy-action (`clean: true`). The workflow pushes with the repo's `TOKEN` secret on purpose — a push authenticated with the default `GITHUB_TOKEN` does not trigger a GitHub Pages build, so the live site would silently keep serving the old deploy; the checkout step also sets `persist-credentials: false` so the two credentials can't conflict. Pull requests run `.github/workflows/ci.yml` (lint / format / build).
 
-Rollback: `zola-final` tags the last old-Zola build on `gh-pages` — `git push --force origin zola-final:gh-pages` restores it. The pre-cutover git bundle and SHAs are archived at `~/backups/site-cutover-2026-09-28/`.
+Rollback: `zola-final` tags the last old-Zola build on `gh-pages` — `git push --force origin zola-final:gh-pages` restores it. The pre-cutover git bundle, the post-cutover cleanup bundles, and the maintenance scripts are archived at `~/backups/site-cutover-2026-09-28/`.
 
 URL compatibility: the old site served posts at `/blogs/<slug>/`; this build serves `/posts/<slug>/`. The `redirects` map in `astro.config.ts` emits a static redirect page for every post plus the listing and the old `/sitemap.xml` path (37 total, `noindex` so search engines and pagefind skip them), so old links keep working after cutover. If a post moves again, add a matching entry there. Old top-level pages (`/about/`, `/art/`, `/music/`, `/resume/`) kept their paths and need no redirect.
 
@@ -235,6 +240,8 @@ All 35 posts from the old site are converted and committed in `src/content/posts
 - `~/backups/old-migration-2026-09-25/astro-migration.bundle` (git bundle with all 35 converted posts)
 - `~/backups/old-migration-2026-09-25/post-manifest.txt` (list of every converted post: file, title, date)
 - `~/backups/old-migration-2026-09-25/staged-full.patch` (fallback, patch against commit `79a8bf2`)
+
+The migration branches (`clean-astro-migration`, `old-migration`) were deleted on 2026-09-29 during the post-cutover cleanup; these bundles (plus `~/backups/site-cutover-2026-09-28/`) are the recovery path now.
 
 To bring one post over:
 
